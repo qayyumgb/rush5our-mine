@@ -22,6 +22,7 @@ import {
   type ReactNode,
 } from "react";
 import { gsap } from "@/lib/motion/gsap";
+import { parseVideoUrl } from "@/lib/video";
 import { useMotion } from "@/components/motion/MotionProvider";
 import styles from "./VideoPlayer.module.css";
 
@@ -46,14 +47,7 @@ export function useVideoPlayer() {
   return useContext(VideoPlayerContext);
 }
 
-/** Converts a share URL to an autoplaying embed URL, or null if not embeddable. */
-function embedUrl(u: string): string | null {
-  let m = u.match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/);
-  if (m) return `https://www.youtube.com/embed/${m[1]}?autoplay=1&rel=0`;
-  m = u.match(/vimeo\.com\/(\d+)/);
-  if (m) return `https://player.vimeo.com/video/${m[1]}?autoplay=1`;
-  return null;
-}
+// Provider detection and embed-URL building live in lib/video.ts.
 
 export function VideoPlayerProvider({ children }: { children: ReactNode }) {
   const [request, setRequest] = useState<VideoRequest | null>(null);
@@ -115,7 +109,12 @@ export function VideoPlayerProvider({ children }: { children: ReactNode }) {
     return () => document.removeEventListener("keydown", onKey);
   }, [request, close]);
 
-  const embed = request?.url ? embedUrl(request.url) : null;
+  // Vertical formats (TikTok, YouTube Shorts) get a portrait frame; a 16:9
+  // box would letterbox them into a sliver.
+  const parsed = parseVideoUrl(request?.url);
+  const boxClass = [styles.box, parsed.aspect === "portrait" ? styles.boxPortrait : ""]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <VideoPlayerContext.Provider value={{ open, close }}>
@@ -132,15 +131,16 @@ export function VideoPlayerProvider({ children }: { children: ReactNode }) {
             if (e.target === e.currentTarget) close();
           }}
         >
-          <div ref={boxRef} className={styles.box}>
-            {embed ? (
+          <div ref={boxRef} className={boxClass}>
+            {parsed.embedSrc ? (
               <iframe
-                src={embed}
+                src={parsed.embedSrc}
                 title={request.title}
+                // `fullscreen` here covers the legacy `allowFullScreen`
+                // attribute; setting both makes the browser warn.
                 allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-                allowFullScreen
               />
-            ) : request.url ? (
+            ) : parsed.provider === "file" ? (
               <video src={request.url} controls autoPlay playsInline />
             ) : (
               <>

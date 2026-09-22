@@ -168,10 +168,34 @@ a real file, replace the two spans inside `components/ui/Logo.tsx` with an
 
 ### Video links
 
-Set `videoUrl` on any entry in `data/videos.ts` (or `hero.storyVideo.videoUrl`).
-YouTube and Vimeo URLs are converted to embeds automatically; anything else is
-treated as a direct media file. An empty string is safe — the player shows the
-thumbnail with a "coming soon" note instead of breaking.
+Set `videoUrl` on any entry in `data/videos.ts` (or `hero.storyVideo.videoUrl`)
+to the plain share URL — the one the platform's "Copy link" button gives you.
+
+| Platform | Example | Player |
+| --- | --- | --- |
+| TikTok | `https://www.tiktok.com/@rush5our/video/7680567561460731166` | portrait |
+| YouTube | `https://youtu.be/ID` or `watch?v=ID` | landscape |
+| YouTube Shorts | `https://www.youtube.com/shorts/ID` | portrait |
+| Vimeo | `https://vimeo.com/123456789` | landscape |
+| Direct file | `https://…/clip.mp4` | native `<video>` |
+
+Parsing lives in `lib/video.ts`. Tracking parameters (`?is_from_webapp=…`,
+`?si=…`) are ignored, so pasting the whole URL is fine. Vertical formats are
+detected automatically and open in a portrait lightbox.
+
+An empty string is safe — the player shows the thumbnail with a "coming soon"
+note. So is an unrecognised URL: rather than failing silently in a `<video>`
+tag, it falls back to the same poster state.
+
+**Do not paste TikTok's `<blockquote>` embed snippet.** It loads TikTok's
+`embed.js`, which swaps it for TikTok's own card — its chrome, caption and
+author bar, none of it styleable, and it cannot sit inside our lightbox. The
+share link renders the same video in our player.
+
+**Thumbnails:** TikTok's oEmbed endpoint returns one —
+`https://www.tiktok.com/oembed?url=<video url>` → `thumbnail_url`. Those URLs
+are signed and expire, so download the image into `public/assets/images/`
+rather than hotlinking it.
 
 ---
 
@@ -269,11 +293,63 @@ immediately and a CSS rule neutralises remaining animations and transitions.
 
 ---
 
+## Hydration and browser extensions
+
+`<html>` and `<body>` both carry `suppressHydrationWarning` in
+`app/layout.tsx`, for two different reasons:
+
+- **`<html>`** — the pre-paint motion gate adds `.motion` before React
+  hydrates, so the server and client `className` legitimately differ.
+- **`<body>`** — browser extensions stamp attributes onto it before React
+  loads (ColorZilla's `cz-shortcut-listen`, Grammarly's `data-gr-*`, and
+  others). Without this, anyone with such an extension sees a hydration
+  error on every refresh.
+
+Both are scoped to that one element's own attributes. Anything *inside*
+`<body>` still hydrates strictly — verified by injecting an attribute onto a
+child element and confirming React still reports it. Neither element renders
+dynamic attributes of ours, so nothing real is being masked.
+
+---
+
+## Video metrics
+
+**The view counts and durations on screen are mockup figures, not real data.**
+This is a deliberate choice so the client demo matches the approved comp; they
+are to be swapped in one pass before launch. All of them live in
+`data/videos.ts` (`views` and `duration` on each entry).
+
+Real counts cannot come from the oEmbed endpoint that supplies our thumbnails
+— it returns no engagement fields whatsoever. They need TikTok's **Display
+API**:
+
+1. Create a TikTok developer app → client key + client secret
+2. Have the **@rush5our account** authorize it once via OAuth, granting the
+   `video.list` scope
+3. Store the refresh token (an environment variable is enough to start)
+4. Call `/v2/video/query/` server-side for `view_count`, `like_count`,
+   `comment_count`, `share_count`, and cache with ISR (hourly is plenty) so
+   TikTok is not called on every page view
+
+`VideoItem.views` is already optional, so wiring this up changes the loader,
+not the components.
+
+> Scraping the public video page is **not** a supported route. The numbers are
+> present in its embedded JSON, but it breaks TikTok's terms, the page ships
+> captcha/verification machinery, and their bot protection blocks datacenter
+> IPs — so it would fail from Vercel regardless. It is also unreliable: the
+> stats blocks are not tied to the video id in a way that can be attributed
+> confidently.
+
+---
+
 ## Known placeholders
 
 These are intentional and marked in the code:
 
-- `videoUrl` is empty on every video — the player shows a poster instead.
+- `videoUrl` is set only on "$5 or mystery gift"; the rest show a poster.
+- `views` and `duration` on every video are mockup figures — see
+  **Video metrics** above.
 - Social, shop, "view all" and drop links point at `#`.
 - Merch and drop imagery is cut from the client mockup.
 - The fourth featured video reuses the hero photo (no thumbnail supplied).

@@ -24,6 +24,16 @@
     0 0 80px rgba(var(--red-rgb), 0.35);
 }
 
+/* PORTRAIT — TikTok and YouTube Shorts. Sized from the viewport height
+   rather than its width, so a 9:16 video fills the screen vertically
+   instead of being letterboxed inside a 16:9 frame. */
+.boxPortrait {
+  aspect-ratio: 9 / 16;
+  width: auto;
+  height: min(86vh, 900px);
+  max-width: 100%;
+}
+
 .box iframe,
 .box video,
 .box img {

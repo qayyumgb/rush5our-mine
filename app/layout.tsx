@@ -62,7 +62,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           injects stylesheet links and font preloads itself. Rendering our own
           <head> alongside that gives React two sources reconciling the same
           subtree, which shows up as a hydration mismatch. */}
-      <body>
+      {/* `suppressHydrationWarning` on <body> covers browser extensions that
+          stamp attributes onto it before React hydrates — ColorZilla adds
+          cz-shortcut-listen="true", Grammarly adds data-gr-* , and there are
+          others. The page itself renders no dynamic attributes here, so
+          nothing of ours is being hidden, and the exemption covers only
+          <body>'s own attributes: everything inside still hydrates strictly. */}
+      <body suppressHydrationWarning>
         {/* The motion gate runs here, as the first thing in <body>. The
             stylesheet is already parsed, and no [data-a] element exists yet,
             so `.motion` is on <html> before anything could paint un-animated. */}

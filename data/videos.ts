@@ -13,8 +13,36 @@
  *   The section already takes both lists as optional props and falls back to
  *   the constants below, so the swap is a one-line change at the call site.
  *
- *   `videoUrl` accepts a YouTube, Vimeo or direct media URL. Leaving it empty
- *   is safe: the player shows the thumbnail and a "coming soon" note.
+ * ▸ ADDING A VIDEO LINK
+ *   Paste the plain share URL into `videoUrl` — the one a platform's "Copy
+ *   link" button gives you. TikTok, YouTube (including Shorts), Vimeo and
+ *   direct .mp4 files are all understood; see lib/video.ts. Tracking
+ *   parameters (`?is_from_webapp=…`, `?si=…`) are ignored, so pasting the
+ *   whole thing is fine, but the canonical form is kept here for tidiness.
+ *
+ *   Do NOT paste TikTok's <blockquote> embed snippet. It loads TikTok's
+ *   embed.js, which replaces it with TikTok's own card — unstyleable, and it
+ *   cannot sit inside our lightbox. The share link gives the same video.
+ *
+ *   Vertical videos (TikTok, Shorts) are detected automatically and open in
+ *   a portrait player.
+ *
+ *   Leaving `videoUrl` empty is safe: the player shows the thumbnail with a
+ *   "coming soon" note.
+ *
+ * ▸ PLACEHOLDER METRICS — READ BEFORE LAUNCH
+ *   `views` and `duration` on every entry below are the figures drawn in the
+ *   mockup, not real numbers. They are kept on purpose so the client demo
+ *   matches the approved comp, and they are meant to be replaced in one pass
+ *   once the real data is available.
+ *
+ *   This matters most where a video is already real: "$5 or mystery gift"
+ *   plays the genuine TikTok but still shows mockup figures beside it.
+ *
+ *   Real view counts are NOT available from the oEmbed endpoint that supplies
+ *   our thumbnails — it returns no engagement fields at all. They require
+ *   TikTok's Display API (OAuth as @rush5our, `video.list` scope). See the
+ *   "Video metrics" section of the README.
  */
 
 export interface VideoItem {
@@ -90,11 +118,11 @@ export const featuredVideos: VideoItem[] = [
     id: "five-or-mystery",
     title: "$5 or mystery gift",
     subtitle: "Random people. Big wins.",
-    thumbnail: "/assets/images/thumb-5-or-mystery.webp",
+    thumbnail: "/assets/images/thumb-5-or-mystery.jpg",
     thumbnailPosition: "50% 30%",
     duration: "8:21",
     category: "five",
-    videoUrl: "",
+    videoUrl: "https://www.tiktok.com/@rush5our/video/7680567561460731166",
     badge: "Trending",
   },
   {
@@ -139,12 +167,12 @@ export const gridVideos: VideoItem[] = [
     id: "grid-five-or-mystery",
     title: "$5 or mystery gift",
     subtitle: "Random people. Big wins.",
-    thumbnail: "/assets/images/thumb-5-or-mystery.webp",
+    thumbnail: "/assets/images/thumb-5-or-mystery.jpg",
     thumbnailPosition: "50% 12%",
     duration: "8:21",
     views: "98K",
     category: "five",
-    videoUrl: "",
+    videoUrl: "https://www.tiktok.com/@rush5our/video/7680567561460731166",
   },
   {
     id: "grid-rush-hunts",

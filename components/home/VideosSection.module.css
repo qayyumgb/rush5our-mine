@@ -515,23 +515,42 @@
   margin: calc(-35 * var(--u)) 0 0 calc(-35 * var(--u));
   top: 56%;
   border-width: calc(2 * var(--u));
+  /* Opacity is transitioned only here, not on the base `.vplay`: the featured
+     carousel's play button has its opacity driven by GSAP, and a CSS
+     transition would fight those per-frame updates. */
+  transition:
+    transform 0.5s var(--ease-out),
+    opacity 0.35s var(--ease-out),
+    background-color 0.35s,
+    border-color 0.35s,
+    box-shadow 0.5s var(--ease-out);
 }
 
-/* Only the first card shows its play button at rest, as in the mockup —
-   the rest reveal theirs on hover or keyboard focus. */
-.card:not(:first-child) .vplay {
-  opacity: 0;
-  transform: scale(0.7);
-}
+/* PLAY BUTTON VISIBILITY
+   Default (touch, and anything without a hover-capable pointer): every card
+   shows its play button at rest. There is no hover on a phone, so a hidden
+   control would simply be undiscoverable.
 
-.card:hover .vplay,
-.card .vplay:focus-visible {
-  opacity: 1;
-  transform: scale(1);
-}
+   The hover-only behaviour is opt-in via the media query below rather than
+   the other way round, so any device that cannot hover — including
+   hybrid/stylus input — falls back to the visible state. */
+@media (hover: hover) and (pointer: fine) {
+  .card .vplay {
+    opacity: 0;
+    transform: scale(0.7);
+  }
 
-.card:hover .vplay:hover {
-  transform: scale(1.12);
+  /* `:focus-visible` keeps it reachable by keyboard, where there is no
+     hover either. */
+  .card:hover .vplay,
+  .card .vplay:focus-visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .card:hover .vplay:hover {
+    transform: scale(1.12);
+  }
 }
 
 .card .dur {
