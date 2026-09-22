@@ -32,7 +32,14 @@
 
 import { useEffect, useRef } from "react";
 import { gsap, ScrollTrigger, hasFinePointer } from "@/lib/motion/gsap";
-import { EASE, EASE_IO, charsIn, magnetic, writeHand } from "@/lib/motion/helpers";
+import {
+  EASE,
+  EASE_IO,
+  charsIn,
+  magnetic,
+  pauseWhenOffscreen,
+  writeHand,
+} from "@/lib/motion/helpers";
 import { scramble, splitBrLines, splitTitle } from "@/lib/motion/split";
 import { whenIntroReady } from "@/lib/motion/intro";
 import { useMotion } from "@/components/motion/MotionProvider";
@@ -79,30 +86,40 @@ export function HeroSection() {
       /* 2. AMBIENT — start immediately, they belong to the scene not the   */
       /*    entrance                                                        */
       /* ---------------------------------------------------------------- */
-      gsap.to(q(`.${styles.glowBreathe}`), {
+      // OPACITY ONLY, DELIBERATELY.
+      //
+      // This layer holds three gradients at `filter: blur(24-26px)`. Opacity
+      // is a compositor property, so changing it does not re-rasterise them.
+      // Scaling would: the browser has to redraw the blur at the new size on
+      // the main thread, every frame, forever. That kept the main thread busy
+      // even while the page sat idle, and scroll updates then queued behind
+      // it — which is felt as judder, not slowness. The glow still breathes,
+      // by brightness rather than size.
+      const glowLoop = gsap.to(q(`.${styles.glowBreathe}`), {
         opacity: 0.35,
-        scale: 1.06,
         duration: 3.6,
         ease: "sine.inOut",
         yoyo: true,
         repeat: -1,
       });
+
       // An irregular flicker, so the lamp reads as a real light source.
-      gsap.to(q(`.${styles.gLamp}`), {
+      // Opacity-only on a small element — cheap everywhere.
+      const lampLoop = gsap.to(q(`.${styles.gLamp}`), {
         keyframes: { opacity: [1, 0.6, 1, 0.8, 1] },
         duration: 2.4,
         repeat: -1,
         repeatDelay: 1.3,
         ease: "none",
       });
-      gsap.to(q(`.${styles.smoke}`), {
-        xPercent: -6,
-        yPercent: -3,
-        duration: 16,
-        ease: "sine.inOut",
-        yoyo: true,
-        repeat: -1,
-      });
+
+      // The smoke drift is gone for the same reason, only more so: `.smoke`
+      // is an SVG feTurbulence filter with four octaves, and translating it
+      // re-renders that filter on every frame. The smoke itself stays — it is
+      // a static layer now rather than an animated one.
+
+      // Ambient loops idle out when the hero is not on screen.
+      cleanups.push(pauseWhenOffscreen(root, [glowLoop, lampLoop]));
 
       /* ---------------------------------------------------------------- */
       /* 3. SCROLL SCENES                                                  */

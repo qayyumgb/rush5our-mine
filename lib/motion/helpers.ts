@@ -274,25 +274,73 @@ export function lift(el: HTMLElement, distance = 10): () => void {
 }
 
 /** Shared ambient loop for any scroll cue: the line fills, the chevron bobs. */
-export function animateScrollCue(cue: Element) {
+export function animateScrollCue(cue: Element): gsap.core.Animation[] {
   const line = cue.querySelector(".js-cue-line");
   const chev = cue.querySelector(".js-cue-chev");
+  const anims: gsap.core.Animation[] = [];
 
   if (line) {
-    gsap
-      .timeline({ repeat: -1, repeatDelay: 0.35 })
-      .fromTo(
-        line,
-        { scaleY: 0, transformOrigin: "50% 0%" },
-        { scaleY: 1, duration: 0.7, ease: "power2.inOut" },
-      )
-      .set(line, { transformOrigin: "50% 100%" })
-      .to(line, { scaleY: 0, duration: 0.6, ease: "power2.inOut" });
+    anims.push(
+      gsap
+        .timeline({ repeat: -1, repeatDelay: 0.35 })
+        .fromTo(
+          line,
+          { scaleY: 0, transformOrigin: "50% 0%" },
+          { scaleY: 1, duration: 0.7, ease: "power2.inOut" },
+        )
+        .set(line, { transformOrigin: "50% 100%" })
+        .to(line, { scaleY: 0, duration: 0.6, ease: "power2.inOut" }),
+    );
   }
 
   if (chev) {
-    gsap.to(chev, { y: 5, duration: 0.9, ease: "sine.inOut", yoyo: true, repeat: -1 });
+    anims.push(
+      gsap.to(chev, { y: 5, duration: 0.9, ease: "sine.inOut", yoyo: true, repeat: -1 }),
+    );
   }
+
+  return anims;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Idle cost control                                                         */
+/* ------------------------------------------------------------------------ */
+
+/**
+ * Pauses looping animations while `el` is outside the viewport.
+ *
+ * Ambient loops (`repeat: -1`) otherwise run for the entire life of the page,
+ * including for sections nobody can see. Each running tween keeps GSAP's
+ * ticker writing styles every frame, so the main thread never goes idle — and
+ * scroll updates then have to queue behind that work, which is felt as
+ * judder rather than as slowness.
+ *
+ * An IntersectionObserver is used rather than a ScrollTrigger on purpose: it
+ * fires only when the element crosses the boundary, so it adds nothing at all
+ * to the scroll path itself. `rootMargin` wakes the loops slightly before the
+ * section arrives, so nothing visibly starts mid-scroll.
+ *
+ * @returns a cleanup function that disconnects the observer
+ */
+export function pauseWhenOffscreen(
+  el: Element,
+  anims: Array<gsap.core.Animation | null | undefined>,
+): () => void {
+  const list = anims.filter(Boolean) as gsap.core.Animation[];
+  if (list.length === 0) return () => {};
+
+  if (typeof IntersectionObserver === "undefined") return () => {};
+
+  const io = new IntersectionObserver(
+    (entries) => {
+      const visible = entries[0]?.isIntersecting ?? true;
+      list.forEach((a) => (visible ? a.play() : a.pause()));
+    },
+    { rootMargin: "200px 0px" },
+  );
+  io.observe(el);
+
+  return () => io.disconnect();
 }
 
 export { EASE, EASE_IO };

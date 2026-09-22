@@ -12,7 +12,7 @@
 
 import { useEffect, useRef } from "react";
 import { gsap } from "@/lib/motion/gsap";
-import { animateScrollCue } from "@/lib/motion/helpers";
+import { animateScrollCue, pauseWhenOffscreen } from "@/lib/motion/helpers";
 import { useMotion } from "@/components/motion/MotionProvider";
 import styles from "./ScrollCue.module.css";
 
@@ -47,9 +47,16 @@ export function ScrollCue({
   useEffect(() => {
     const el = ref.current;
     if (!el || !ready || reduced) return;
-    // Scoped context so the repeating tweens are killed on unmount.
-    const ctx = gsap.context(() => animateScrollCue(el), el);
-    return () => ctx.revert();
+    // Scoped context so the repeating tweens are killed on unmount, and the
+    // loops idle out whenever the cue is off screen.
+    let stopWatching = () => {};
+    const ctx = gsap.context(() => {
+      stopWatching = pauseWhenOffscreen(el, animateScrollCue(el));
+    }, el);
+    return () => {
+      stopWatching();
+      ctx.revert();
+    };
   }, [ready, reduced]);
 
   return (

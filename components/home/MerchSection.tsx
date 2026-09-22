@@ -25,6 +25,7 @@ import {
   EASE_IO,
   headReveal,
   injectTrace,
+  pauseWhenOffscreen,
   prepareStrokes,
   runTrace,
   tilt,
@@ -124,21 +125,30 @@ export function MerchSection({
       prepareStrokes(root);
 
       /* --- ambient ------------------------------------------------------ */
-      gsap.to(q(`.${styles.dropPulse}, .${styles.barGlow}`), {
+      // Opacity only. These two carry a 30-unit blurred `box-shadow`, so
+      // scaling them forced the browser to redraw that shadow every frame,
+      // on the main thread, for the whole life of the page. The neon still
+      // pulses — by brightness rather than size. Same reasoning as the hero
+      // glow; see the note in HeroSection.tsx.
+      const neonLoop = gsap.to(q(`.${styles.dropPulse}, .${styles.barGlow}`), {
         opacity: 1,
-        scale: 1.015,
         duration: 1.6,
         ease: "sine.inOut",
         yoyo: true,
         repeat: -1,
       });
-      gsap.to(q(`.${styles.stageBg}`), {
+
+      const textureLoop = gsap.to(q(`.${styles.stageBg}`), {
         opacity: 0.7,
         duration: 3,
         ease: "sine.inOut",
         yoyo: true,
         repeat: -1,
       });
+
+      // These sit far below the fold. Without this they ran the entire time
+      // someone was reading the hero.
+      cleanups.push(pauseWhenOffscreen(root, [neonLoop, textureLoop]));
 
       /* --- teaser heading ----------------------------------------------- */
       const copy = q(`.${styles.copy}`)[0] as HTMLElement | undefined;
