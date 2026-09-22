@@ -22,9 +22,11 @@
   --color-r5-muted: #bdbdbd;
   --color-r5-dim: #8a8a8a;
 
-  --font-display: var(--font-display), "Anton", Impact, "Arial Narrow", sans-serif;
+  --font-display:
+    var(--font-display), "Anton", Impact, "Arial Narrow", sans-serif;
   --font-cond: var(--font-cond), "Oswald", "Arial Narrow", sans-serif;
-  --font-body: var(--font-body), "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body:
+    var(--font-body), "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-hand: var(--font-hand), "Sedgwick Ave", "Permanent Marker", cursive;
 }
 
@@ -44,7 +46,8 @@
 
   --f-display: var(--font-display), "Anton", Impact, "Arial Narrow", sans-serif;
   --f-ui: var(--font-cond), "Oswald", "Arial Narrow", sans-serif;
-  --f-body: var(--font-body), "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-body:
+    var(--font-body), "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-hand: var(--font-hand), "Sedgwick Ave", "Permanent Marker", cursive;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -234,7 +237,9 @@ video {
 }
 
 .cz::before {
-  margin-bottom: calc(((var(--lh) - var(--a) - var(--d)) / 2 + var(--a) - var(--c)) * -1em);
+  margin-bottom: calc(
+    ((var(--lh) - var(--a) - var(--d)) / 2 + var(--a) - var(--c)) * -1em
+  );
 }
 
 .cz::after {
@@ -289,42 +294,72 @@ video {
   color: var(--red);
 }
 
-@supports ((-webkit-background-clip: text) or (background-clip: text)) {
-  .grunge .t-white,
-  .grunge .t-red,
-  .grunge.t-white,
-  .grunge.t-red {
-    color: transparent;
-    -webkit-background-clip: text;
-    background-clip: text;
-    background-size: 240px 240px, 300% 100%;
-    background-position: 0 0, 100% 0;
-    background-repeat: repeat, no-repeat;
-  }
+/* GRUNGE TEXT — desktop only, deliberately.
+ *
+ * `splitTitle` pushes the colour class down onto every character, so this
+ * makes each of ~20 glyphs its own `background-clip: text` layer painting a
+ * noise tile plus a 300%-wide gradient. On mobile GPUs that combination —
+ * clip-to-text on many small, simultaneously-transformed layers — both costs
+ * a lot and is prone to dropping glyphs entirely, which is exactly the
+ * "characters missing mid-animation" failure.
+ *
+ * Phones get the same headline as flat colour from `.t-white` / `.t-red`.
+ * The texture is a subtle finish, not the design; losing letters is not.
+ */
+@media (hover: hover) and (pointer: fine) {
+  @supports ((-webkit-background-clip: text) or (background-clip: text)) {
+    .grunge .t-white,
+    .grunge .t-red,
+    .grunge.t-white,
+    .grunge.t-red {
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      background-size:
+        240px 240px,
+        300% 100%;
+      background-position:
+        0 0,
+        100% 0;
+      background-repeat: repeat, no-repeat;
+    }
 
-  .grunge .t-white,
-  .grunge.t-white {
-    background-image: var(--grunge), linear-gradient(100deg, #fff 0 42%, #ffd9d6 50%, #fff 58% 100%);
-  }
+    .grunge .t-white,
+    .grunge.t-white {
+      background-image:
+        var(--grunge),
+        linear-gradient(100deg, #fff 0 42%, #ffd9d6 50%, #fff 58% 100%);
+    }
 
-  .grunge .t-red,
-  .grunge.t-red {
-    background-image: var(--grunge),
-      linear-gradient(100deg, var(--red) 0 42%, #ff7a6e 50%, var(--red) 58% 100%);
-  }
+    .grunge .t-red,
+    .grunge.t-red {
+      background-image:
+        var(--grunge),
+        linear-gradient(
+          100deg,
+          var(--red) 0 42%,
+          #ff7a6e 50%,
+          var(--red) 58% 100%
+        );
+    }
 
-  .sheen .t-white,
-  .sheen .t-red {
-    animation: sheen 1.9s cubic-bezier(0.3, 0.6, 0.2, 1) forwards;
+    .sheen .t-white,
+    .sheen .t-red {
+      animation: sheen 1.9s cubic-bezier(0.3, 0.6, 0.2, 1) forwards;
+    }
   }
 }
 
 @keyframes sheen {
   from {
-    background-position: 0 0, 100% 0;
+    background-position:
+      0 0,
+      100% 0;
   }
   to {
-    background-position: 0 0, 0% 0;
+    background-position:
+      0 0,
+      0% 0;
   }
 }
 
@@ -338,9 +373,13 @@ video {
   white-space: nowrap;
 }
 
+/* No `will-change` here on purpose. A headline splits into ~20 characters, and
+   promoting every one to its own compositor layer for the lifetime of the page
+   costs more memory and paint work than it saves — badly so on phones, where
+   several headlines exist at once. GSAP already promotes what it is actively
+   transforming, which is exactly when promotion helps. */
 .char {
   display: inline-block;
-  will-change: transform;
 }
 
 .sheen .char {

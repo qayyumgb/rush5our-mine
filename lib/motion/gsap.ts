@@ -32,8 +32,14 @@ export function initGsap() {
   // Symmetrical in/out with a fast middle, for wipes.
   CustomEase.create(EASE_IO, "M0,0 C0.77,0 0.18,1 1,1");
 
-  // Keeps ScrollTrigger in sync when the tab is throttled or Lenis drives RAF.
-  gsap.ticker.lagSmoothing(0);
+  // On phones the URL bar hides and shows as you flick-scroll, which changes
+  // the viewport height. By default ScrollTrigger treats that as a resize and
+  // refreshes — recalculating every trigger mid-scroll, which is what makes
+  // in-flight animations stick or jump. Ignoring it is the documented fix.
+  ScrollTrigger.config({ ignoreMobileResize: true });
+
+  // NOTE: lag smoothing is configured by MotionProvider, not here. It depends
+  // on whether Lenis is driving the ticker, which is a per-device decision.
 }
 
 /** True when the visitor has asked for reduced motion. */

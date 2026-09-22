@@ -33,7 +33,7 @@ import {
 } from "react";
 import Lenis from "lenis";
 import { gsap, ScrollTrigger, initGsap } from "@/lib/motion/gsap";
-import { useReducedMotion } from "@/lib/motion/useMediaQuery";
+import { useMediaQuery, useReducedMotion } from "@/lib/motion/useMediaQuery";
 
 interface MotionContextValue {
   /** The visitor asked for reduced motion — skip everything decorative. */
@@ -62,6 +62,8 @@ export function MotionProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
   const lenisRef = useRef<Lenis | null>(null);
   const reduced = useReducedMotion();
+  /* Touch devices get native scrolling — see the smooth-scroll effect. */
+  const touch = useMediaQuery("(pointer: coarse)", false);
 
   /**
    * Scroll locking is reference-counted. The preloader, the nav drawer, the
@@ -89,11 +91,24 @@ export function MotionProvider({ children }: { children: ReactNode }) {
   }, []);
 
   /* --- smooth scroll ---------------------------------------------------- */
-  // Skipped entirely under reduced motion: hijacking the scroll wheel is
-  // exactly the kind of movement that setting asks us to avoid.
+  // Skipped under reduced motion (hijacking the wheel is exactly the movement
+  // that setting asks us to avoid) AND on touch devices.
+  //
+  // Lenis does not smooth touch scrolling unless `syncTouch` is enabled, so on
+  // a phone it adds a RAF loop and a second source of scroll updates without
+  // smoothing anything. Worse, driving ScrollTrigger from Lenis while the
+  // browser runs native momentum scrolling means two systems reporting scroll
+  // position, which is what makes animations stick during a fast flick.
+  // Native scroll plus ScrollTrigger's own listener is the better-tested path.
   useEffect(() => {
     initGsap();
-    if (reduced) return;
+    if (reduced || touch) {
+      // Without Lenis driving the ticker, keep GSAP's default lag smoothing.
+      // It caps how far time can jump after a long frame, so a dropped frame
+      // shows as a brief slowdown rather than the animation teleporting.
+      gsap.ticker.lagSmoothing(500, 33);
+      return;
+    }
 
     const instance = new Lenis({
       duration: 1.15,
@@ -103,14 +118,17 @@ export function MotionProvider({ children }: { children: ReactNode }) {
     instance.on("scroll", ScrollTrigger.update);
     const tick = (time: number) => instance.raf(time * 1000);
     gsap.ticker.add(tick);
+    // Lenis drives the loop itself, so smoothing would fight it here.
+    gsap.ticker.lagSmoothing(0);
     lenisRef.current = instance;
 
     return () => {
       gsap.ticker.remove(tick);
       instance.destroy();
       lenisRef.current = null;
+      gsap.ticker.lagSmoothing(500, 33);
     };
-  }, [reduced]);
+  }, [reduced, touch]);
 
   /* --- in-page anchors --------------------------------------------------- */
   // Handled here rather than per-link so every section behaves the same,
@@ -153,8 +171,17 @@ export function MotionProvider({ children }: { children: ReactNode }) {
       ScrollTrigger.refresh();
     });
 
+    // Refresh again once images have loaded. Trigger positions measured
+    // before the hero photo and thumbnails have height are simply wrong, and
+    // a trigger whose start is in the wrong place either fires late or never
+    // fires at all — which reads as an animation randomly not running.
+    const onLoad = () => ScrollTrigger.refresh();
+    if (document.readyState === "complete") onLoad();
+    else window.addEventListener("load", onLoad);
+
     return () => {
       cancelled = true;
+      window.removeEventListener("load", onLoad);
     };
   }, []);
 
