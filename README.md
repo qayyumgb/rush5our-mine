@@ -319,9 +319,44 @@ This is a deliberate choice so the client demo matches the approved comp; they
 are to be swapped in one pass before launch. All of them live in
 `data/videos.ts` (`views` and `duration` on each entry).
 
-Real counts cannot come from the oEmbed endpoint that supplies our thumbnails
-— it returns no engagement fields whatsoever. They need TikTok's **Display
-API**:
+Neither platform's oEmbed endpoint carries metrics — TikTok's and YouTube's
+both return title/author/thumbnail and nothing else. Real counts need a
+proper API, and the two platforms differ enormously in what that costs:
+
+| | YouTube Data API v3 | TikTok Display API |
+| --- | --- | --- |
+| Auth | API key | OAuth; account owner authorizes |
+| App review | not required | required, days–weeks |
+| Terms/Privacy URLs | not required | required |
+| Domain verification | not required | required |
+| Token upkeep | none | refresh tokens rotate/expire |
+
+**Prefer YouTube where the content exists on both.** It avoids every blocker
+below, including the Terms/Privacy pages the site does not yet have.
+
+### YouTube (recommended)
+
+1. Google Cloud project → enable **YouTube Data API v3** → create an API key
+2. Keep the key server-side only (env var); we fetch during ISR, never from
+   the browser
+3. `videos.list?part=statistics,contentDetails,snippet&id=…` returns
+   `viewCount`, `likeCount`, `commentCount`, `duration` and thumbnails —
+   up to 50 ids per call
+
+Quota is generous: 10,000 units/day, and `videos.list` costs 1 unit per call
+regardless of id count. Hourly revalidation is roughly 24 units/day.
+
+The whole grid could also be driven from the channel: `channels.list` →
+uploads playlist → `playlistItems.list` (1 unit), so new uploads appear with
+no code change.
+
+> Do not show one platform's view count beside another platform's embed. The
+> same video can have wildly different numbers on TikTok and YouTube, so the
+> player and the metric must come from the same source per video.
+
+### TikTok
+
+If a video exists only on TikTok, its counts need the **Display API**:
 
 1. Create a TikTok developer app → client key + client secret
 2. Have the **@rush5our account** authorize it once via OAuth, granting the
@@ -350,7 +385,7 @@ These are intentional and marked in the code:
 - `videoUrl` is set only on "$5 or mystery gift"; the rest show a poster.
 - `views` and `duration` on every video are mockup figures — see
   **Video metrics** above.
-- Social, shop, "view all" and drop links point at `#`.
+- Social links are live. Shop, "view all", drop and legal links still point at `#`.
 - Merch and drop imagery is cut from the client mockup.
 - The fourth featured video reuses the hero photo (no thumbnail supplied).
 - `submitContact` logs and resolves rather than sending.

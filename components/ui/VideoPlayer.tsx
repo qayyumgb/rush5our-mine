@@ -93,7 +93,19 @@ export function VideoPlayerProvider({ children }: { children: ReactNode }) {
       gsap.fromTo(
         boxRef.current,
         { scale: 0.9, y: 30, opacity: 0 },
-        { scale: 1, y: 0, opacity: 1, duration: 0.7, ease: "expo.out" },
+        {
+          scale: 1,
+          y: 0,
+          opacity: 1,
+          duration: 0.7,
+          ease: "expo.out",
+          // Essential, not tidiness: GSAP would otherwise leave an inline
+          // `transform: matrix(1,0,0,1,0,0)` behind. An identity transform
+          // still makes this element the containing block for `position:
+          // fixed` descendants — and a fullscreen element is position:fixed,
+          // so fullscreen would anchor to this box instead of the screen.
+          clearProps: "transform",
+        },
       );
     });
     return () => ctx.revert();

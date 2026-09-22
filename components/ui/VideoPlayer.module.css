@@ -42,7 +42,42 @@
   width: 100%;
   height: 100%;
   border: 0;
+}
+
+/* The poster may be cropped to fill its frame — it is decoration. */
+.box img {
   object-fit: cover;
+}
+
+/* Real media must never be cropped: `cover` would cut the edges off the
+   picture. The box is already sized to the right aspect, so `contain` only
+   letterboxes in the rare mismatch. */
+.box video {
+  object-fit: contain;
+  background: #000;
+}
+
+/* FULLSCREEN
+   Drop our framing so the player owns the whole screen. Sizes are in
+   viewport units rather than percentages: a fullscreen element is
+   `position: fixed`, and percentages resolve against its containing block —
+   which any transformed or filtered ancestor would hijack. Viewport units
+   are immune to that. (`:fullscreen` and `:-webkit-full-screen` must be
+   separate rules: one unknown selector would invalidate the whole group.) */
+.box iframe:fullscreen,
+.box video:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  object-fit: contain;
+}
+
+.box iframe:-webkit-full-screen,
+.box video:-webkit-full-screen {
+  width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  object-fit: contain;
 }
 
 /* Shown when a video URL hasn't been wired up yet — the poster stays

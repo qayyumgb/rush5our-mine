@@ -312,10 +312,12 @@
 /* Footer                                                                    */
 /* ------------------------------------------------------------------------ */
 
+/* Measured from mockup 6: border at y1430, wordmark cap top y1474,
+   links baseline y1578, mockup bottom y1655. */
 .footer {
   margin-top: calc(61 * var(--u));
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding: calc(47 * var(--u)) 0 calc(78 * var(--u));
+  padding: calc(44 * var(--u)) 0 calc(77 * var(--u));
 }
 
 .footerInner {
@@ -326,20 +328,24 @@
   margin-inline: auto;
 }
 
+/* Cap-trimmed (`.f-display cz` in the markup) so the box top sits on the cap
+   top — otherwise the padding above it measures to the ascender, dropping the
+   wordmark ~3 units below where the mockup has it. */
 .footerWord {
-  font-family: var(--f-display);
-  font-size: calc(36 * var(--u));
-  line-height: 1;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  /* `display: block` is required: `.cz` trims leading with `display: table`
+     pseudo-elements, which have no effect inside an inline box. */
+  display: block;
+  --lh: 1;
+  font-size: calc(38 * var(--u));
+  letter-spacing: 0.01em;
   color: var(--white);
 }
 
 .footerTag {
-  --lh: 1.66;
-  margin-top: calc(21 * var(--u));
-  font-size: calc(15 * var(--u));
-  letter-spacing: 0.26em;
+  --lh: 1.45;
+  margin-top: calc(22 * var(--u));
+  font-size: calc(16.5 * var(--u));
+  letter-spacing: 0.2em;
   font-weight: 500;
   color: #8a8a8a;
 }
@@ -350,21 +356,24 @@
 
 .footerRight {
   display: flex;
-  align-items: flex-start;
-  gap: calc(34 * var(--u));
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+/* The divider belongs to the socials row only. In the mockup the link row
+   below is wider and starts to the LEFT of the divider (x543 vs x602), which
+   is impossible if the divider is a sibling of the whole right-hand column. */
+.socialsRow {
+  display: flex;
+  align-items: center;
+  gap: calc(62 * var(--u));
 }
 
 .footerSep {
-  width: 1px;
-  /* Runs from the socials down past the link row. */
-  height: calc(104 * var(--u));
+  width: max(1px, calc(1.5 * var(--u)));
+  /* 57 units in the mockup — it spans the icon row, not the whole column. */
+  height: calc(57 * var(--u));
   background: rgba(255, 255, 255, 0.14);
-}
-
-.footerCol {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
 }
 
 .socials {
@@ -385,18 +394,19 @@
 }
 
 .socials svg {
-  width: calc(38 * var(--u));
-  height: calc(38 * var(--u));
+  width: calc(34 * var(--u));
+  height: calc(34 * var(--u));
 }
 
 .footerLinks {
   display: flex;
-  gap: calc(40 * var(--u));
-  margin-top: calc(34 * var(--u));
+  gap: calc(36 * var(--u));
+  /* From the bottom of the socials row (divider bottom) to the link caps. */
+  margin-top: calc(37 * var(--u));
 }
 
 .footerLinks a {
-  font-size: calc(15 * var(--u));
+  font-size: calc(13.7 * var(--u));
   letter-spacing: 0.16em;
   font-weight: 500;
   text-transform: uppercase;

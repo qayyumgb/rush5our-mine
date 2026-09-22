@@ -36,13 +36,27 @@
  *   matches the approved comp, and they are meant to be replaced in one pass
  *   once the real data is available.
  *
+ *   EXCEPTION: "Picking up girls" now shows its real YouTube figures —
+ *   1,332 views, looked up on 2026-09-22, and a 6:08 duration that happens
+ *   to match what the mockup already had. The view count is a STATIC
+ *   SNAPSHOT and will drift as the video gains views; only the API makes it
+ *   self-updating.
+ *
  *   This matters most where a video is already real: "$5 or mystery gift"
  *   plays the genuine TikTok but still shows mockup figures beside it.
  *
- *   Real view counts are NOT available from the oEmbed endpoint that supplies
- *   our thumbnails — it returns no engagement fields at all. They require
- *   TikTok's Display API (OAuth as @rush5our, `video.list` scope). See the
- *   "Video metrics" section of the README.
+ *   Real view counts are NOT available from the oEmbed endpoints that supply
+ *   our thumbnails — neither TikTok's nor YouTube's returns any engagement
+ *   field. They need a proper API:
+ *
+ *     • YouTube — an API key is enough (public stats need no OAuth), and one
+ *       call also returns duration and thumbnails. By far the easier path.
+ *     • TikTok  — OAuth as @rush5our plus app review.
+ *
+ *   Keep the metric and the player on the same platform per video: the same
+ *   clip can have very different counts on each.
+ *
+ *   See the "Video metrics" section of the README for both setups.
  */
 
 export interface VideoItem {
@@ -107,11 +121,11 @@ export const featuredVideos: VideoItem[] = [
     id: "picking-up-girls",
     title: "Picking up girls",
     subtitle: "Real convos. Real reactions.",
-    thumbnail: "/assets/images/thumb-30-seconds.webp",
+    thumbnail: "/assets/images/thumb-picking-up-girls.jpg",
     thumbnailPosition: "50% 0%",
     duration: "6:08",
     category: "girls",
-    videoUrl: "",
+    videoUrl: "https://youtu.be/dAV-rudZcS4",
     badge: "Latest",
   },
   {
@@ -156,12 +170,12 @@ export const gridVideos: VideoItem[] = [
     id: "grid-picking-up-girls",
     title: "Picking up girls",
     subtitle: "Real convos. Real reactions.",
-    thumbnail: "/assets/images/thumb-30-seconds.webp",
+    thumbnail: "/assets/images/thumb-picking-up-girls.jpg",
     thumbnailPosition: "100% 50%",
     duration: "6:08",
-    views: "125K",
+    views: "1,332",
     category: "girls",
-    videoUrl: "",
+    videoUrl: "https://youtu.be/dAV-rudZcS4",
   },
   {
     id: "grid-five-or-mystery",

@@ -41,12 +41,20 @@ export const navLinks: NavLink[] = [
   { label: "FAQ", href: "#faq" },
 ];
 
-/** SOCIALS: swap the placeholder hrefs for the real profile URLs. */
+/**
+ * SOCIALS — rendered in both the footer and the nav drawer, in this order
+ * (which matches mockup 6).
+ *
+ * URLs are stored canonically, with the share-tracking parameters stripped:
+ * `?si=`, `?igsh=`, `?_r=&_t=`, `?s=`. Those identify the device and session
+ * of whoever copied the link, so they do not belong in the repository — and
+ * every profile resolves without them.
+ */
 export const socialLinks: SocialLink[] = [
-  { label: "Instagram", href: "#", icon: "instagram" },
-  { label: "TikTok", href: "#", icon: "tiktok" },
-  { label: "YouTube", href: "#", icon: "youtube" },
-  { label: "X", href: "#", icon: "x" },
+  { label: "Instagram", href: "https://www.instagram.com/rush5our", icon: "instagram" },
+  { label: "TikTok", href: "https://www.tiktok.com/@rush5our", icon: "tiktok" },
+  { label: "YouTube", href: "https://www.youtube.com/@RUSH5OUR", icon: "youtube" },
+  { label: "X", href: "https://x.com/RUSH5OUR", icon: "x" },
 ];
 
 /** Footer utility links. */

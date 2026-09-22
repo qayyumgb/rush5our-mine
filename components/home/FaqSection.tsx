@@ -277,7 +277,7 @@ export function FaqSection({ items = defaultItems }: FaqSectionProps) {
       <footer className={styles.footer}>
         <div className={styles.footerInner}>
           <div>
-            <span className={styles.footerWord}>
+            <span className={`${styles.footerWord} f-display cz`}>
               {site.wordmark.light}
               <span className="text-red">{site.wordmark.accent}</span>
             </span>
@@ -288,8 +288,10 @@ export function FaqSection({ items = defaultItems }: FaqSectionProps) {
           </div>
 
           <div className={styles.footerRight}>
-            <span className={styles.footerSep} aria-hidden="true" />
-            <div className={styles.footerCol}>
+            {/* The divider is scoped to the icon row so the wider link row
+                below can extend past it to the left, as in the mockup. */}
+            <div className={styles.socialsRow}>
+              <span className={styles.footerSep} aria-hidden="true" />
               <div className={styles.socials}>
                 {socialLinks.map((s) => (
                   <a
@@ -303,15 +305,15 @@ export function FaqSection({ items = defaultItems }: FaqSectionProps) {
                   </a>
                 ))}
               </div>
-
-              <nav className={styles.footerLinks} aria-label="Footer">
-                {footerLinks.map((l) => (
-                  <a key={l.label} href={l.href}>
-                    {l.label}
-                  </a>
-                ))}
-              </nav>
             </div>
+
+            <nav className={styles.footerLinks} aria-label="Footer">
+              {footerLinks.map((l) => (
+                <a key={l.label} href={l.href} className="f-sans cz caps">
+                  {l.label}
+                </a>
+              ))}
+            </nav>
           </div>
         </div>
       </footer>
