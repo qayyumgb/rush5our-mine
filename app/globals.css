@@ -297,9 +297,16 @@ video {
   -webkit-text-stroke: 0.02em currentColor;
 }
 
+/* Deliberately unpromoted. Nothing transforms `.line-inner` — `charsIn`
+   animates the `.char` spans inside it — but this is the element that carries
+   the grunge via `background-clip: text`, where `color` is `transparent` and
+   the glyphs are only a stencil for the background image. Giving it a standing
+   GPU layer puts that texture at the mercy of layer eviction: when a tile is
+   re-rasterised and the background fails to paint, the characters in it render
+   as nothing, while still being present and selectable. Left in the normal
+   paint path the text rasterises with the document and stays robust. */
 .line-inner {
   display: block;
-  will-change: transform;
 }
 
 .t-white {
@@ -545,4 +552,39 @@ html.lenis {
   stroke-width: 1.6;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+/* -------------------------------------------------------------------------
+   DIAGNOSTIC — `?plain=1`
+
+   TEMPORARY. Loading any page with `?plain=1` repaints the display headlines
+   as solid colour instead of a noise texture clipped to the glyphs. Nothing
+   else changes: same fonts, same sizes, same animation, same scroll.
+
+   It exists to settle one question on a real device. If the headline stops
+   losing characters with `?plain=1` and loses them without it, the cause is
+   `background-clip: text` failing to rasterise — because that is the only
+   difference between the two. If characters still go missing with `?plain=1`,
+   the texture is innocent and the cause is elsewhere.
+
+   Delete this block, and the `data-plain` line in MOTION_GATE, once the
+   question is answered.
+   ------------------------------------------------------------------------- */
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  :root[data-plain] .grunge .t-white,
+  :root[data-plain] .grunge.t-white {
+    color: var(--white);
+    background-image: none;
+  }
+
+  :root[data-plain] .grunge .t-red,
+  :root[data-plain] .grunge.t-red {
+    color: var(--red);
+    background-image: none;
+  }
+
+  :root[data-plain] .sheen .t-white,
+  :root[data-plain] .sheen .t-red {
+    animation: none;
+  }
 }

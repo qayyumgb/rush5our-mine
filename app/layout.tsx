@@ -47,6 +47,7 @@ export const viewport: Viewport = {
  * script that didn't run.
  */
 const MOTION_GATE = `(function(){var d=document.documentElement;
+if(location.search.indexOf('plain=1')>-1)d.setAttribute('data-plain','');
 if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
 d.classList.add('motion');
 setTimeout(function(){if(!d.classList.contains('motion-ready'))d.classList.remove('motion');},4000);})();`;
