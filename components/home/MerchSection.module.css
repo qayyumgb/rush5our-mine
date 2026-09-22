@@ -59,7 +59,7 @@
 .sub {
   --lh: 1.345;
   margin-top: calc(15 * var(--u));
-  font-size: calc(22.3 * var(--u));
+  font-size: max(10px, calc(22.3 * var(--u)));
   color: #c4c4c4;
 }
 
@@ -117,7 +117,7 @@
 
 .badge p {
   --lh: 1.25;
-  font-size: calc(12.8 * var(--u));
+  font-size: max(7px, calc(12.8 * var(--u)));
   letter-spacing: 0.07em;
   font-weight: 600;
   color: #d6d6d6;
@@ -308,7 +308,7 @@
 .progIntro {
   --lh: 1.266;
   margin-top: calc(19 * var(--u));
-  font-size: calc(23.7 * var(--u));
+  font-size: max(10px, calc(23.7 * var(--u)));
   color: #cfcfcf;
 }
 
@@ -677,7 +677,7 @@
   left: calc(447 * var(--u));
   top: calc(64 * var(--u));
   --lh: 1.62;
-  font-size: calc(17.9 * var(--u));
+  font-size: max(10px, calc(17.9 * var(--u)));
   letter-spacing: 0.189em;
   font-weight: 400;
   color: #d4d4d4;
@@ -686,4 +686,22 @@
 .barTags span {
   display: block;
   white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Badge row on phones                                                       */
+/* ------------------------------------------------------------------------ */
+
+/* Below ~600px the badge copy hits its floor while the row around it keeps
+   scaling down with `--u`, so the three badges grow relative to their column
+   and run into the product shot. The icons stay at full mockup size — only
+   the gaps tighten, and the copy takes the reduction (7px floor). */
+@media (max-width: 600px) {
+  .badges {
+    gap: calc(18 * var(--u));
+  }
+
+  .badge {
+    gap: calc(7 * var(--u));
+  }
 }

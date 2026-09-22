@@ -416,7 +416,9 @@
   left: calc(50 * var(--u));
   top: calc(69 * var(--u));
   --lh: 1.854;
-  font-size: calc(15.1 * var(--u));
+  /* 8px floor for phones — this sits in a narrow column beside the divider,
+     so it takes a smaller floor than the body copy. */
+  font-size: max(8px, calc(15.1 * var(--u)));
   letter-spacing: 0.319em;
   font-weight: 500;
   color: #cfcfcf;

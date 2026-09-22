@@ -187,7 +187,10 @@
 .cellBody {
   --lh: 1.37;
   margin-top: calc(27 * var(--u));
-  font-size: calc(24 * var(--u));
+  /* 10px floor for phones: at 950-unit scale this copy would render at under
+     10px on a 390px screen. On wider screens the unit value wins, so the
+     mockup proportions are preserved. */
+  font-size: max(10px, calc(24 * var(--u)));
   color: #bdbdbd;
 }
 

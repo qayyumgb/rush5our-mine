@@ -67,7 +67,8 @@
 .sub {
   --lh: 1.38;
   margin-top: calc(34 * var(--u));
-  font-size: calc(27.5 * var(--u));
+  /* 10px floor for phones — see the note in CultureSection.module.css. */
+  font-size: max(10px, calc(27.5 * var(--u)));
   color: #bdbdbd;
 }
 
