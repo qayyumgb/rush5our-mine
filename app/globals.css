@@ -204,7 +204,6 @@ video {
   --a: 1.176;
   --d: 0.329;
   --c: 0.859;
-  --lh: 0.9;
 }
 
 .f-sans {
@@ -212,7 +211,6 @@ video {
   --a: 0.969;
   --d: 0.241;
   --c: 0.728;
-  --lh: 1.2;
 }
 
 .f-cond {
@@ -220,6 +218,29 @@ video {
   --a: 1.193;
   --d: 0.289;
   --c: 0.81;
+}
+
+/* -------------------------------------------------------------------------
+   DEFAULT LINE HEIGHTS — deliberately zero-specificity.
+
+   `--a`, `--d` and `--c` above are font facts and must not be overridden.
+   `--lh` is different: nearly every section sets its own, measured from the
+   mockup.
+
+   These are wrapped in `:where()` so they carry no specificity at all. A
+   plain `.f-display { --lh: .9 }` ties with a section's `.cellTitle { --lh:
+   1.46 }` — both are one class — and the tie is broken by source order, which
+   puts this file last. That silently defeated all 25 per-element line heights
+   in the section stylesheets, collapsing two-line titles into each other.
+   With `:where()`, any section rule wins, and these apply only when nothing
+   else has spoken.
+   ------------------------------------------------------------------------- */
+:where(.f-display) {
+  --lh: 0.9;
+}
+
+:where(.f-sans),
+:where(.f-cond) {
   --lh: 1.2;
 }
 

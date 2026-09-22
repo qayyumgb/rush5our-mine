@@ -147,7 +147,11 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  height: calc(527 * var(--u));
+  /* `min-height`, not `height`: 527 units is the mockup's card, but the copy
+     now uses its intended 1.3 line height and needs a little more room at
+     some widths. The grid stretches all three cards to the tallest, so they
+     stay equal and the composition still matches — it just cannot clip. */
+  min-height: calc(527 * var(--u));
   padding: calc(38 * var(--u)) calc(19 * var(--u)) calc(34 * var(--u)) calc(38 * var(--u));
   border-radius: calc(14 * var(--u));
   background: linear-gradient(180deg, #0f0f10 0%, #0a0a0b 100%);
@@ -260,8 +264,12 @@
   margin-top: calc(25 * var(--u));
   font-size: var(--fs-body, calc(20.3 * var(--u)));
   color: #bdbdbd;
-  /* Pushes the icon and link to the bottom regardless of copy length. */
-  flex: 1;
+  /* Pushes the icon and link to the bottom regardless of copy length.
+     `1 0 auto`, not `1`: the shorthand `flex: 1` means `flex-basis: 0`, which
+     tells the card to size itself as though this copy had no height at all —
+     so the text silently overflowed the card. `auto` keeps its real height in
+     the calculation while it still grows into any spare space. */
+  flex: 1 0 auto;
 }
 
 .cardIcon {
