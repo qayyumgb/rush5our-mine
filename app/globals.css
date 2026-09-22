@@ -359,9 +359,18 @@ video {
   white-space: nowrap;
 }
 
+/* No `will-change` here, deliberately. `.line-inner` carries the grunge via
+   `background-clip: text` and is already promoted as a single layer; promoting
+   each char as well splits that layer, so the glyph rasterises in a child layer
+   while the background it clips lives in the parent. Some mobile GPU drivers
+   (seen on a Galaxy S25 Ultra, not on a Redmi Note 10) lose the clip on
+   re-raster and drop the glyph entirely — the headline "breaks" during *slow*
+   scrolling, which is exactly when re-rasterisation happens most; fast
+   scrolling reuses a cached texture and looks fine. GSAP's default
+   `force3D: "auto"` still promotes each char for the duration of the entrance
+   tween and releases it after, which is the only time they actually move. */
 .char {
   display: inline-block;
-  will-change: transform;
 }
 
 .sheen .char {

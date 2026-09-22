@@ -135,9 +135,18 @@
   height: 124%;
   opacity: 0.2;
   mix-blend-mode: screen;
-  will-change: transform;
   -webkit-mask-image: radial-gradient(120% 75% at 70% 20%, #000 20%, transparent 75%);
   mask-image: radial-gradient(120% 75% at 70% 20%, #000 20%, transparent 75%);
+}
+
+/* Only the pointer parallax moves the smoke (see `hasFinePointer()` in the
+   section), so it is only worth a layer there. On touch it never transforms,
+   and a permanently promoted `mix-blend-mode: screen` layer cannot composite
+   on its own — it re-reads and re-blends the backdrop on every scroll frame. */
+@media (hover: hover) and (pointer: fine) {
+  .smoke {
+    will-change: transform;
+  }
 }
 
 /* Red light that trails the cursor across the hero (fine pointers only). */
