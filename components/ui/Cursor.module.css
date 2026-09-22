@@ -1,0 +1,82 @@
+/* CUSTOM CURSOR — a fast red dot with a slower trailing ring.
+   Fine pointers only; never rendered on touch. */
+
+.cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 95;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.hidden {
+  opacity: 0;
+}
+
+.dot,
+.ring {
+  position: fixed;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background: var(--red);
+  box-shadow: 0 0 10px var(--red);
+}
+
+.ring {
+  width: 38px;
+  height: 38px;
+  margin: -19px 0 0 -19px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transition:
+    width 0.5s var(--ease-out),
+    height 0.5s var(--ease-out),
+    margin 0.5s var(--ease-out),
+    background-color 0.35s,
+    border-color 0.35s;
+}
+
+.label {
+  font-family: var(--f-ui);
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Over any interactive element: the ring grows and tints red. */
+.hover .ring {
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  background: rgba(var(--red-rgb), 0.12);
+  border-color: rgba(var(--red-rgb), 0.85);
+}
+
+/* Over an element with data-cursor: the ring fills and shows its label. */
+.labelled .ring {
+  width: 86px;
+  height: 86px;
+  margin: -43px 0 0 -43px;
+  background: var(--red);
+  border-color: var(--red);
+}
+
+.labelled .label {
+  opacity: 1;
+}
+
+.labelled .dot {
+  opacity: 0;
+}

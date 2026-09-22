@@ -1,0 +1,47 @@
+/* SCROLL CUE — tracked label, a filling red line, and a bobbing chevron.
+   The line's fill and the chevron bob are GSAP loops (`animateScrollCue`);
+   only the hover colour change lives in CSS. */
+
+.cue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.label {
+  font-weight: 500;
+  color: #bdbdbd;
+  transition: color 0.3s;
+  --lh: 1;
+}
+
+.cue:hover .label {
+  color: #fff;
+}
+
+/* The track. Its inner <i> is the part that fills and drains. */
+.line {
+  position: relative;
+  display: block;
+  background: rgba(var(--red-rgb), 0.22);
+  overflow: hidden;
+}
+
+.line i {
+  position: absolute;
+  inset: 0;
+  background: var(--red);
+  box-shadow: 0 0 8px var(--red);
+}
+
+.chev {
+  overflow: visible;
+}
+
+.chev path {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

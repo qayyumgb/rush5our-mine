@@ -1,0 +1,86 @@
+/* VIDEO PLAYER — full-screen lightbox shared by every play button. */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.86);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.box {
+  position: relative;
+  width: min(1100px, 100%);
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 0 80px rgba(var(--red-rgb), 0.35);
+}
+
+.box iframe,
+.box video,
+.box img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  object-fit: cover;
+}
+
+/* Shown when a video URL hasn't been wired up yet — the poster stays
+   visible behind it so the layout still reads as a real player. */
+.soon {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.soon strong {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: clamp(28px, 5vw, 56px);
+  text-transform: uppercase;
+}
+
+.soon span {
+  font-size: 12px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 26px;
+  line-height: 1;
+  transition:
+    background-color 0.3s,
+    transform 0.4s var(--ease-out);
+}
+
+.close:hover {
+  background: var(--red);
+  transform: rotate(90deg);
+}

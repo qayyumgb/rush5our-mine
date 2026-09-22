@@ -1,0 +1,115 @@
+/* PRELOADER — a branded hold that covers the font load and the hero's first
+   paint, then wipes away in two staggered panels (black, then red). */
+
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+
+/* The red panel sits beneath the black one and leaves a beat later, which is
+   what gives the wipe its two-tone edge. */
+.red {
+  position: absolute;
+  inset: 0;
+  background: var(--red);
+}
+
+.panel {
+  position: absolute;
+  inset: 0;
+  background: var(--black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(60% 40% at 50% 50%, rgba(var(--red-rgb), 0.14), transparent 70%);
+}
+
+.center {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Fixed-size mark — the preloader is viewport-centred, not mockup-scaled. */
+.mark {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  background: var(--red);
+  transform: skewX(-7deg);
+  box-shadow: 0 0 22px -4px rgba(var(--red-rgb), 0.55);
+}
+
+.mark span {
+  font-family: var(--f-display);
+  font-size: 26px;
+  line-height: 1;
+  color: #0a0a0a;
+  transform: skewX(-8deg);
+}
+
+.word {
+  overflow: hidden;
+  padding-top: 0.06em;
+}
+
+.wordInner {
+  display: block;
+  font-family: var(--f-display);
+  font-size: 36px;
+  line-height: 1.05;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.bottom {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: 26px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.tag {
+  font-weight: 500;
+  font-size: 9px;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.count {
+  font-family: var(--f-display);
+  font-size: clamp(44px, 12vw, 104px);
+  line-height: 0.9;
+  font-variant-numeric: tabular-nums;
+}
+
+.bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.bar i {
+  position: absolute;
+  inset: 0;
+  background: var(--red);
+  transform: scaleX(0);
+  transform-origin: left;
+  box-shadow: 0 0 14px var(--red);
+}

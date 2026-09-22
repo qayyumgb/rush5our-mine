@@ -1,0 +1,209 @@
+/* NAV — fixed header, mockup-measured in --nu units (the nav's own scale,
+   capped so the bar doesn't become enormous on wide screens). */
+
+.nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 50;
+  height: calc(120 * var(--nu));
+  border-bottom: 1px solid transparent;
+  will-change: transform;
+  transition:
+    background-color 0.5s var(--ease-out),
+    border-color 0.5s,
+    backdrop-filter 0.5s;
+}
+
+/* Once the page has moved, the bar earns a background so the logo stays
+   legible over photography. */
+.scrolled {
+  background: rgba(4, 4, 4, 0.8);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.inner {
+  position: relative;
+  height: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 calc(46 * var(--nu)) 0 calc(34 * var(--nu));
+}
+
+/* Reading-progress hairline pinned to the bottom edge of the bar. */
+.progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--red);
+  transform: scaleX(0);
+  transform-origin: left;
+  box-shadow: 0 0 10px rgba(var(--red-rgb), 0.8);
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Burger                                                                  */
+/* ---------------------------------------------------------------------- */
+
+.burger {
+  position: relative;
+  z-index: 2;
+  width: calc(54 * var(--nu));
+  height: calc(33 * var(--nu));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.burger span {
+  display: block;
+  height: calc(4.5 * var(--nu));
+  min-height: 2px;
+  width: 100%;
+  background: var(--white);
+  transform-origin: right center;
+  transition:
+    transform 0.45s var(--ease-out),
+    opacity 0.3s,
+    background-color 0.3s;
+}
+
+/* Middle bar retracts on hover — a small sign of life before the click. */
+.burger:hover span:nth-child(2) {
+  transform: scaleX(0.6);
+  background: var(--red);
+}
+
+.burgerOpen span:nth-child(1) {
+  transform: translateY(calc(14 * var(--nu))) rotate(45deg);
+  transform-origin: center;
+}
+
+.burgerOpen span:nth-child(2) {
+  opacity: 0;
+}
+
+.burgerOpen span:nth-child(3) {
+  transform: translateY(calc(-14 * var(--nu))) rotate(-45deg);
+  transform-origin: center;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Drawer                                                                  */
+/* ---------------------------------------------------------------------- */
+
+.drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: calc(160 * var(--nu)) clamp(24px, 7vw, 96px) 10vh;
+  background: #050505;
+  /* Clipped closed; the open animation wipes it down from the top. */
+  clip-path: inset(0 0 100% 0);
+  visibility: hidden;
+  overflow-y: auto;
+}
+
+/* Non-JS / reduced-motion fallback: a plain open state. */
+.drawerOpen {
+  clip-path: inset(0 0 0 0);
+  visibility: visible;
+}
+
+/* The same layered red glow as the rest of the site, pooled top-right. */
+.drawerGlow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 45% at 85% 10%, rgba(var(--red-rgb), 0.22), transparent 70%),
+    radial-gradient(70% 50% at 10% 100%, rgba(var(--red-rgb), 0.1), transparent 70%);
+}
+
+.drawerList {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 2.2vh, 26px);
+}
+
+.drawerItem {
+  overflow: hidden;
+}
+
+.drawerLink {
+  display: inline-flex;
+  align-items: baseline;
+  gap: clamp(12px, 2vw, 24px);
+  font-family: var(--f-display);
+  font-size: clamp(34px, 9vw, 86px);
+  line-height: 1.02;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--white);
+  transition: color 0.4s var(--ease-out);
+}
+
+.drawerLink:hover {
+  color: var(--red);
+}
+
+/* Index numerals, sized against the link they label. */
+.drawerIndex {
+  font-family: var(--f-body);
+  font-size: clamp(11px, 1.6vw, 15px);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--red);
+  transform: translateY(-0.55em);
+}
+
+.drawerFoot {
+  position: relative;
+  margin-top: clamp(28px, 6vh, 64px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(16px, 4vw, 34px);
+}
+
+.drawerTag {
+  font-size: clamp(10px, 1.4vw, 13px);
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.drawerSocials {
+  display: flex;
+  gap: clamp(14px, 3vw, 26px);
+}
+
+.drawerSocials a {
+  color: var(--muted);
+  transition:
+    color 0.35s,
+    transform 0.45s var(--ease-out);
+}
+
+.drawerSocials a:hover {
+  color: var(--red);
+  transform: translateY(-3px);
+}
+
+.drawerSocials svg {
+  width: clamp(20px, 3.4vw, 26px);
+  height: clamp(20px, 3.4vw, 26px);
+}

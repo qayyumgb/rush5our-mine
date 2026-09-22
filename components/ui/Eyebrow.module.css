@@ -1,0 +1,28 @@
+/* EYEBROW — the tracked red label + hairline that opens every section.
+   Sizes and gaps come from the section (each mockup tracks it differently);
+   only the structure and colour live here. */
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  color: var(--red);
+  font-weight: 500;
+}
+
+/* Centred variant — sections 5 and 6 put a rule on both sides. */
+.centred {
+  justify-content: center;
+}
+
+.rule {
+  display: block;
+  flex: none;
+  background: var(--red);
+  /* Scaled from the label outward on reveal. */
+  transform-origin: left;
+}
+
+/* The left-hand rule grows the other way, so the pair opens symmetrically. */
+.ruleLeft {
+  transform-origin: right;
+}

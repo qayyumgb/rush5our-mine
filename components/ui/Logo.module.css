@@ -1,0 +1,44 @@
+/* Logo — the skewed red "R5" tile plus the RUSH5OUR wordmark.
+   Sizes are mockup pixels scaled by --nu (the nav unit). */
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: calc(20 * var(--nu));
+}
+
+/* MARK — recreated in CSS to match the mockup exactly.
+   ▸ SWAP for the real logo file: replace the <Logo> internals with
+     <Image src="/assets/images/r5-logo.svg" ... /> and delete these rules. */
+.mark {
+  display: grid;
+  place-items: center;
+  width: calc(76 * var(--nu));
+  height: calc(78 * var(--nu));
+  background: var(--red);
+  transform: skewX(-7deg);
+  box-shadow: 0 0 22px -4px rgba(var(--red-rgb), 0.55);
+  transition: box-shadow 0.4s;
+}
+
+.mark span {
+  font-family: var(--f-display);
+  font-size: calc(38 * var(--nu));
+  line-height: 1;
+  color: #0a0a0a;
+  /* Counter-skew so the letters stand upright inside the slanted tile. */
+  transform: skewX(-8deg);
+  letter-spacing: 0.01em;
+}
+
+.word {
+  font-family: var(--f-display);
+  font-size: calc(37.2 * var(--nu));
+  letter-spacing: 0.062em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.logo:hover .mark {
+  box-shadow: 0 0 30px 0 rgba(var(--red-rgb), 0.8);
+}

@@ -1,0 +1,18 @@
+/* HandAccent — structural only. The visual treatment (`.hand`, `.hand-line`,
+   `.hand-underline`) is global because the motion system selects on it, and
+   every position/size comes from the consuming section's stylesheet. */
+
+.accent {
+  /* Reset any inherited text alignment so lines hang from the left edge. */
+  text-align: left;
+}
+
+.hand {
+  /* Placeholder hook — sections set font-size, colour and --rot here. */
+  margin: 0;
+}
+
+.underline {
+  /* Placeholder hook — sections set inset and size here. */
+  pointer-events: none;
+}

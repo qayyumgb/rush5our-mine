@@ -1,0 +1,613 @@
+/* =========================================================================
+   HERO — section 1.
+
+   Every number below is a pixel measured off the hero mockup (1.png, an
+   882 x 1536 phone frame) multiplied by `--hu`, the hero unit. That keeps
+   the composition proportionally identical to the mockup at any width.
+
+   `--cu` scales the copy block specifically, so the desktop composition can
+   shrink the type independently of the photo and accents.
+
+   Layers, back to front:
+     bgParallax → photo → glow/smoke/flash → shade → dim → accents → copy
+   ========================================================================= */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  /* Never shorter than the viewport, never shorter than the mockup ratio. */
+  height: max(calc(1536 * var(--hu)), 100vh);
+  height: max(calc(1536 * var(--hu)), 100svh);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Background stack                                                          */
+/* ------------------------------------------------------------------------ */
+
+.bgParallax,
+.bg {
+  position: absolute;
+  inset: 0;
+}
+
+/* Negative z-index keeps the whole background behind the section's own
+   content without needing a stacking value on every foreground layer. */
+.bgParallax {
+  z-index: -1;
+  will-change: transform;
+}
+
+/* A red-to-black gradient behind the photo, so the edges never go flat. */
+.bg {
+  background: linear-gradient(180deg, #1c0405, #070404 60%, var(--black));
+}
+
+.photo {
+  position: absolute;
+  inset: 0;
+  /* Scales from the subject's head, not the centre of the frame. */
+  transform-origin: 50% 30%;
+  will-change: transform;
+}
+
+.photo picture {
+  position: absolute;
+  inset: 0;
+}
+
+.img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 0%;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Living light — layered radial gradients + blur, breathing on a loop       */
+/* ------------------------------------------------------------------------ */
+
+.glowBreathe {
+  position: absolute;
+  inset: 0;
+  /* `screen` adds light rather than painting over the photo. */
+  mix-blend-mode: screen;
+  opacity: 0.55;
+  transform-origin: 75% 25%;
+}
+
+.glow {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* The big flare behind the subject's right shoulder. */
+.gFlare {
+  width: 110%;
+  aspect-ratio: 1;
+  right: -45%;
+  top: -18%;
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 52, 40, 0.55),
+    rgba(214, 12, 12, 0.3) 40%,
+    transparent 75%
+  );
+  filter: blur(24px);
+}
+
+/* Soft red wash filling the upper half. */
+.gBack {
+  width: 75%;
+  aspect-ratio: 1;
+  left: 30%;
+  top: 8%;
+  background: radial-gradient(closest-side, rgba(255, 45, 40, 0.28), transparent 72%);
+  filter: blur(26px);
+}
+
+/* The hot point of light — the street lamp in the mockup. */
+.gLamp {
+  width: 26%;
+  aspect-ratio: 1;
+  left: 74%;
+  top: 30%;
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 90, 80, 0.55),
+    rgba(255, 20, 20, 0.18) 50%,
+    transparent 75%
+  );
+  filter: blur(10px);
+}
+
+/* Generated smoke, masked into the top-right so it only drifts where the
+   flare already is. */
+.smoke {
+  position: absolute;
+  inset: -12%;
+  width: 124%;
+  height: 124%;
+  opacity: 0.2;
+  mix-blend-mode: screen;
+  will-change: transform;
+  -webkit-mask-image: radial-gradient(120% 75% at 70% 20%, #000 20%, transparent 75%);
+  mask-image: radial-gradient(120% 75% at 70% 20%, #000 20%, transparent 75%);
+}
+
+/* Red light that trails the cursor across the hero (fine pointers only). */
+.glowPointer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 560px;
+  height: 560px;
+  margin: -280px 0 0 -280px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 40, 40, 0.18),
+    rgba(255, 20, 20, 0.05) 55%,
+    transparent 75%
+  );
+  mix-blend-mode: screen;
+}
+
+/* Vignette that darkens top and bottom so the nav and copy stay legible,
+   and resolves to solid black at the very bottom to meet section 2. */
+.shade {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(4, 4, 4, 0.35) 0%,
+    transparent 14%,
+    transparent 40%,
+    rgba(4, 4, 4, 0.35) 62%,
+    rgba(4, 4, 4, 0.7) 86%,
+    var(--black) 100%
+  );
+}
+
+/* A single camera-flash pop during the load timeline. */
+.flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+  background: radial-gradient(
+    70% 55% at 78% 22%,
+    rgba(255, 70, 55, 0.9),
+    rgba(255, 20, 20, 0.3) 45%,
+    transparent 75%
+  );
+}
+
+/* Scrubbed to 0.7 as the hero scrolls away, handing off to section 2. */
+.dim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: var(--black);
+  opacity: 0;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Copy block — anchored to the bottom, as in the mockup                     */
+/* ------------------------------------------------------------------------ */
+
+.copy {
+  position: absolute;
+  z-index: 5;
+  left: calc(46 * var(--cu));
+  bottom: calc(323 * var(--cu));
+}
+
+.rule {
+  display: block;
+  width: calc(60 * var(--cu));
+  height: calc(3.5 * var(--cu));
+  background: var(--red);
+  margin-bottom: calc(28 * var(--cu));
+  transform-origin: left;
+}
+
+.title .l1 {
+  font-size: calc(129.2 * var(--cu));
+  letter-spacing: -0.013em;
+  /* Pulls the first glyph flush left, cancelling its side bearing. */
+  margin-left: -0.02em;
+}
+
+.title .l2 {
+  font-size: calc(123.3 * var(--cu));
+  letter-spacing: 0.069em;
+  margin-top: calc(16 * var(--cu));
+  margin-left: -0.02em;
+}
+
+.sub {
+  --lh: 1.553;
+  margin-top: calc(35 * var(--cu));
+  font-size: calc(20.6 * var(--cu));
+  letter-spacing: 0.319em;
+  font-weight: 500;
+  color: #cfcfcf;
+}
+
+.ctas {
+  margin-top: calc(41 * var(--cu));
+  display: flex;
+  align-items: center;
+}
+
+.btn {
+  width: calc(422 * var(--cu));
+  height: calc(95 * var(--cu));
+  gap: calc(30 * var(--cu));
+  font-family: var(--f-ui);
+  font-weight: 600;
+  font-size: calc(27.2 * var(--cu));
+  letter-spacing: 0.09em;
+}
+
+.btn svg {
+  width: calc(32 * var(--cu));
+  height: calc(20 * var(--cu));
+}
+
+/* ------------------------------------------------------------------------ */
+/* Play button + label                                                       */
+/* ------------------------------------------------------------------------ */
+
+.playGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(31 * var(--cu));
+  margin-left: calc(39 * var(--cu));
+}
+
+.play {
+  position: relative;
+  width: calc(103 * var(--cu));
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: calc(4 * var(--cu)) solid var(--red);
+  display: grid;
+  place-items: center;
+  background: rgba(4, 4, 4, 0.35);
+  box-shadow:
+    0 0 22px -6px rgba(var(--red-rgb), 0.6),
+    inset 0 0 14px -4px rgba(var(--red-rgb), 0.45);
+  transition:
+    background-color 0.4s,
+    box-shadow 0.45s var(--ease-out),
+    transform 0.45s var(--ease-out);
+}
+
+.play svg {
+  width: 30%;
+  /* Optical centring: a triangle's visual centre sits left of its box. */
+  margin-left: 8%;
+  transition: transform 0.45s var(--ease-out);
+}
+
+/* A ring that pulses outward on a slow loop, like a radar ping. */
+.play::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--red-rgb), 0.8);
+  opacity: 0;
+  pointer-events: none;
+}
+
+:global(.motion) .play::after {
+  animation: ring 3s var(--ease-out) 3s infinite;
+}
+
+@keyframes ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  70%,
+  100% {
+    transform: scale(1.65);
+    opacity: 0;
+  }
+}
+
+.playGroup:hover .play {
+  background: var(--red);
+  transform: scale(1.06);
+  box-shadow: 0 0 40px 0 rgba(255, 30, 30, 0.65);
+}
+
+.playGroup:hover .play svg {
+  transform: scale(1.12);
+}
+
+.playLabel {
+  --lh: 1.676;
+  font-weight: 600;
+  font-size: calc(17.9 * var(--cu));
+  letter-spacing: 0.124em;
+  color: #f2f2f2;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Accents — positions read straight off the mockup                          */
+/* ------------------------------------------------------------------------ */
+
+.accentMore {
+  left: calc(48 * var(--hu));
+  top: calc(168 * var(--hu));
+}
+
+.accentMore :global(.hand) {
+  font-size: calc(33.8 * var(--hu));
+  line-height: 1.42;
+  color: #a9a9ae;
+}
+
+.accentMoreUnderline {
+  left: calc(8 * var(--hu));
+  top: calc(134 * var(--hu));
+  width: calc(100 * var(--hu));
+  height: calc(28 * var(--hu));
+}
+
+.accentMoreUnderline path {
+  stroke-width: 4;
+}
+
+/* Tracked-caps block, top right. Not handwritten — this one is set type. */
+.accentTags {
+  position: absolute;
+  z-index: 4;
+  right: calc(34 * var(--hu));
+  top: calc(211 * var(--hu));
+  width: calc(161 * var(--hu));
+  will-change: transform;
+}
+
+.tags {
+  --lh: 1.788;
+  font-weight: 500;
+  font-size: calc(13.7 * var(--hu));
+  letter-spacing: 0.322em;
+  color: #cfcfcf;
+  white-space: nowrap;
+}
+
+.tags span {
+  display: block;
+}
+
+.tagsRule {
+  display: block;
+  width: calc(55 * var(--hu));
+  height: calc(4 * var(--hu));
+  background: var(--red);
+  margin-top: calc(28 * var(--hu));
+  transform-origin: left;
+}
+
+.accentSame {
+  left: calc(752 * var(--hu));
+  bottom: calc(560 * var(--hu));
+}
+
+.accentSame :global(.hand) {
+  font-size: calc(20.7 * var(--hu));
+  line-height: 1.6;
+  color: #8f8f94;
+}
+
+.accentSameUnderline {
+  left: calc(10 * var(--hu));
+  bottom: calc(-24 * var(--hu));
+  width: calc(56 * var(--hu));
+  height: calc(14 * var(--hu));
+}
+
+.accentMoments {
+  left: calc(50 * var(--hu));
+  bottom: calc(170 * var(--hu));
+}
+
+.accentMoments :global(.hand) {
+  font-size: calc(24.5 * var(--hu));
+  line-height: 1.22;
+  color: #8f8f94;
+}
+
+.accentMomentsUnderline {
+  left: calc(12 * var(--hu));
+  bottom: calc(-26 * var(--hu));
+  width: calc(58 * var(--hu));
+  height: calc(16 * var(--hu));
+}
+
+/* ------------------------------------------------------------------------ */
+/* Scroll cue                                                                */
+/* ------------------------------------------------------------------------ */
+
+.cueWrap {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  bottom: calc(90 * var(--hu));
+  transform: translateX(-50%);
+}
+
+/* The trailing letter-space is padded back on so the tracked caps still
+   look optically centred. */
+.cueLabel {
+  font-size: calc(13.7 * var(--hu));
+  letter-spacing: 0.445em;
+  padding-left: 0.445em;
+}
+
+.cueLine {
+  width: calc(3 * var(--hu));
+  height: calc(42 * var(--hu));
+  margin-top: calc(23 * var(--hu));
+}
+
+.cueChev {
+  width: calc(23 * var(--hu));
+  height: calc(12 * var(--hu));
+  margin-top: calc(19 * var(--hu));
+}
+
+/* ========================================================================= */
+/* TABLET PORTRAIT                                                           */
+/* Keeps the phone composition, but stops it outgrowing the screen height.   */
+/* ========================================================================= */
+
+@media (min-width: 640px) and (orientation: portrait) {
+  .hero {
+    /* 0.5742 is the mockup's aspect ratio (882 ÷ 1536). */
+    --hu: calc(min(100vw, 100vh * 0.5742) / 882);
+    --hu: calc(min(100vw, 100svh * 0.5742) / 882);
+    --cu: var(--hu);
+    /* Half the leftover width, used to re-centre the composition. */
+    --gutter: calc((100vw - 882 * var(--hu)) / 2);
+  }
+
+  .copy,
+  .accentMore,
+  .accentMoments {
+    left: calc(46 * var(--hu) + var(--gutter));
+  }
+
+  .accentMoments {
+    left: calc(50 * var(--hu) + var(--gutter));
+  }
+
+  .accentSame {
+    left: calc(752 * var(--hu) + var(--gutter));
+  }
+
+  .accentTags {
+    right: calc(34 * var(--hu) + var(--gutter));
+  }
+}
+
+/* ========================================================================= */
+/* DESKTOP / LANDSCAPE                                                       */
+/* The mockup is phone-only, so this is the same system recomposed on a      */
+/* 1440 x 860 canvas: subject right of centre, copy bottom-left, accents     */
+/* framing the figure. Type is scaled to 0.74 so the headline stays a        */
+/* headline rather than a billboard.                                         */
+/* ========================================================================= */
+
+@media (min-width: 1024px), (orientation: landscape) and (min-width: 640px) {
+  .hero {
+    --hu: min(calc(100vw / 1440), calc(100vh / 860));
+    --hu: min(calc(100vw / 1440), calc(100svh / 860));
+    --cu: calc(var(--hu) * 0.74);
+    --x0: calc((100vw - 1440 * var(--hu)) / 2);
+
+    height: 100vh;
+    height: 100svh;
+    min-height: 380px;
+  }
+
+  /* Push the subject right of centre and feather the left edge so the copy
+     sits on clean darkness rather than on the photo. */
+  .photo picture {
+    left: 14%;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 24%);
+    mask-image: linear-gradient(90deg, transparent, #000 24%);
+  }
+
+  .img {
+    object-position: 50% 24%;
+  }
+
+  .shade {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(4, 4, 4, 0.4) 0%,
+        transparent 16%,
+        transparent 55%,
+        rgba(4, 4, 4, 0.75) 88%,
+        var(--black) 100%
+      ),
+      linear-gradient(90deg, rgba(4, 4, 4, 0.55), transparent 55%);
+  }
+
+  .gFlare {
+    width: 70%;
+    right: -18%;
+    top: -40%;
+  }
+
+  .gBack {
+    width: 45%;
+    left: 42%;
+    top: -5%;
+  }
+
+  .gLamp {
+    width: 14%;
+    left: 78%;
+    top: 34%;
+  }
+
+  .copy {
+    left: calc(var(--x0) + 120 * var(--hu));
+    bottom: calc(175 * var(--hu));
+  }
+
+  .accentMore {
+    left: calc(var(--x0) + 120 * var(--hu));
+    top: calc(128 * var(--hu));
+  }
+
+  .accentTags {
+    right: calc(var(--x0) + 110 * var(--hu));
+    top: calc(150 * var(--hu));
+  }
+
+  .accentSame {
+    left: auto;
+    right: calc(var(--x0) + 120 * var(--hu));
+    bottom: calc(300 * var(--hu));
+  }
+
+  .accentMoments {
+    left: calc(var(--x0) + 990 * var(--hu));
+    bottom: calc(120 * var(--hu));
+  }
+
+  .cueWrap {
+    bottom: calc(30 * var(--hu));
+  }
+}
+
+/* Short landscape (a phone turned sideways): drop the two accents that would
+   otherwise collide with the copy. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .accentMore,
+  .accentMoments {
+    display: none;
+  }
+}

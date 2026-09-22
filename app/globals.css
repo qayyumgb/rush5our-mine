@@ -1,0 +1,518 @@
+@import "tailwindcss";
+
+/* =========================================================================
+   RUSH 5OUR — global tokens, resets and typography primitives.
+
+   Section-specific measurements live in co-located CSS Modules. This file
+   only holds what genuinely is global: theme tokens, the reset, and the
+   typography utilities that every section shares.
+   ========================================================================= */
+
+/* -------------------------------------------------------------------------
+   TAILWIND THEME (v4 CSS-first config)
+   Exposes the brand tokens to Tailwind utilities: bg-black, text-red,
+   font-display, etc. Mirrors lib/theme.ts.
+   ------------------------------------------------------------------------- */
+@theme {
+  --color-r5-red: #eb151f;
+  --color-r5-red-hot: #ff2b2b;
+  --color-r5-black: #040404;
+  --color-r5-card: #0d0d0e;
+  --color-r5-white: #f4f4f4;
+  --color-r5-muted: #bdbdbd;
+  --color-r5-dim: #8a8a8a;
+
+  --font-display: var(--font-display), "Anton", Impact, "Arial Narrow", sans-serif;
+  --font-cond: var(--font-cond), "Oswald", "Arial Narrow", sans-serif;
+  --font-body: var(--font-body), "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-hand: var(--font-hand), "Sedgwick Ave", "Permanent Marker", cursive;
+}
+
+/* -------------------------------------------------------------------------
+   DESIGN TOKENS — colours sampled from the mockups
+   ------------------------------------------------------------------------- */
+:root {
+  --red: #eb151f;
+  --red-rgb: 235, 21, 31;
+  --red-hot: #ff2b2b;
+  --black: #040404;
+  --card: #0d0d0e;
+  --white: #f4f4f4;
+  --muted: #bdbdbd;
+  --dim: #8a8a8a;
+  --line: rgba(255, 255, 255, 0.16);
+
+  --f-display: var(--font-display), "Anton", Impact, "Arial Narrow", sans-serif;
+  --f-ui: var(--font-cond), "Oswald", "Arial Narrow", sans-serif;
+  --f-body: var(--font-body), "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-hand: var(--font-hand), "Sedgwick Ave", "Permanent Marker", cursive;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ---------------------------------------------------------------------
+     LAYOUT UNITS — how the mockups become responsive CSS.
+
+     The mockups are phone frames: the hero is 882px wide, sections 2-6 are
+     950px wide. 1 unit = 1 mockup pixel, so every size in the section
+     stylesheets is the number literally measured off the mockup. On larger
+     screens the units stop growing and the page becomes a centred column
+     (the hero gets its own desktop composition in HeroSection.module.css).
+     --------------------------------------------------------------------- */
+  --u: calc(min(100vw, 1040px) / 950); /* sections 2-6 */
+  --hu: calc(100vw / 882); /* hero (phone)  */
+  --cu: var(--hu); /* hero copy     */
+  --nu: calc(min(100vw, 560px) / 882); /* nav           */
+
+  /* Film grain + torn-paper grunge, generated so they cost no requests. */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* The feColorMatrix MUST stay inside <filter>: it throws away the
+     turbulence's colour (rows 1-3 are zero → black) and rebuilds the alpha
+     channel as 2.4·R − 1.5, so only the brightest ~37% of the noise shows,
+     as sparse black distress specks. Closing </filter> before it leaves the
+     rect painted with raw full-colour turbulence, which greys out white text
+     and desaturates red to salmon. */
+  --grunge: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2.4 0 0 0 -1.5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+
+/* -------------------------------------------------------------------------
+   RESET / BASE
+   ------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--black);
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--f-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+/* -------------------------------------------------------------------------
+   MOTION GATE
+
+   `.motion` is added to <html> by an inline script before paint, but only
+   when motion is allowed. Elements marked [data-a] stay hidden until GSAP
+   has set their entrance state, which prevents a flash of un-animated
+   content. A failsafe in that same script removes `.motion` if the
+   animation system never boots, so content can never stay invisible.
+   ------------------------------------------------------------------------- */
+.motion [data-a] {
+  visibility: hidden;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Fixed film-grain overlay sitting above the whole page. */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  background-image: var(--grain);
+  background-size: 220px;
+  opacity: 0.06;
+}
+
+/* -------------------------------------------------------------------------
+   CAP-HEIGHT TRIM (`.cz`)
+
+   Browsers pad text boxes with leading, so a margin of "35px" never matches
+   the 35px measured between two baselines on a mockup. `.cz` cancels that
+   leading with negative margins derived from the font's own metrics, so the
+   box starts exactly at the cap top and ends at the last baseline. Every gap
+   in the section stylesheets is therefore the literal mockup value.
+
+   --a / --d  font ascent & descent (must match the overrides in fonts.ts)
+   --c        cap height ÷ unitsPerEm
+   --lh       line-height for this element
+   ------------------------------------------------------------------------- */
+.f-display {
+  font-family: var(--f-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  /* NOTE: no text-stroke here. It lives on `.line` (the large headline
+     construct) instead — see the comment there. Applying it to every display
+     element made small type look blurry on phones. */
+  --a: 1.176;
+  --d: 0.329;
+  --c: 0.859;
+  --lh: 0.9;
+}
+
+.f-sans {
+  font-family: var(--f-body);
+  --a: 0.969;
+  --d: 0.241;
+  --c: 0.728;
+  --lh: 1.2;
+}
+
+.f-cond {
+  font-family: var(--f-ui);
+  --a: 1.193;
+  --d: 0.289;
+  --c: 0.81;
+  --lh: 1.2;
+}
+
+.cz {
+  line-height: var(--lh);
+}
+
+.cz::before,
+.cz::after {
+  content: "";
+  display: table;
+}
+
+.cz::before {
+  margin-bottom: calc(((var(--lh) - var(--a) - var(--d)) / 2 + var(--a) - var(--c)) * -1em);
+}
+
+.cz::after {
+  margin-top: calc(((var(--lh) - var(--a) - var(--d)) / 2 + var(--d)) * -1em);
+}
+
+.caps {
+  text-transform: uppercase;
+}
+
+.text-red {
+  color: var(--red);
+}
+
+/* -------------------------------------------------------------------------
+   DISPLAY HEADLINES
+
+   Each headline line is a masked box (`.line`) wrapping a transform target
+   (`.line-inner`), which is what lets characters rise from behind the mask
+   on entrance. The grunge treatment paints the text with a noise texture
+   plus a diagonal highlight that sweeps across once on reveal (`.sheen`).
+   ------------------------------------------------------------------------- */
+.line {
+  display: block;
+  overflow: hidden;
+  /* Breathing room so ascenders/descenders aren't clipped by the mask. */
+  padding-block: 0.05em;
+  margin-block: -0.05em;
+  white-space: nowrap;
+  /* A hair of stroke matches the mockup's optical weight on the big display
+     headlines. It is scoped to `.line` on purpose: a stroke narrower than a
+     device pixel cannot be drawn crisply, so the browser renders it as a soft
+     halo around every glyph. At phone widths the small display text (card
+     titles, drop names, FAQ questions, feature titles) sits at 10-19px, where
+     0.02em is 0.2-0.4px — pure haze. Headlines using `.line` are 28px+ even
+     on a small phone, where the stroke lands close enough to a whole pixel to
+     read as weight rather than blur. Inherited by `.line-inner` and the split
+     `.char` spans, and `em` resolves against this element's own font-size. */
+  -webkit-text-stroke: 0.02em currentColor;
+}
+
+.line-inner {
+  display: block;
+  will-change: transform;
+}
+
+.t-white {
+  color: var(--white);
+}
+
+.t-red {
+  color: var(--red);
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .grunge .t-white,
+  .grunge .t-red,
+  .grunge.t-white,
+  .grunge.t-red {
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    background-size: 240px 240px, 300% 100%;
+    background-position: 0 0, 100% 0;
+    background-repeat: repeat, no-repeat;
+  }
+
+  .grunge .t-white,
+  .grunge.t-white {
+    background-image: var(--grunge), linear-gradient(100deg, #fff 0 42%, #ffd9d6 50%, #fff 58% 100%);
+  }
+
+  .grunge .t-red,
+  .grunge.t-red {
+    background-image: var(--grunge),
+      linear-gradient(100deg, var(--red) 0 42%, #ff7a6e 50%, var(--red) 58% 100%);
+  }
+
+  .sheen .t-white,
+  .sheen .t-red {
+    animation: sheen 1.9s cubic-bezier(0.3, 0.6, 0.2, 1) forwards;
+  }
+}
+
+@keyframes sheen {
+  from {
+    background-position: 0 0, 100% 0;
+  }
+  to {
+    background-position: 0 0, 0% 0;
+  }
+}
+
+.glow-text {
+  filter: drop-shadow(0 0 26px rgba(var(--red-rgb), 0.28));
+}
+
+/* Split-text nodes created at runtime by lib/motion/split.ts */
+.word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.char {
+  display: inline-block;
+  will-change: transform;
+}
+
+.sheen .char {
+  animation-delay: calc(var(--i) * 40ms) !important;
+}
+
+/* Masked sub-lines used for line-by-line fade-ups. */
+.sub-line {
+  display: block;
+  overflow: hidden;
+}
+
+.sub-line-inner {
+  display: block;
+}
+
+/* -------------------------------------------------------------------------
+   HANDWRITTEN ACCENTS
+
+   Each line tilts and skews on its own, like a marker pen on the mockups,
+   and reveals left-to-right as if being written. The underline is an SVG
+   path with `pathLength="1"` so it can be drawn with a dash offset of 1→0.
+   ------------------------------------------------------------------------- */
+.hand {
+  font-family: var(--f-hand);
+  text-transform: uppercase;
+  color: #bdbdc2;
+  pointer-events: none;
+  /* NO text-stroke here, deliberately. Painting an outline over the fill
+     roughly doubles the apparent stroke weight: measured against the mockup,
+     stroke width as a fraction of the text block's height is 0.013–0.018,
+     while a 0.045em outline pushed it to 0.032–0.036. The marker lettering is
+     meant to read as thin and dry, so the glyphs are left at their natural
+     weight. */
+}
+
+.hand-line {
+  display: block;
+  white-space: nowrap;
+  transform: rotate(var(--rot, -12deg)) skewX(-12deg);
+  transform-origin: 0 100%;
+}
+
+.hand-underline {
+  position: absolute;
+  overflow: visible;
+}
+
+.hand-underline path {
+  fill: none;
+  stroke: var(--red);
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+}
+
+.hand-underline.is-grey path {
+  stroke: rgba(200, 200, 200, 0.6);
+  stroke-width: 3;
+}
+
+.accent {
+  position: absolute;
+  z-index: 4;
+  will-change: transform;
+}
+
+/* -------------------------------------------------------------------------
+   SHARED INTERACTION PRIMITIVES
+   ------------------------------------------------------------------------- */
+
+/* Wrapper for magnetic buttons — JS translates this, not the button itself,
+   so the button keeps its own hover transform. */
+.magnet {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* Section frame: a 950-unit column, centred. */
+.frame {
+  position: relative;
+  width: calc(950 * var(--u));
+  margin-inline: auto;
+}
+
+/* A light that travels around a border. Injected by the motion system into
+   cards, the CTA bar and the featured carousel. */
+@property --angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.card-trace {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  padding: 1.5px;
+  pointer-events: none;
+  opacity: 0;
+  background: conic-gradient(
+    from var(--angle),
+    transparent 0deg 250deg,
+    rgba(255, 60, 45, 0.9) 318deg,
+    #fff 342deg,
+    rgba(255, 60, 45, 0.9) 352deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  filter: drop-shadow(0 0 6px rgba(255, 40, 30, 0.85));
+}
+
+/* -------------------------------------------------------------------------
+   LENIS SMOOTH SCROLL
+   ------------------------------------------------------------------------- */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+html.lenis {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* -------------------------------------------------------------------------
+   REDUCED MOTION — the global kill switch.
+
+   The JS system already skips every decorative timeline; this catches CSS
+   animations and transitions that would otherwise still run.
+   ------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   CUSTOM CURSOR
+
+   The native cursor is only hidden once <Cursor> has actually mounted and
+   added `.has-cursor`, so a JS failure can never leave the page pointerless.
+   ------------------------------------------------------------------------- */
+.has-cursor,
+.has-cursor * {
+  cursor: none !important;
+}
+
+/* -------------------------------------------------------------------------
+   LINE ICONS
+
+   `.i-stroke` is both a style and a marker: `prepareStrokes` finds every one
+   of these paths and sets its dash array to its own length, so the motion
+   system can draw the icon on. Colour and weight are set by each context
+   (red inside icon rings, white on the merch badges).
+   ------------------------------------------------------------------------- */
+.i-stroke {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

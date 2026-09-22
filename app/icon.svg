@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="RUSH 5OUR">
+  <!-- Brand mark: the skewed red R5 tile from the nav logo.
+       App Router picks this up automatically as the site icon.
+       SWAP: replace with the client's real icon file when supplied. -->
+  <rect width="64" height="64" fill="#040404"/>
+  <!-- Skewed tile, matching the -7deg slant of the nav logo. -->
+  <path d="M14 10h40l-4 44H10z" fill="#EB151F"/>
+  <text x="32" y="44"
+        font-family="Impact, 'Arial Narrow', Haettenschweiler, sans-serif"
+        font-size="30" font-weight="700" text-anchor="middle"
+        fill="#0A0A0A" letter-spacing="0.5">R5</text>
+</svg>

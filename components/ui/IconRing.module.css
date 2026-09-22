@@ -1,0 +1,42 @@
+/* ICON RING — a red-glowing circle holding a line icon.
+   Used by the concept cards; the parent sets the diameter via `--size`. */
+
+.ring {
+  width: var(--size, calc(131 * var(--u)));
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: calc(3 * var(--u)) solid var(--red);
+  /* Inner wash so the centre isn't a flat hole. */
+  background: radial-gradient(circle, rgba(var(--red-rgb), 0.08), rgba(4, 4, 4, 0.2) 70%);
+  /* Outer bloom + inner bloom — the layered red glow used site-wide. */
+  box-shadow:
+    0 0 22px -4px rgba(var(--red-rgb), 0.6),
+    inset 0 0 16px -4px rgba(var(--red-rgb), 0.45);
+  color: var(--red);
+  transition:
+    transform 0.6s var(--ease-out),
+    box-shadow 0.6s var(--ease-out);
+}
+
+.ring svg {
+  width: 52%;
+  height: 52%;
+  /* Lets stroke joins and the draw-on dash overflow the box cleanly. */
+  overflow: visible;
+}
+
+/* The play icon is solid white in the mockup, unlike the stroked ones. */
+.solid svg {
+  color: #fff;
+}
+
+/* Hover state is driven by the card, not the ring itself. */
+.ring[data-hovered="true"],
+:global(.js-card):hover .ring {
+  transform: scale(1.07);
+  box-shadow:
+    0 0 40px 2px rgba(255, 30, 30, 0.6),
+    inset 0 0 22px -2px rgba(255, 40, 40, 0.7);
+}

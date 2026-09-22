@@ -1,0 +1,522 @@
+/* =========================================================================
+   SECTION 2 — WHAT IS RUSH 5OUR  (mockup 2.png, 950-wide frame)
+
+   Sizes are mockup pixels x `--u`. The section sits inside `.frame`, the
+   shared 950-unit centred column.
+   ========================================================================= */
+
+.concept {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: calc(150 * var(--u)) 0 calc(63 * var(--u));
+  background: var(--black);
+}
+
+/* Atmosphere layer — behind everything, never interactive. */
+.atmos {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Red pool bleeding in from the top-right, parallaxed on scroll. */
+.glow {
+  position: absolute;
+  width: 90%;
+  aspect-ratio: 1;
+  right: -45%;
+  top: -18%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(200, 10, 10, 0.14), transparent 72%);
+  filter: blur(30px);
+}
+
+/* Faint scratched-concrete lines along the bottom edge. */
+.scratches {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 22%;
+  opacity: 0.1;
+}
+
+.scratches path {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Heading                                                                   */
+/* ------------------------------------------------------------------------ */
+
+.head {
+  padding-left: calc(42 * var(--u));
+}
+
+.eyebrow {
+  gap: calc(30 * var(--u));
+}
+
+.eyebrowLabel {
+  font-size: calc(20.6 * var(--u));
+  letter-spacing: 0.407em;
+}
+
+.eyebrowRule {
+  width: calc(88 * var(--u));
+  /* max() keeps hairlines visible on low-DPI screens. */
+  height: max(1px, calc(1.5 * var(--u)));
+}
+
+.title {
+  margin-top: calc(32 * var(--u));
+}
+
+.title .l1 {
+  font-size: calc(108.2 * var(--u));
+  letter-spacing: 0.049em;
+}
+
+.title .l2 {
+  font-size: calc(121 * var(--u));
+  letter-spacing: 0.04em;
+  margin-top: calc(9 * var(--u));
+}
+
+.intro {
+  --lh: 1.111;
+  margin-top: calc(27 * var(--u));
+  font-size: calc(27 * var(--u));
+  color: #cfcfcf;
+}
+
+/* Marker note sitting to the right of the headline. */
+.accentBigger {
+  left: calc(746 * var(--u));
+  top: calc(54 * var(--u));
+}
+
+.accentBigger :global(.hand) {
+  --rot: -16deg;
+  font-size: calc(37 * var(--u));
+  line-height: 1.48;
+  color: #c4c4c8;
+}
+
+.accentBiggerUnderline {
+  left: calc(30 * var(--u));
+  top: calc(250 * var(--u));
+  width: calc(132 * var(--u));
+  height: calc(58 * var(--u));
+}
+
+.accentBiggerUnderline path {
+  stroke-width: 4;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Cards                                                                     */
+/* ------------------------------------------------------------------------ */
+
+.cards {
+  margin: calc(45 * var(--u)) 0 0 calc(25 * var(--u));
+  width: calc(906 * var(--u));
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: calc(13 * var(--u));
+}
+
+/* A wrapper the entrance animates, so the card keeps its own hover
+   transform without the two fighting. */
+.cardWrap {
+  display: flex;
+}
+
+.card {
+  --glow: 1;
+  --mx: 50%;
+  --my: 50%;
+  position: relative;
+  isolation: isolate;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: calc(527 * var(--u));
+  padding: calc(38 * var(--u)) calc(19 * var(--u)) calc(34 * var(--u)) calc(38 * var(--u));
+  border-radius: calc(14 * var(--u));
+  background: linear-gradient(180deg, #0f0f10 0%, #0a0a0b 100%);
+}
+
+/* Hairline border that warms toward red at the bottom, as in the mockup.
+   Drawn with a masked gradient so it can be a true 1px line at any DPI. */
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  opacity: var(--glow, 1);
+  background: linear-gradient(
+    170deg,
+    rgba(255, 255, 255, 0.16) 0%,
+    rgba(255, 255, 255, 0.1) 60%,
+    rgba(var(--red-rgb), 0.35) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  transition: filter 0.5s;
+}
+
+/* Red spotlight that follows the cursor across the card face. */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    260px circle at var(--mx) var(--my),
+    rgba(var(--red-rgb), 0.14),
+    transparent 62%
+  );
+  transition: opacity 0.5s;
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.card:hover::after {
+  filter: brightness(1.8) saturate(1.3);
+}
+
+/* Red bloom pooling under the card on hover. */
+.halo {
+  position: absolute;
+  z-index: -2;
+  left: 10%;
+  right: 10%;
+  bottom: -8%;
+  height: 40%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgba(var(--red-rgb), 0.4), transparent 75%);
+  filter: blur(18px);
+  opacity: 0;
+  transition:
+    opacity 0.6s var(--ease-out),
+    transform 0.6s var(--ease-out);
+}
+
+.card:hover .halo {
+  opacity: 0.9;
+  transform: scale(1.1, 1.2);
+}
+
+.cardNum {
+  display: flex;
+  align-items: center;
+  gap: calc(13 * var(--u));
+}
+
+.cardNum span {
+  font-size: calc(29.1 * var(--u));
+  color: var(--red);
+}
+
+.cardNum i {
+  display: block;
+  width: calc(47 * var(--u));
+  height: max(1px, calc(1.5 * var(--u)));
+  background: #6b6b6b;
+  transform-origin: left;
+}
+
+/* `--fs` is set per card from the data file — the three titles are optically
+   sized so they occupy a similar width despite different lengths. */
+.cardTitle {
+  margin-top: calc(27 * var(--u));
+  font-size: var(--fs);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.cardDesc {
+  --lh: 1.3;
+  margin-top: calc(25 * var(--u));
+  font-size: var(--fs-body, calc(20.3 * var(--u)));
+  color: #bdbdbd;
+  /* Pushes the icon and link to the bottom regardless of copy length. */
+  flex: 1;
+}
+
+.cardIcon {
+  display: flex;
+  justify-content: center;
+  /* Negative left margin re-centres against the card's asymmetric padding. */
+  margin: 0 0 calc(27 * var(--u)) calc(-19 * var(--u));
+}
+
+.cardLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: calc(14 * var(--u));
+}
+
+.cardLink span {
+  --lh: 1.523;
+  font-size: calc(15.1 * var(--u));
+  letter-spacing: 0.23em;
+  font-weight: 500;
+  color: #ededed;
+}
+
+.cardLink svg {
+  width: calc(11 * var(--u));
+  height: calc(25 * var(--u));
+  flex: none;
+  overflow: visible;
+  transition: transform 0.45s var(--ease-out);
+}
+
+.cardLink svg :global(.i-stroke) {
+  stroke-width: 2.4;
+}
+
+.card:hover .cardLink svg {
+  transform: translateX(4px);
+}
+
+/* ------------------------------------------------------------------------ */
+/* CTA bar                                                                   */
+/* ------------------------------------------------------------------------ */
+
+.ctaWrap {
+  margin: calc(22 * var(--u)) 0 0 calc(25 * var(--u));
+  width: calc(901 * var(--u));
+}
+
+.ctaBar {
+  position: relative;
+  isolation: isolate;
+  height: calc(309 * var(--u));
+  border-radius: calc(14 * var(--u));
+  background: linear-gradient(180deg, #0d0d0e, #080808);
+}
+
+/* Neutral hairline outline. The red light on the edges is drawn by the two
+   elements below, matching how the mockup lights only two corners. */
+.ctaBar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.13);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+}
+
+/* Red light along the top-left edge, faded out toward the right. */
+.ctaEdgeTop {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  top: 0;
+  width: 70%;
+  height: 45%;
+  pointer-events: none;
+  border-radius: calc(14 * var(--u)) 0 0 0;
+  box-shadow:
+    inset calc(1.8 * var(--u)) calc(1.8 * var(--u)) 0 #ff3035,
+    calc(-1 * var(--u)) calc(-3 * var(--u)) calc(12 * var(--u)) rgba(255, 30, 30, 0.6);
+  -webkit-mask-image:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.75), #000 25%, #000 55%, transparent),
+    linear-gradient(180deg, #000 10%, transparent 70%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.75), #000 25%, #000 55%, transparent),
+    linear-gradient(180deg, #000 10%, transparent 70%);
+  mask-composite: intersect;
+}
+
+.ctaHalo {
+  position: absolute;
+  z-index: -1;
+  left: 4%;
+  width: 52%;
+  top: calc(-18 * var(--u));
+  height: calc(30 * var(--u));
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 30, 30, 0.5), transparent 80%);
+  filter: blur(calc(8 * var(--u)));
+  pointer-events: none;
+  transition: opacity 0.6s;
+}
+
+/* The mirrored light on the bottom-right corner. */
+.ctaCorner {
+  position: absolute;
+  z-index: 3;
+  right: 0;
+  bottom: 0;
+  width: 30%;
+  height: 70%;
+  pointer-events: none;
+  border-radius: 0 0 calc(14 * var(--u)) 0;
+  box-shadow:
+    inset calc(-1.8 * var(--u)) calc(-1.8 * var(--u)) 0 #ff3035,
+    calc(2 * var(--u)) calc(2 * var(--u)) calc(12 * var(--u)) rgba(255, 30, 30, 0.55);
+  -webkit-mask-image:
+    linear-gradient(90deg, transparent, #000 70%),
+    linear-gradient(0deg, #000 35%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(90deg, transparent, #000 70%),
+    linear-gradient(0deg, #000 35%, transparent);
+  mask-composite: intersect;
+}
+
+.ctaCornerGlow {
+  position: absolute;
+  z-index: -1;
+  right: calc(-10 * var(--u));
+  bottom: calc(-10 * var(--u));
+  width: 26%;
+  height: 45%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 30, 30, 0.35), transparent 80%);
+  filter: blur(calc(10 * var(--u)));
+  pointer-events: none;
+}
+
+.ctaTags {
+  position: absolute;
+  left: calc(50 * var(--u));
+  top: calc(69 * var(--u));
+  --lh: 1.854;
+  font-size: calc(15.1 * var(--u));
+  letter-spacing: 0.319em;
+  font-weight: 500;
+  color: #cfcfcf;
+}
+
+.ctaTags span {
+  display: block;
+  white-space: nowrap;
+}
+
+.ctaDivider {
+  position: absolute;
+  left: calc(449 * var(--u));
+  top: calc(64 * var(--u));
+  width: max(1px, calc(2 * var(--u)));
+  height: calc(56 * var(--u));
+  background: rgba(255, 255, 255, 0.55);
+  transform-origin: top;
+}
+
+.accentBuild {
+  left: calc(612 * var(--u));
+  top: calc(40 * var(--u));
+}
+
+.accentBuild :global(.hand) {
+  --rot: -12deg;
+  font-size: calc(35.1 * var(--u));
+  line-height: 1.4;
+  color: #c4c4c8;
+}
+
+/* The second line is indented, as it is in the mockup. */
+.accentBuild :global(.hand-line):nth-child(2) {
+  margin-left: calc(10 * var(--u));
+}
+
+.accentBuildUnderline {
+  left: calc(62 * var(--u));
+  top: calc(66 * var(--u));
+  width: calc(176 * var(--u));
+  height: calc(50 * var(--u));
+}
+
+.accentBuildUnderline path {
+  stroke-width: 4;
+}
+
+.ctaBtnWrap {
+  position: absolute;
+  left: calc(30 * var(--u));
+  right: calc(31 * var(--u));
+  bottom: calc(35 * var(--u));
+}
+
+/* The magnet wrapper must fill the column so the button can be full width. */
+.ctaBtnWrap :global(.magnet) {
+  display: block;
+}
+
+.ctaBtn {
+  width: 100%;
+  height: calc(84 * var(--u));
+  gap: calc(26 * var(--u));
+  font-family: var(--f-ui);
+  font-weight: 600;
+  font-size: calc(24.7 * var(--u));
+  letter-spacing: 0.09em;
+  border-radius: 2px;
+}
+
+.ctaBtn svg {
+  width: calc(30 * var(--u));
+  height: calc(18 * var(--u));
+}
+
+/* ------------------------------------------------------------------------ */
+/* Scroll cue                                                                */
+/* ------------------------------------------------------------------------ */
+
+.cueWrap {
+  display: flex;
+  justify-content: center;
+  margin-top: calc(84 * var(--u));
+}
+
+.cueLabel {
+  font-size: calc(13.7 * var(--u));
+  letter-spacing: 0.43em;
+  padding-left: 0.43em;
+}
+
+.cueLine {
+  width: max(1.5px, calc(2 * var(--u)));
+  height: calc(36 * var(--u));
+  margin-top: calc(23 * var(--u));
+}
+
+.cueChev {
+  width: calc(23 * var(--u));
+  height: calc(12 * var(--u));
+  margin-top: calc(9 * var(--u));
+}

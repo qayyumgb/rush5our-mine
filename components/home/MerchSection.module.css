@@ -1,0 +1,689 @@
+/* =========================================================================
+   SECTION 4 — MERCH  (mockup 4.png, 950-wide frame)
+
+   Two halves separated by a hairline: the Drop 01 teaser with its product
+   carousel, and the locked "progression" grid below it.
+   ========================================================================= */
+
+.merch {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: calc(147 * var(--u)) 0 calc(62 * var(--u));
+  background: var(--black);
+}
+
+/* Fixed-height band: the product stage is absolutely placed inside it and
+   overhangs the top, exactly as in the mockup. */
+.top {
+  position: relative;
+  height: calc(478 * var(--u));
+}
+
+.copy {
+  position: relative;
+  z-index: 3;
+  padding-left: calc(40 * var(--u));
+}
+
+.eyebrow {
+  gap: calc(13 * var(--u));
+}
+
+.eyebrowLabel {
+  font-size: calc(20.6 * var(--u));
+  letter-spacing: 0.148em;
+}
+
+.eyebrowRule {
+  width: calc(96 * var(--u));
+  height: max(1px, calc(1.5 * var(--u)));
+}
+
+.title {
+  margin-top: calc(19 * var(--u));
+}
+
+.title .l1 {
+  font-size: calc(86.1 * var(--u));
+  letter-spacing: 0.054em;
+}
+
+.title .l2 {
+  font-size: calc(89.6 * var(--u));
+  letter-spacing: 0.029em;
+  margin-top: calc(10 * var(--u));
+  margin-left: -0.02em;
+}
+
+.sub {
+  --lh: 1.345;
+  margin-top: calc(15 * var(--u));
+  font-size: calc(22.3 * var(--u));
+  color: #c4c4c4;
+}
+
+.sub b {
+  color: #fff;
+  font-weight: 700;
+}
+
+.btn {
+  margin-top: calc(26 * var(--u));
+  margin-left: calc(-3 * var(--u));
+  width: calc(350 * var(--u));
+  height: calc(68 * var(--u));
+  border-radius: calc(6 * var(--u));
+  gap: calc(10 * var(--u));
+  /* This button uses the body face, not the condensed one. */
+  font-family: var(--f-body);
+  font-weight: 500;
+  font-size: calc(22 * var(--u));
+  letter-spacing: 0.086em;
+}
+
+.btn svg {
+  width: calc(20 * var(--u));
+  height: calc(14 * var(--u));
+}
+
+/* ------------------------------------------------------------------------ */
+/* Trust badges                                                              */
+/* ------------------------------------------------------------------------ */
+
+.badges {
+  display: flex;
+  gap: calc(40 * var(--u));
+  margin: calc(40 * var(--u)) 0 0 calc(-2 * var(--u));
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: calc(11 * var(--u));
+}
+
+.badge svg {
+  width: calc(36 * var(--u));
+  height: calc(32 * var(--u));
+  flex: none;
+  overflow: visible;
+  color: #f0f0f0;
+}
+
+.badge svg :global(.i-stroke) {
+  stroke-width: 2;
+}
+
+.badge p {
+  --lh: 1.25;
+  font-size: calc(12.8 * var(--u));
+  letter-spacing: 0.07em;
+  font-weight: 600;
+  color: #d6d6d6;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Product carousel                                                          */
+/* ------------------------------------------------------------------------ */
+
+.stage {
+  position: absolute;
+  z-index: 1;
+  left: calc(432 * var(--u));
+  top: calc(-55 * var(--u));
+  width: calc(518 * var(--u));
+  height: calc(536 * var(--u));
+  touch-action: pan-y;
+}
+
+/* Red concrete texture behind the product, feathered to an oval so it reads
+   as light rather than as a photo. */
+.stageBg {
+  position: absolute;
+  inset: -6% -12%;
+  background: url("/assets/images/texture-red.webp") 70% 50% / cover no-repeat;
+  opacity: 0.5;
+  mix-blend-mode: screen;
+  -webkit-mask-image: radial-gradient(60% 60% at 60% 50%, #000 30%, transparent 75%);
+  mask-image: radial-gradient(60% 60% at 60% 50%, #000 30%, transparent 75%);
+}
+
+.slides {
+  position: absolute;
+  inset: 0;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+}
+
+/* Soft edges on all four sides, so a slide can move or fade without ever
+   revealing a hard rectangle. */
+.slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-mask-image:
+    linear-gradient(90deg, transparent 0, #000 16%, #000 90%, transparent 100%),
+    linear-gradient(0deg, transparent 0, #000 10%, #000 94%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(90deg, transparent 0, #000 16%, #000 90%, transparent 100%),
+    linear-gradient(0deg, transparent 0, #000 10%, #000 94%, transparent 100%);
+  mask-composite: intersect;
+}
+
+.slide:not(.slideActive) {
+  opacity: 0;
+}
+
+/* Slides 2+ are looser crops, so they get an oval feather instead. */
+.slide:nth-child(n + 2) img {
+  -webkit-mask-image: radial-gradient(closest-side at 55% 50%, #000 62%, transparent 100%);
+  mask-image: radial-gradient(closest-side at 55% 50%, #000 62%, transparent 100%);
+}
+
+/* Flashes during a slide change, so the product looks lit as it swaps. */
+.stageGlow {
+  position: absolute;
+  left: 20%;
+  right: 5%;
+  top: 10%;
+  bottom: 10%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 30, 30, 0.35), transparent 70%);
+  filter: blur(24px);
+  opacity: 0;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.dots {
+  position: absolute;
+  z-index: 3;
+  left: calc(645 * var(--u));
+  top: calc(421 * var(--u));
+  display: flex;
+}
+
+.dot {
+  width: calc(28 * var(--u));
+  height: calc(28 * var(--u));
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+/* Hollow ring by default, solid red when active. */
+.dot::before {
+  content: "";
+  width: calc(14 * var(--u));
+  height: calc(14 * var(--u));
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 max(1px, calc(1.6 * var(--u))) #c9c9c9;
+  transition:
+    background-color 0.4s,
+    box-shadow 0.4s,
+    transform 0.4s var(--ease-out);
+}
+
+.dotActive::before {
+  background: var(--red);
+  box-shadow:
+    inset 0 0 0 20px var(--red),
+    0 0 10px rgba(var(--red-rgb), 0.8);
+}
+
+.dot:hover::before {
+  transform: scale(1.25);
+}
+
+.accentLevel {
+  left: calc(814 * var(--u));
+  top: calc(300 * var(--u));
+  z-index: 4;
+}
+
+.accentLevel :global(.hand) {
+  --rot: -19deg;
+  font-size: calc(26 * var(--u));
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+  color: #b8b8bd;
+}
+
+.accentLevelUnderline {
+  left: 0;
+  top: calc(112 * var(--u));
+  width: calc(100 * var(--u));
+  height: calc(38 * var(--u));
+}
+
+.accentLevelUnderline path {
+  stroke-width: 4;
+}
+
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+  transform-origin: left;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Progression                                                               */
+/* ------------------------------------------------------------------------ */
+
+.prog {
+  padding: calc(35 * var(--u)) 0 0 calc(41 * var(--u));
+}
+
+.progEyebrow {
+  gap: calc(20 * var(--u));
+}
+
+.progEyebrowLabel {
+  font-size: calc(22 * var(--u));
+  letter-spacing: 0.262em;
+  font-weight: 600;
+}
+
+/* This rule fades out rather than ending hard, unlike the others. */
+.progEyebrowRule {
+  width: calc(98 * var(--u));
+  height: calc(2 * var(--u));
+  background: linear-gradient(90deg, var(--red), rgba(var(--red-rgb), 0));
+}
+
+.progTitle {
+  margin-top: calc(20 * var(--u));
+  font-size: calc(68.7 * var(--u));
+  letter-spacing: 0.055em;
+}
+
+.progIntro {
+  --lh: 1.266;
+  margin-top: calc(19 * var(--u));
+  font-size: calc(23.7 * var(--u));
+  color: #cfcfcf;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Drop cards                                                                */
+/* ------------------------------------------------------------------------ */
+
+.drops {
+  margin: calc(27 * var(--u)) 0 0 calc(37 * var(--u));
+  width: calc(875 * var(--u));
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* The top row is taller than the bottom one, as in the mockup. */
+  grid-template-rows: calc(247 * var(--u)) calc(236 * var(--u));
+  column-gap: calc(20 * var(--u));
+  row-gap: calc(19 * var(--u));
+}
+
+.drop {
+  position: relative;
+  isolation: isolate;
+  border-radius: calc(12 * var(--u));
+  background: #0b0b0c;
+  will-change: transform;
+}
+
+.dropMedia {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.dropMedia img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition:
+    transform 1.2s var(--ease-out),
+    filter 0.6s;
+}
+
+/* LOCKED: the product is blurred and desaturated, so a real unreleased
+   photograph can sit here without giving anything away. */
+.locked .dropMedia img {
+  filter: blur(2px) brightness(0.85) grayscale(0.4);
+  /* Slight over-scale hides the blur's soft edges. */
+  transform: scale(1.04);
+}
+
+.locked .dropMedia::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.45));
+}
+
+.locked::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 max(1px, calc(1.5 * var(--u))) rgba(255, 255, 255, 0.22);
+}
+
+/* NEON TUBE — a hot core line, a tight bloom, then a wide soft halo. Three
+   layers is what makes it read as a lit tube rather than a red border. */
+.neon {
+  --neon:
+    inset 0 0 0 calc(2 * var(--u)) #ff1e26,
+    inset 0 0 calc(7 * var(--u)) rgba(255, 25, 30, 0.35),
+    0 0 calc(2 * var(--u)) rgba(255, 40, 45, 0.95),
+    0 0 calc(7 * var(--u)) rgba(255, 25, 30, 0.6),
+    0 0 calc(16 * var(--u)) rgba(255, 20, 20, 0.25);
+}
+
+.unlocked {
+  cursor: pointer;
+  border-radius: calc(14 * var(--u));
+}
+
+.unlocked::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: var(--neon);
+}
+
+/* Separate element so the halo can pulse without re-rendering the tube. */
+.dropPulse {
+  position: absolute;
+  inset: calc(-4 * var(--u));
+  border-radius: calc(18 * var(--u));
+  z-index: -2;
+  pointer-events: none;
+  box-shadow: 0 0 calc(30 * var(--u)) calc(2 * var(--u)) rgba(255, 20, 20, 0.22);
+  opacity: 0.5;
+}
+
+.unlocked:hover .dropMedia img {
+  transform: scale(1.06);
+}
+
+.dropLevel {
+  position: absolute;
+  left: calc(24 * var(--u));
+  top: calc(24 * var(--u));
+  font-size: calc(24.4 * var(--u));
+  letter-spacing: 0.067em;
+  color: #f0f0f0;
+}
+
+.locked .dropLevel {
+  color: #c9c9c9;
+}
+
+.pill {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  border-radius: calc(5 * var(--u));
+  font-weight: 600;
+  font-size: calc(13.7 * var(--u));
+  text-transform: uppercase;
+}
+
+.pillUnlocked {
+  right: calc(19 * var(--u));
+  top: calc(19 * var(--u));
+  width: calc(101 * var(--u));
+  height: calc(33 * var(--u));
+  background: var(--red);
+  color: #fff;
+  letter-spacing: 0.053em;
+  box-shadow: 0 0 14px rgba(var(--red-rgb), 0.6);
+}
+
+.pillLocked {
+  right: calc(22 * var(--u));
+  bottom: calc(24 * var(--u));
+  width: calc(101 * var(--u));
+  height: calc(39 * var(--u));
+  border: max(1px, calc(1.5 * var(--u))) solid #9a9a9a;
+  color: #d0d0d0;
+  letter-spacing: 0.126em;
+  font-weight: 500;
+  background: rgba(0, 0, 0, 0.25);
+  transition:
+    border-color 0.3s,
+    color 0.3s;
+}
+
+.lock {
+  position: absolute;
+  right: calc(23 * var(--u));
+  top: calc(22 * var(--u));
+  width: calc(26 * var(--u));
+  height: calc(32 * var(--u));
+  overflow: visible;
+  color: #cfcfcf;
+  /* Rotates about the shackle, so the shake reads as a padlock rattling. */
+  transform-origin: 50% 20%;
+}
+
+.lock :global(.i-stroke) {
+  stroke-width: 1.5;
+}
+
+.dropName {
+  position: absolute;
+  left: calc(24 * var(--u));
+  bottom: calc(26 * var(--u));
+}
+
+.dropName small {
+  display: block;
+  --lh: 1;
+  font-size: calc(17.9 * var(--u));
+  letter-spacing: 0.055em;
+  font-weight: 500;
+  color: #d0d0d0;
+}
+
+.dropName strong {
+  display: block;
+  margin-top: calc(15 * var(--u));
+  font-size: calc(29.1 * var(--u));
+  letter-spacing: 0.024em;
+  font-weight: 400;
+  color: #f4f4f4;
+}
+
+.locked .dropName strong {
+  color: #c9c9c9;
+}
+
+.dropGo {
+  position: absolute;
+  right: calc(30 * var(--u));
+  bottom: calc(25 * var(--u));
+  width: calc(54 * var(--u));
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: max(1px, calc(1.8 * var(--u))) solid #fff;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  transition:
+    background-color 0.4s,
+    transform 0.5s var(--ease-out),
+    box-shadow 0.4s;
+}
+
+.dropGo svg {
+  width: 42%;
+  overflow: visible;
+}
+
+.dropGo svg :global(.i-stroke) {
+  stroke-width: 2;
+}
+
+.unlocked:hover .dropGo {
+  background: var(--red);
+  border-color: var(--red);
+  transform: scale(1.08);
+  box-shadow: 0 0 22px rgba(255, 30, 30, 0.7);
+}
+
+.unlocked:hover .dropGo svg {
+  transform: translateX(3px);
+}
+
+.locked:hover .pillLocked {
+  border-color: var(--red);
+  color: #fff;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Bottom bar                                                                */
+/* ------------------------------------------------------------------------ */
+
+.bar {
+  position: relative;
+  isolation: isolate;
+  /* Visible overflow so the neon halo isn't clipped; the photo inside gets
+     its own clipping wrapper. */
+  overflow: visible;
+  margin: calc(27 * var(--u)) 0 0 calc(37 * var(--u));
+  width: calc(875 * var(--u));
+  height: calc(211 * var(--u));
+  border-radius: calc(12 * var(--u));
+  background:
+    radial-gradient(40% 90% at 0% 50%, rgba(120, 10, 12, 0.18), transparent 70%),
+    #050505;
+}
+
+.bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 2;
+  box-shadow: var(--neon);
+}
+
+.barClip {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+/* Texture bleeding in from the left edge. */
+.barClip::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 22%;
+  background: url("/assets/images/texture-red.webp") 62% 50% / cover no-repeat;
+  opacity: 0.16;
+  mix-blend-mode: screen;
+  -webkit-mask-image: linear-gradient(90deg, #000, transparent);
+  mask-image: linear-gradient(90deg, #000, transparent);
+}
+
+.barGlow {
+  position: absolute;
+  inset: calc(-4 * var(--u));
+  z-index: -2;
+  border-radius: calc(16 * var(--u));
+  box-shadow: 0 0 calc(30 * var(--u)) calc(2 * var(--u)) rgba(255, 20, 20, 0.2);
+}
+
+.barArt {
+  position: absolute;
+  right: calc(6 * var(--u));
+  top: calc(6 * var(--u));
+  width: calc(164 * var(--u));
+  height: calc(200 * var(--u));
+  object-fit: cover;
+  opacity: 0.95;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 35%);
+  mask-image: linear-gradient(90deg, transparent, #000 35%);
+}
+
+.accentSupport {
+  left: calc(96 * var(--u));
+  top: calc(38 * var(--u));
+}
+
+.accentSupport :global(.hand) {
+  --rot: -19deg;
+  font-size: calc(33 * var(--u));
+  line-height: 1.2;
+  color: #c4c4c8;
+  /* This used to carry a lighter text-stroke than the global default. The
+     default is now no stroke at all (see `.hand` in globals.css), so the
+     override would only add weight back — it is intentionally gone. */
+}
+
+/* Progressive indents, reproducing the slant of the written original. */
+.accentSupport :global(.hand-line):nth-child(2) {
+  margin-left: calc(8 * var(--u));
+}
+
+.accentSupport :global(.hand-line):nth-child(3) {
+  margin-left: calc(16 * var(--u));
+}
+
+.accentSupport :global(.hand-line):nth-child(4) {
+  margin-left: calc(38 * var(--u));
+}
+
+.accentSupportUnderline {
+  left: calc(60 * var(--u));
+  top: calc(136 * var(--u));
+  width: calc(102 * var(--u));
+  height: calc(44 * var(--u));
+}
+
+.accentSupportUnderline path {
+  stroke-width: 4;
+}
+
+.barDivider {
+  position: absolute;
+  left: calc(349 * var(--u));
+  top: calc(49 * var(--u));
+  width: max(1px, calc(2 * var(--u)));
+  height: calc(105 * var(--u));
+  background: rgba(255, 255, 255, 0.6);
+  transform-origin: top;
+}
+
+.barTags {
+  position: absolute;
+  left: calc(447 * var(--u));
+  top: calc(64 * var(--u));
+  --lh: 1.62;
+  font-size: calc(17.9 * var(--u));
+  letter-spacing: 0.189em;
+  font-weight: 400;
+  color: #d4d4d4;
+}
+
+.barTags span {
+  display: block;
+  white-space: nowrap;
+}

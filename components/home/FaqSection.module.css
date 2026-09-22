@@ -1,0 +1,417 @@
+/* =========================================================================
+   SECTION 6 — QUESTIONS? ANSWERED.  (mockup 6.png, 950-wide frame)
+
+   A centred heading, an accordion, a "reach out" bar and the footer.
+   ========================================================================= */
+
+.faq {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding-top: calc(41 * var(--u));
+  background: var(--black);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.atmos {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(60% 30% at 50% 0%, rgba(var(--red-rgb), 0.08), transparent 70%);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Heading                                                                   */
+/* ------------------------------------------------------------------------ */
+
+.head {
+  position: relative;
+  text-align: center;
+}
+
+.eyebrow {
+  gap: calc(26 * var(--u));
+}
+
+.eyebrowLabel {
+  font-size: calc(22 * var(--u));
+  letter-spacing: 0.36em;
+  padding-left: 0.36em;
+}
+
+.eyebrowRule {
+  width: calc(150 * var(--u));
+  height: max(1px, calc(1.5 * var(--u)));
+}
+
+.title {
+  margin-top: calc(32 * var(--u));
+}
+
+.title :global(.line) {
+  text-align: center;
+}
+
+.title .l1 {
+  font-size: calc(95.5 * var(--u));
+  letter-spacing: 0.01em;
+}
+
+.title .l2 {
+  font-size: calc(94.3 * var(--u));
+  letter-spacing: 0.01em;
+  margin-top: calc(12 * var(--u));
+}
+
+.sub {
+  --lh: 1.38;
+  margin-top: calc(34 * var(--u));
+  font-size: calc(27.5 * var(--u));
+  color: #bdbdbd;
+}
+
+.sub span {
+  display: block;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Accordion                                                                 */
+/* ------------------------------------------------------------------------ */
+
+.list {
+  margin: calc(46 * var(--u)) auto 0;
+  width: calc(870 * var(--u));
+  display: flex;
+  flex-direction: column;
+  gap: calc(18 * var(--u));
+}
+
+.item {
+  position: relative;
+  border-radius: calc(10 * var(--u));
+  background: linear-gradient(180deg, #0c0c0d, #090909);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  transition: box-shadow 0.5s var(--ease-out);
+}
+
+.item:hover {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.24);
+}
+
+/* OPEN: a red tube outline plus an outer halo, matching the mockup. */
+.itemOpen {
+  box-shadow:
+    inset 0 0 0 max(1px, calc(1.5 * var(--u))) var(--red),
+    0 0 calc(22 * var(--u)) rgba(255, 25, 30, 0.22);
+}
+
+.itemOpen:hover {
+  box-shadow:
+    inset 0 0 0 max(1px, calc(1.5 * var(--u))) var(--red),
+    0 0 calc(30 * var(--u)) rgba(255, 25, 30, 0.32);
+}
+
+/* The clickable question row. Fixed height so closed items match the
+   mockup's 102-unit rhythm exactly. */
+.trigger {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: calc(102 * var(--u));
+  padding: 0 calc(45 * var(--u)) 0 calc(28 * var(--u));
+  text-align: left;
+}
+
+.num {
+  flex: none;
+  width: calc(52 * var(--u));
+  font-size: calc(30 * var(--u));
+  letter-spacing: 0.02em;
+  color: var(--red);
+}
+
+/* Hairline between the number and the question. */
+.sep {
+  flex: none;
+  width: 1px;
+  height: calc(40 * var(--u));
+  margin-right: calc(44 * var(--u));
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.question {
+  flex: 1;
+  font-size: calc(30 * var(--u));
+  letter-spacing: 0.035em;
+  color: var(--white);
+  transition: color 0.35s;
+}
+
+.trigger:hover .question {
+  color: #fff;
+}
+
+/* TOGGLE — one horizontal bar plus a vertical one that collapses to form
+   the minus. Built from two elements so the change can be animated rather
+   than swapping a glyph. */
+.toggle {
+  position: absolute;
+  right: calc(28 * var(--u));
+  top: 50%;
+  width: calc(34 * var(--u));
+  height: calc(34 * var(--u));
+  margin-top: calc(-17 * var(--u));
+  pointer-events: none;
+}
+
+.toggle i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background: var(--red);
+  border-radius: 1px;
+  transition: transform 0.5s var(--ease-out);
+}
+
+.toggle i:first-child {
+  width: calc(34 * var(--u));
+  height: max(2px, calc(3.4 * var(--u)));
+  margin: calc(-1.7 * var(--u)) 0 0 calc(-17 * var(--u));
+}
+
+.toggle i:last-child {
+  width: max(2px, calc(3.4 * var(--u)));
+  height: calc(34 * var(--u));
+  margin: calc(-17 * var(--u)) 0 0 calc(-1.7 * var(--u));
+}
+
+/* Open: the vertical bar rotates flat into the horizontal one. */
+.itemOpen .toggle i:last-child {
+  transform: rotate(90deg) scaleX(0.001);
+}
+
+/* PANEL — height is animated by GSAP; `hidden` on the wrapper would block
+   that, so the closed state is a zero height with clipped overflow. */
+.panel {
+  overflow: hidden;
+  height: 0;
+}
+
+.answer {
+  --lh: 1.375;
+  padding: 0 calc(60 * var(--u)) calc(34 * var(--u)) calc(124 * var(--u));
+  font-size: calc(24 * var(--u));
+  color: #bdbdbd;
+}
+
+.answer span {
+  display: block;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Reach out                                                                 */
+/* ------------------------------------------------------------------------ */
+
+.reach {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: calc(36 * var(--u)) auto 0;
+  width: calc(870 * var(--u));
+  height: calc(124 * var(--u));
+  padding: 0 calc(40 * var(--u));
+  border-radius: calc(10 * var(--u));
+  background: #0a0a0b;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  text-align: left;
+  transition:
+    box-shadow 0.5s var(--ease-out),
+    background-color 0.4s;
+}
+
+.reach:hover {
+  background: #0d0d0e;
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--red-rgb), 0.6),
+    0 0 calc(30 * var(--u)) rgba(255, 25, 30, 0.18);
+}
+
+/* Oversized R5 watermark bleeding off the right edge, as in the mockup. */
+.reachMark {
+  position: absolute;
+  right: calc(-10 * var(--u));
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--f-hand);
+  font-size: calc(190 * var(--u));
+  line-height: 0.8;
+  color: rgba(255, 255, 255, 0.035);
+  pointer-events: none;
+  user-select: none;
+}
+
+.reachIcon {
+  flex: none;
+  width: calc(58 * var(--u));
+  height: calc(58 * var(--u));
+  color: var(--red);
+  overflow: visible;
+  filter: drop-shadow(0 0 8px rgba(255, 30, 30, 0.6));
+  transition: transform 0.5s var(--ease-out);
+}
+
+.reach:hover .reachIcon {
+  transform: scale(1.08);
+}
+
+.reachSep {
+  flex: none;
+  width: 1px;
+  height: calc(62 * var(--u));
+  margin: 0 calc(38 * var(--u));
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.reachKicker {
+  --lh: 1;
+  font-size: calc(19 * var(--u));
+  letter-spacing: 0.22em;
+  font-weight: 500;
+  color: #bdbdbd;
+}
+
+.reachLabel {
+  display: flex;
+  align-items: center;
+  gap: calc(16 * var(--u));
+  margin-top: calc(16 * var(--u));
+  font-size: calc(30 * var(--u));
+  letter-spacing: 0.03em;
+  color: var(--white);
+}
+
+.reachLabel svg {
+  width: calc(28 * var(--u));
+  height: calc(20 * var(--u));
+  overflow: visible;
+  color: var(--red);
+  transition: transform 0.45s var(--ease-out);
+}
+
+.reachLabel svg :global(.i-stroke) {
+  stroke-width: 2;
+}
+
+.reach:hover .reachLabel svg {
+  transform: translateX(6px);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Footer                                                                    */
+/* ------------------------------------------------------------------------ */
+
+.footer {
+  margin-top: calc(61 * var(--u));
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: calc(47 * var(--u)) 0 calc(78 * var(--u));
+}
+
+.footerInner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: calc(870 * var(--u));
+  margin-inline: auto;
+}
+
+.footerWord {
+  font-family: var(--f-display);
+  font-size: calc(36 * var(--u));
+  line-height: 1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--white);
+}
+
+.footerTag {
+  --lh: 1.66;
+  margin-top: calc(21 * var(--u));
+  font-size: calc(15 * var(--u));
+  letter-spacing: 0.26em;
+  font-weight: 500;
+  color: #8a8a8a;
+}
+
+.footerTag span {
+  display: block;
+}
+
+.footerRight {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(34 * var(--u));
+}
+
+.footerSep {
+  width: 1px;
+  /* Runs from the socials down past the link row. */
+  height: calc(104 * var(--u));
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.footerCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.socials {
+  display: flex;
+  gap: calc(34 * var(--u));
+}
+
+.socials a {
+  color: var(--white);
+  transition:
+    color 0.35s,
+    transform 0.45s var(--ease-out);
+}
+
+.socials a:hover {
+  color: var(--red);
+  transform: translateY(-3px);
+}
+
+.socials svg {
+  width: calc(38 * var(--u));
+  height: calc(38 * var(--u));
+}
+
+.footerLinks {
+  display: flex;
+  gap: calc(40 * var(--u));
+  margin-top: calc(34 * var(--u));
+}
+
+.footerLinks a {
+  font-size: calc(15 * var(--u));
+  letter-spacing: 0.16em;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: #8a8a8a;
+  transition: color 0.3s;
+}
+
+.footerLinks a:hover {
+  color: var(--white);
+}
+
+/* Without motion, GSAP never sets an inline panel height, so the open panel
+   is expanded here instead. */
+@media (prefers-reduced-motion: reduce) {
+  .itemOpen .panel {
+    height: auto;
+  }
+}

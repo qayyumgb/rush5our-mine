@@ -1,0 +1,196 @@
+/* =========================================================================
+   SECTION 5 — THIS IS A CULTURE  (mockup 5.png, 950-wide frame)
+
+   A centred statement over a 2x2 feature grid divided by hairline rules.
+   Every number is a pixel measured off the mockup x `--u`.
+   ========================================================================= */
+
+.culture {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: calc(74 * var(--u)) 0 calc(159 * var(--u));
+  background: var(--black);
+  /* The mockup shows a hairline where the section meets the nav. */
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+}
+
+/* Soft red pools top and bottom, keeping the flat black alive. */
+.atmos {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(55% 30% at 50% 0%, rgba(var(--red-rgb), 0.1), transparent 70%),
+    radial-gradient(60% 35% at 50% 100%, rgba(var(--red-rgb), 0.07), transparent 70%);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Statement                                                                 */
+/* ------------------------------------------------------------------------ */
+
+/* Wrapper the shared `headReveal` animates as one unit. */
+.head {
+  position: relative;
+}
+
+.eyebrow {
+  gap: calc(26 * var(--u));
+}
+
+.eyebrowLabel {
+  font-size: calc(24 * var(--u));
+  letter-spacing: 0.36em;
+  /* Balances the trailing letter-space so the label centres optically. */
+  padding-left: 0.36em;
+}
+
+.eyebrowRule {
+  width: calc(185 * var(--u));
+  height: max(1px, calc(1.5 * var(--u)));
+}
+
+.title {
+  margin-top: calc(49 * var(--u));
+}
+
+/* Centred headline lines: `.line` is normally a left-aligned mask, so the
+   inner element is centred explicitly here. */
+.title :global(.line) {
+  text-align: center;
+}
+
+.title .l1 {
+  font-size: calc(94.3 * var(--u));
+  letter-spacing: 0.02em;
+}
+
+.title .l2 {
+  font-size: calc(95.5 * var(--u));
+  letter-spacing: 0.02em;
+  margin-top: calc(10 * var(--u));
+}
+
+.title .l3 {
+  font-size: calc(95.5 * var(--u));
+  letter-spacing: 0.005em;
+  margin-top: calc(13 * var(--u));
+}
+
+.sub {
+  --lh: 1.636;
+  margin-top: calc(42 * var(--u));
+  font-size: calc(27.5 * var(--u));
+  letter-spacing: 0.08em;
+  font-weight: 400;
+  color: #bdbdbd;
+}
+
+.sub span {
+  display: block;
+}
+
+.btnWrap {
+  margin-top: calc(54 * var(--u));
+}
+
+.btn {
+  width: calc(580 * var(--u));
+  height: calc(95 * var(--u));
+  gap: calc(34 * var(--u));
+  border-radius: calc(4 * var(--u));
+  font-family: var(--f-ui);
+  font-weight: 600;
+  font-size: calc(29 * var(--u));
+  letter-spacing: 0.09em;
+}
+
+.btn svg {
+  width: calc(32 * var(--u));
+  height: calc(20 * var(--u));
+}
+
+/* ------------------------------------------------------------------------ */
+/* Feature grid                                                              */
+/* ------------------------------------------------------------------------ */
+
+.grid {
+  position: relative;
+  margin: calc(33 * var(--u)) auto 0;
+  width: calc(874 * var(--u));
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: calc(350 * var(--u));
+}
+
+/* The dividing cross. Drawn as two absolutely-placed rules rather than cell
+   borders, so they can be inset from the grid edge exactly as in the mockup
+   and can animate open from the centre. */
+.divH {
+  position: absolute;
+  left: calc(21 * var(--u));
+  right: calc(26 * var(--u));
+  top: 50%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  transform-origin: center;
+  pointer-events: none;
+}
+
+.divV {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  transform-origin: center;
+  pointer-events: none;
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: calc(50 * var(--u));
+}
+
+/* Deliberately plain: a flat red outline, no glow, no transition, no hover
+   state, and no entrance or ambient animation in CultureSection.tsx either.
+   The drop-shadow bloom that used to sit here softened the strokes, so the
+   icons are left crisp. */
+.icon {
+  width: calc(96 * var(--u));
+  height: calc(96 * var(--u));
+  color: var(--red);
+  overflow: visible;
+}
+
+.icon :global(.i-stroke) {
+  stroke-width: 1.5;
+}
+
+.cellTitle {
+  --lh: 1.46;
+  margin-top: calc(24 * var(--u));
+  font-size: calc(26 * var(--u));
+  letter-spacing: 0.12em;
+  color: var(--white);
+}
+
+.cellTitle span {
+  display: block;
+}
+
+.cellBody {
+  --lh: 1.37;
+  margin-top: calc(27 * var(--u));
+  font-size: calc(24 * var(--u));
+  color: #bdbdbd;
+}
+
+.cellBody span {
+  display: block;
+}
