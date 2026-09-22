@@ -41,6 +41,7 @@ import {
   writeHand,
 } from "@/lib/motion/helpers";
 import { scramble, splitBrLines, splitTitle } from "@/lib/motion/split";
+import { useMediaQuery } from "@/lib/motion/useMediaQuery";
 import { whenIntroReady } from "@/lib/motion/intro";
 import { useMotion } from "@/components/motion/MotionProvider";
 import { useVideoPlayer } from "@/components/ui/VideoPlayer";
@@ -54,6 +55,8 @@ export function HeroSection() {
   const rootRef = useRef<HTMLElement>(null);
   const playWrapRef = useRef<HTMLSpanElement>(null);
   const { ready, reduced } = useMotion();
+  /* Ambient glow loops are pointer-device only — see the note in the effect. */
+  const isTouch = useMediaQuery("(pointer: coarse)", false);
   const { open: openVideo } = useVideoPlayer();
 
   /* --- entrance + ambient + scroll + pointer ---------------------------- */
@@ -86,40 +89,49 @@ export function HeroSection() {
       /* 2. AMBIENT — start immediately, they belong to the scene not the   */
       /*    entrance                                                        */
       /* ---------------------------------------------------------------- */
-      // OPACITY ONLY, DELIBERATELY.
+      // THE GLOW BREATHES ON POINTER DEVICES ONLY.
       //
-      // This layer holds three gradients at `filter: blur(24-26px)`. Opacity
-      // is a compositor property, so changing it does not re-rasterise them.
-      // Scaling would: the browser has to redraw the blur at the new size on
-      // the main thread, every frame, forever. That kept the main thread busy
-      // even while the page sat idle, and scroll updates then queued behind
-      // it — which is felt as judder, not slowness. The glow still breathes,
-      // by brightness rather than size.
-      const glowLoop = gsap.to(q(`.${styles.glowBreathe}`), {
-        opacity: 0.35,
-        duration: 3.6,
-        ease: "sine.inOut",
-        yoyo: true,
-        repeat: -1,
-      });
+      // `.glowBreathe` carries `mix-blend-mode: screen` and covers the whole
+      // hero. A blended element cannot be composited on its own — the browser
+      // has to re-blend it against the photograph across the full viewport
+      // whenever anything about it changes. So even opacity, which is free on
+      // an ordinary layer, costs a full-screen blend here, on the main thread,
+      // every frame, forever.
+      //
+      // Scale and the smoke drift were worse still (they re-rasterised a blur
+      // and a four-octave feTurbulence filter respectively) and are gone
+      // everywhere. This last loop is cheap enough for a desktop and not for
+      // a phone, so phones get a still glow: same picture, no per-frame work.
+      // The hero's main thread is then genuinely idle when you are not
+      // scrolling, which is the whole point.
+      const ambient: gsap.core.Animation[] = [];
 
-      // An irregular flicker, so the lamp reads as a real light source.
-      // Opacity-only on a small element — cheap everywhere.
-      const lampLoop = gsap.to(q(`.${styles.gLamp}`), {
-        keyframes: { opacity: [1, 0.6, 1, 0.8, 1] },
-        duration: 2.4,
-        repeat: -1,
-        repeatDelay: 1.3,
-        ease: "none",
-      });
+      if (!isTouch) {
+        ambient.push(
+          gsap.to(q(`.${styles.glowBreathe}`), {
+            opacity: 0.35,
+            duration: 3.6,
+            ease: "sine.inOut",
+            yoyo: true,
+            repeat: -1,
+          }),
+        );
 
-      // The smoke drift is gone for the same reason, only more so: `.smoke`
-      // is an SVG feTurbulence filter with four octaves, and translating it
-      // re-renders that filter on every frame. The smoke itself stays — it is
-      // a static layer now rather than an animated one.
+        // The lamp flicker sits *inside* that same blended container, so it
+        // carries the identical cost despite being a small element.
+        ambient.push(
+          gsap.to(q(`.${styles.gLamp}`), {
+            keyframes: { opacity: [1, 0.6, 1, 0.8, 1] },
+            duration: 2.4,
+            repeat: -1,
+            repeatDelay: 1.3,
+            ease: "none",
+          }),
+        );
+      }
 
-      // Ambient loops idle out when the hero is not on screen.
-      cleanups.push(pauseWhenOffscreen(root, [glowLoop, lampLoop]));
+      // Whatever is left idles out when the hero is off screen.
+      if (ambient.length) cleanups.push(pauseWhenOffscreen(root, ambient));
 
       /* ---------------------------------------------------------------- */
       /* 3. SCROLL SCENES                                                  */
@@ -310,7 +322,7 @@ export function HeroSection() {
       cleanups.forEach((fn) => fn());
       ctx.revert();
     };
-  }, [ready, reduced]);
+  }, [ready, reduced, isTouch]);
 
   /* --- magnetic play button -------------------------------------------- */
   useEffect(() => {
