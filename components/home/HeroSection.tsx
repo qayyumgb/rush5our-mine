@@ -32,7 +32,6 @@
 
 import { useEffect, useRef } from "react";
 import { gsap, ScrollTrigger, hasFinePointer } from "@/lib/motion/gsap";
-import { useMediaQuery } from "@/lib/motion/useMediaQuery";
 import { EASE, EASE_IO, charsIn, magnetic, writeHand } from "@/lib/motion/helpers";
 import { scramble, splitBrLines, splitTitle } from "@/lib/motion/split";
 import { whenIntroReady } from "@/lib/motion/intro";
@@ -48,8 +47,6 @@ export function HeroSection() {
   const rootRef = useRef<HTMLElement>(null);
   const playWrapRef = useRef<HTMLSpanElement>(null);
   const { ready, reduced } = useMotion();
-  /* Phones get cheaper ambient loops — see the note in the effect below. */
-  const isTouch = useMediaQuery("(pointer: coarse)", false);
   const { open: openVideo } = useVideoPlayer();
 
   /* --- entrance + ambient + scroll + pointer ---------------------------- */
@@ -82,25 +79,15 @@ export function HeroSection() {
       /* 2. AMBIENT — start immediately, they belong to the scene not the   */
       /*    entrance                                                        */
       /* ---------------------------------------------------------------- */
-      // Touch devices run a cheaper version of the ambient loops. The glow
-      // layers carry `filter: blur()` and the smoke is an SVG turbulence
-      // filter — scaling or moving either forces the browser to re-rasterise
-      // the filter every single frame, which is the kind of sustained cost
-      // that turns a fast flick into dropped frames. Opacity alone composites
-      // on the GPU and costs effectively nothing.
-      const cheap = isTouch;
-
       gsap.to(q(`.${styles.glowBreathe}`), {
         opacity: 0.35,
-        ...(cheap ? {} : { scale: 1.06 }),
+        scale: 1.06,
         duration: 3.6,
         ease: "sine.inOut",
         yoyo: true,
         repeat: -1,
       });
-
       // An irregular flicker, so the lamp reads as a real light source.
-      // Opacity-only, so it is safe everywhere.
       gsap.to(q(`.${styles.gLamp}`), {
         keyframes: { opacity: [1, 0.6, 1, 0.8, 1] },
         duration: 2.4,
@@ -108,27 +95,20 @@ export function HeroSection() {
         repeatDelay: 1.3,
         ease: "none",
       });
-
-      if (!cheap) {
-        gsap.to(q(`.${styles.smoke}`), {
-          xPercent: -6,
-          yPercent: -3,
-          duration: 16,
-          ease: "sine.inOut",
-          yoyo: true,
-          repeat: -1,
-        });
-      }
+      gsap.to(q(`.${styles.smoke}`), {
+        xPercent: -6,
+        yPercent: -3,
+        duration: 16,
+        ease: "sine.inOut",
+        yoyo: true,
+        repeat: -1,
+      });
 
       /* ---------------------------------------------------------------- */
       /* 3. SCROLL SCENES                                                  */
       /* ---------------------------------------------------------------- */
-      // A smoothed scrub (the 1s catch-up) lags visibly behind touch momentum
-      // scrolling, which reads as the parallax sliding around after your
-      // finger has stopped. Touch gets an immediate scrub instead.
-      const smooth = isTouch ? true : 1;
       const hard = { trigger: root, start: "top top", end: "bottom top", scrub: true };
-      const soft = { trigger: root, start: "top top", end: "bottom top", scrub: smooth };
+      const soft = { trigger: root, start: "top top", end: "bottom top", scrub: 1 };
 
       gsap.to(q(`.${styles.bgParallax}`), { yPercent: 18, ease: "none", scrollTrigger: hard });
       gsap.to(q(`.${styles.photo}`), { scale: 1.12, ease: "none", scrollTrigger: hard });
@@ -143,7 +123,7 @@ export function HeroSection() {
         y: () => -window.innerHeight * 0.12,
         opacity: 0,
         ease: "none",
-        scrollTrigger: { trigger: root, start: "top top", end: "bottom 20%", scrub: smooth },
+        scrollTrigger: { trigger: root, start: "top top", end: "bottom 20%", scrub: 1 },
       });
 
       gsap.to(q(`.${styles.cueWrap}`), {
@@ -313,7 +293,7 @@ export function HeroSection() {
       cleanups.forEach((fn) => fn());
       ctx.revert();
     };
-  }, [ready, reduced, isTouch]);
+  }, [ready, reduced]);
 
   /* --- magnetic play button -------------------------------------------- */
   useEffect(() => {
