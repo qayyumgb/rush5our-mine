@@ -23,7 +23,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap } from "@/lib/motion/gsap";
-import { EASE, EASE_IO, headReveal, prepareStrokes, settle } from "@/lib/motion/helpers";
+import { EASE, EASE_IO, headReveal, prepareStrokes } from "@/lib/motion/helpers";
 import { scramble } from "@/lib/motion/split";
 import { useMotion } from "@/components/motion/MotionProvider";
 import ContactForm from "@/components/ui/ContactForm";
@@ -117,7 +117,6 @@ export function FaqSection({ items = defaultItems }: FaqSectionProps) {
         defaults: { ease: EASE },
         scrollTrigger: { trigger: q(`.${styles.list}`)[0], start: "top 84%" },
       });
-      settle(rows);
       rows.fromTo(
         q(`.${styles.item}`),
         { y: 44, opacity: 0 },
@@ -146,7 +145,6 @@ export function FaqSection({ items = defaultItems }: FaqSectionProps) {
         defaults: { ease: EASE },
         scrollTrigger: { trigger: q(`.${styles.footer}`)[0], start: "top 94%" },
       });
-      settle(footer);
       footer
         .fromTo(q(`.${styles.footerWord}`), { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 1 }, 0)
         .fromTo(q(`.${styles.footerTag}`), { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 1 }, 0.12)

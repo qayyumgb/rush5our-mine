@@ -476,6 +476,7 @@
   height: calc(431 * var(--u));
   border-radius: calc(10 * var(--u));
   background: #0a0a0b;
+  will-change: transform;
   box-shadow: inset 0 0 0 max(1px, calc(1.5 * var(--u))) rgba(255, 255, 255, 0.14);
   transition: box-shadow 0.5s;
 }

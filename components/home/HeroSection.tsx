@@ -38,7 +38,6 @@ import {
   charsIn,
   magnetic,
   pauseWhenOffscreen,
-  settle,
   writeHand,
 } from "@/lib/motion/helpers";
 import { scramble, splitBrLines, splitTitle } from "@/lib/motion/split";
@@ -236,7 +235,6 @@ export function HeroSection() {
         gsap.set(q("[data-a]"), { visibility: "visible" });
 
         const tl = gsap.timeline({ defaults: { ease: EASE } });
-        settle(tl);
 
         tl.fromTo(
           q(`.${styles.bg}`),

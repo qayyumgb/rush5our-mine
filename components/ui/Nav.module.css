@@ -7,6 +7,7 @@
   z-index: 50;
   height: calc(120 * var(--nu));
   border-bottom: 1px solid transparent;
+  will-change: transform;
   transition:
     background-color 0.5s var(--ease-out),
     border-color 0.5s,
