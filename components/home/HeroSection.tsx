@@ -51,22 +51,6 @@ import ScrollCue from "@/components/ui/ScrollCue";
 import { hero } from "@/data/hero";
 import styles from "./HeroSection.module.css";
 
-/**
- * How far the deepest hero accent travels on a phone, in px. The other three
- * are scaled against it by their own `depth`, so the corners keep their
- * relative parallax instead of moving together.
- */
-const PHONE_ACCENT_SHIFT = 60;
-
-/**
- * Fraction of the viewport height over which the phone accents complete that
- * travel. The rest of the hero's scroll scenes run the section's whole length;
- * the accents finish early, so they have settled by the time the headline has
- * risen into the upper part of the frame rather than creeping the whole way
- * down. Lower is faster.
- */
-const PHONE_ACCENT_RANGE = 0.22;
-
 export function HeroSection() {
   const rootRef = useRef<HTMLElement>(null);
   const playWrapRef = useRef<HTMLSpanElement>(null);
@@ -111,26 +95,8 @@ export function HeroSection() {
       const hard = { trigger: root, start: "top top", end: "bottom top", scrub: true };
       const soft = { trigger: root, start: "top top", end: "bottom top", scrub: 1 };
 
-      /* PHONE TRAVEL LIMITS.
-         The hero's phone composition is everything below 640px (see the
-         breakpoints in the stylesheet), so the same width decides how far
-         anything travels. Width deliberately, not `pointer`/`hover`: a stylus
-         can change what those report mid-session, and nothing changes width. */
-      const isPhone = window.matchMedia("(max-width: 639px)").matches;
-
-      gsap.to(q(`.${styles.bgParallax}`), {
-        yPercent: isPhone ? 4 : 18,
-        ease: "none",
-        scrollTrigger: hard,
-      });
-      gsap.to(q(`.${styles.photo}`), {
-        // A smaller scale range is not just a smaller movement: a scaled layer
-        // is re-rasterised at each new scale, so travelling 2.5% instead of
-        // 12% is far less raster work as well as a gentler push-in.
-        scale: isPhone ? 1.025 : 1.12,
-        ease: "none",
-        scrollTrigger: hard,
-      });
+      gsap.to(q(`.${styles.bgParallax}`), { yPercent: 18, ease: "none", scrollTrigger: hard });
+      gsap.to(q(`.${styles.photo}`), { scale: 1.12, ease: "none", scrollTrigger: hard });
       gsap.to(q(`.${styles.dim}`), { opacity: 0.7, ease: "none", scrollTrigger: hard });
 
       // The two headline lines slide apart as the section leaves.
@@ -152,34 +118,12 @@ export function HeroSection() {
       });
 
       // Accents travel at their own depths, so the frame gains dimension.
-      const depthEls = q("[data-depth]") as HTMLElement[];
-      const depthOf = (el: HTMLElement) => parseFloat(el.dataset.depth ?? "0");
-      // Largest depth currently in the markup, so the cap below stays correct
-      // if any accent's depth is retuned later.
-      const maxDepth = Math.max(...depthEls.map(depthOf), 0.0001);
-
-      depthEls.forEach((el) => {
-        const depth = depthOf(el);
+      q("[data-depth]").forEach((el) => {
+        const depth = parseFloat((el as HTMLElement).dataset.depth ?? "0");
         gsap.to(el, {
-          // On a phone the deepest accent travels PHONE_ACCENT_SHIFT and the
-          // rest keep their depths relative to it, so the parallax still reads
-          // as depth rather than four corners sliding in lockstep. On desktop
-          // the travel stays proportional to the viewport as before.
-          y: isPhone
-            ? -(depth / maxDepth) * PHONE_ACCENT_SHIFT
-            : () => -window.innerHeight * depth,
+          y: () => -window.innerHeight * depth,
           ease: "none",
-          // Phones get their own, much shorter range so the corners reach
-          // their full offset early instead of spreading 60px across the whole
-          // section — which reads as nothing moving at all.
-          scrollTrigger: isPhone
-            ? {
-                trigger: root,
-                start: "top top",
-                end: () => `+=${window.innerHeight * PHONE_ACCENT_RANGE}`,
-                scrub: 1,
-              }
-            : soft,
+          scrollTrigger: soft,
         });
       });
 
