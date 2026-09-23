@@ -128,24 +128,33 @@
 
 /* Generated smoke, masked into the top-right so it only drifts where the
    flare already is. */
+/* POINTER DEVICES ONLY — not rendered at all on touch.
+   The smoke is drawn by an SVG `feTurbulence` with `numOctaves="4"` (see the
+   section), which is the most expensive filter primitive there is: four
+   Perlin noise passes per pixel, across an element sized 124% of the hero,
+   inside a layer that is both `mix-blend-mode: screen` and masked. It is the
+   worst cost-to-visibility ratio on the page — `opacity: 0.2`, masked into
+   one corner — so on a phone it buys almost nothing for a large amount of
+   rasterisation. `display: none` means the filter is never evaluated, rather
+   than being computed and then hidden. */
 .smoke {
-  position: absolute;
-  inset: -12%;
-  width: 124%;
-  height: 124%;
-  opacity: 0.2;
-  mix-blend-mode: screen;
-  -webkit-mask-image: radial-gradient(120% 75% at 70% 20%, #000 20%, transparent 75%);
-  mask-image: radial-gradient(120% 75% at 70% 20%, #000 20%, transparent 75%);
+  display: none;
 }
 
-/* Only the pointer parallax moves the smoke (see `hasFinePointer()` in the
-   section), so it is only worth a layer there. On touch it never transforms,
-   and a permanently promoted `mix-blend-mode: screen` layer cannot composite
-   on its own — it re-reads and re-blends the backdrop on every scroll frame. */
 @media (hover: hover) and (pointer: fine) {
   .smoke {
+    display: block;
+    position: absolute;
+    inset: -12%;
+    width: 124%;
+    height: 124%;
+    opacity: 0.2;
+    mix-blend-mode: screen;
+    /* Only the pointer parallax moves it, so the layer is only worth having
+       here; on touch it never transformed anyway. */
     will-change: transform;
+    -webkit-mask-image: radial-gradient(120% 75% at 70% 20%, #000 20%, transparent 75%);
+    mask-image: radial-gradient(120% 75% at 70% 20%, #000 20%, transparent 75%);
   }
 }
 
