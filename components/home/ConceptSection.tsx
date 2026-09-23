@@ -63,9 +63,15 @@ export function ConceptSection() {
       prepareStrokes(root);
 
       /* --- atmosphere --------------------------------------------------- */
+      /* `?noscale=1` drops the scale and keeps the drift — see the matching
+         note in HeroSection. This is the heavier of the site's two scrubbed
+         scale tweens: `.glow` carries `filter: blur(30px)` over a ~90vw
+         square, so every new scale re-computes that blur across the whole
+         area. TEMPORARY, paired with `data-noscale` in app/layout.tsx. */
+      const noScale = document.documentElement.hasAttribute("data-noscale");
       gsap.to(q(`.${styles.glow}`), {
         yPercent: 40,
-        scale: 1.25,
+        ...(noScale ? {} : { scale: 1.25 }),
         ease: "none",
         scrollTrigger: { trigger: root, start: "top bottom", end: "bottom top", scrub: true },
       });
