@@ -620,3 +620,39 @@
     display: none;
   }
 }
+
+/* =========================================================================
+   DIAGNOSTIC — hero atmosphere off on touch.
+
+   TEMPORARY, and deliberately blunt. Delete this whole block to restore.
+
+   The hero only rasterises while it is on screen, so scrolling it into view
+   is when the GPU has to build its entire compositing stack at once:
+
+     .glowBreathe   full-viewport `mix-blend-mode: screen` wrapping three
+                    blurred glows (24px, 26px, 10px) — a blended layer cannot
+                    composite on its own, so it re-blends against the photo
+                    across the whole viewport whenever anything beneath moves
+     .smoke         SVG `feTurbulence numOctaves="4"` at 124% of the hero,
+                    inside a layer that is both blended and masked
+     .flash         another full-viewport `mix-blend-mode: screen`, used once
+                    during the intro but present for the whole session
+     .glowPointer   a third blended layer that only ever moves on fine pointers
+
+   Removing these one at a time changed nothing, which is what you would
+   expect if the cause is cumulative cost crossing a budget rather than any
+   single element. This removes all four together to test that.
+
+   If the bug goes: add them back cheapest-first (.glowPointer, .flash, then
+   .smoke, then .glowBreathe) until it returns — the last one added is the
+   one that matters. If the bug stays: the hero's atmosphere is not the cause
+   and this block should come out.
+   ========================================================================= */
+@media (hover: none), (pointer: coarse) {
+  .glowBreathe,
+  .smoke,
+  .flash,
+  .glowPointer {
+    display: none;
+  }
+}
