@@ -1,14 +1,12 @@
 "use client";
 
 /**
- * NAV — fixed header with the logo, a burger, a reading-progress hairline,
- * and a full-screen drawer.
+ * NAV — fixed header with the logo, a burger and a full-screen drawer.
  *
  * Behaviours:
- *   • gains a blurred background once the page has scrolled past 24px
- *   • hides on scroll-down, returns on scroll-up (and always shows at the
- *     top, or while the drawer is open)
- *   • the progress hairline is scrubbed against total document scroll
+ *   • transparent over the hero, gaining a solid background once the page has
+ *     scrolled past 24px — a class toggle, nothing per-frame
+ *   • otherwise it does not move or restyle while scrolling at all
  *   • the drawer wipes down, links rise in sequence, and focus is trapped
  *     while it is open; Escape closes it
  *
@@ -17,7 +15,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
+import { gsap } from "@/lib/motion/gsap";
 import { EASE, EASE_IO } from "@/lib/motion/helpers";
 import { whenIntroReady } from "@/lib/motion/intro";
 import { useMotion } from "@/components/motion/MotionProvider";
@@ -30,7 +28,6 @@ export function Nav() {
   const navRef = useRef<HTMLElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
   const burgerRef = useRef<HTMLButtonElement>(null);
-  const progressRef = useRef<HTMLSpanElement>(null);
 
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -74,39 +71,21 @@ export function Nav() {
     };
   }, [ready, reduced]);
 
-  /* --- progress bar + hide-on-scroll-down ------------------------------ */
-  // `open` is a dependency because a hidden bar must slide back into view the
-  // moment the drawer is opened.
-  useEffect(() => {
-    if (!ready || reduced) return;
+  /* --- no scroll-driven motion on the bar ------------------------------
+     The header is simply fixed: transparent at the top, opaque past 24px via
+     the `scrolled` class, and otherwise still. It used to do two things here,
+     both removed deliberately:
 
-    const ctx = gsap.context(() => {
-      gsap.to(progressRef.current, {
-        scaleX: 1,
-        ease: "none",
-        scrollTrigger: { start: 0, end: "max", scrub: 0.3 },
-      });
+       • a reading-progress hairline scrubbed from scroll 0 to the bottom of
+         the document, which rewrote an inline `transform: scaleX()` on every
+         frame of every scroll, for the whole page height;
+       • hide-on-scroll-down / show-on-scroll-up, which slid the whole bar in
+         and out by 110%.
 
-      let shown = true;
-      ScrollTrigger.create({
-        start: 0,
-        end: "max",
-        onUpdate: (self) => {
-          const show = self.scroll() < 120 || self.direction === -1 || open;
-          if (show === shown) return;
-          shown = show;
-          gsap.to(navRef.current, {
-            yPercent: show ? 0 : -110,
-            duration: 0.6,
-            ease: show ? "power3.out" : "power3.in",
-            overwrite: true,
-          });
-        },
-      });
-    });
-
-    return () => ctx.revert();
-  }, [ready, reduced, open]);
+     Both were per-frame or near-constant work on a full-width element pinned
+     over everything else. The bar now stays put and mutates no inline styles
+     while scrolling. Restoring the hairline is easy if it is wanted back —
+     but it needs a mechanism that does not write to the DOM each frame. */
 
   /* --- drawer open / close --------------------------------------------- */
   const close = useCallback(() => setOpen(false), []);
@@ -196,7 +175,6 @@ export function Nav() {
             <span />
           </button>
 
-          <span ref={progressRef} className={styles.progress} aria-hidden="true" />
         </div>
       </header>
 
