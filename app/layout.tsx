@@ -48,7 +48,6 @@ export const viewport: Viewport = {
  */
 const MOTION_GATE = `(function(){var d=document.documentElement;
 if(location.search.indexOf('plain=1')>-1)d.setAttribute('data-plain','');
-if(location.search.indexOf('noscale=1')>-1)d.setAttribute('data-noscale','');
 if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
 d.classList.add('motion');
 setTimeout(function(){if(!d.classList.contains('motion-ready'))d.classList.remove('motion');},4000);})();`;

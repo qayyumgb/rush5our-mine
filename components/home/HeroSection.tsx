@@ -140,18 +140,7 @@ export function HeroSection() {
       const soft = { trigger: root, start: "top top", end: "bottom top", scrub: 1 };
 
       gsap.to(q(`.${styles.bgParallax}`), { yPercent: 18, ease: "none", scrollTrigger: hard });
-
-      /* DIAGNOSTIC — `?noscale=1` skips this one tween and nothing else.
-         TEMPORARY; delete with the `data-noscale` line in app/layout.tsx.
-
-         Translating a promoted layer is free: the compositor moves a texture
-         it already has. Scaling one is not — the texture has to be rasterised
-         again at each new scale to stay sharp, and this is a full-screen photo
-         scrubbed across the whole hero. The flag exists to find out whether
-         that continuous re-rasterisation is what the S25 is choking on. */
-      if (!document.documentElement.hasAttribute("data-noscale")) {
-        gsap.to(q(`.${styles.photo}`), { scale: 1.12, ease: "none", scrollTrigger: hard });
-      }
+      gsap.to(q(`.${styles.photo}`), { scale: 1.12, ease: "none", scrollTrigger: hard });
       gsap.to(q(`.${styles.dim}`), { opacity: 0.7, ease: "none", scrollTrigger: hard });
 
       // The two headline lines slide apart as the section leaves.
