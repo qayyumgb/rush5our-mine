@@ -17,7 +17,7 @@
  */
 
 import { useEffect, useRef } from "react";
-import { gsap } from "@/lib/motion/gsap";
+import { gsap, hasFinePointer } from "@/lib/motion/gsap";
 import {
   EASE,
   EASE_IO,
@@ -63,12 +63,27 @@ export function ConceptSection() {
       prepareStrokes(root);
 
       /* --- atmosphere --------------------------------------------------- */
-      gsap.to(q(`.${styles.glow}`), {
-        yPercent: 40,
-        scale: 1.25,
-        ease: "none",
-        scrollTrigger: { trigger: root, start: "top bottom", end: "bottom top", scrub: true },
-      });
+      // POINTER DEVICES ONLY.
+      //
+      // `.glow` carries `filter: blur(30px)` over a square roughly 90% of the
+      // viewport wide. Drifting it is cheap — the compositor moves a texture
+      // it already has — but growing it is not: a scaled layer has to be
+      // rasterised again at every new scale to stay sharp, which re-computes
+      // that blur across the whole area, continuously, for as long as the
+      // section is on screen. On a high-DPI phone that is a large texture
+      // rebuilt over and over, and it was implicated in the Galaxy S25
+      // dropping other layers nearby (the CTA bar sits directly over it).
+      //
+      // Touch devices get the glow as a still image: identical picture, no
+      // per-frame raster work.
+      if (hasFinePointer()) {
+        gsap.to(q(`.${styles.glow}`), {
+          yPercent: 40,
+          scale: 1.25,
+          ease: "none",
+          scrollTrigger: { trigger: root, start: "top bottom", end: "bottom top", scrub: true },
+        });
+      }
 
       /* --- heading ------------------------------------------------------ */
       const head = q(`.${styles.head}`)[0] as HTMLElement | undefined;
