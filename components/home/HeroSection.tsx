@@ -85,53 +85,9 @@ export function HeroSection() {
       const titleChars = titleEl ? splitTitle(titleEl) : [];
       const subLines = subEl ? splitBrLines(subEl) : [];
 
-      /* ---------------------------------------------------------------- */
-      /* 2. AMBIENT — start immediately, they belong to the scene not the   */
-      /*    entrance                                                        */
-      /* ---------------------------------------------------------------- */
-      // THE GLOW BREATHES ON POINTER DEVICES ONLY.
-      //
-      // `.glowBreathe` carries `mix-blend-mode: screen` and covers the whole
-      // hero. A blended element cannot be composited on its own — the browser
-      // has to re-blend it against the photograph across the full viewport
-      // whenever anything about it changes. So even opacity, which is free on
-      // an ordinary layer, costs a full-screen blend here, on the main thread,
-      // every frame, forever.
-      //
-      // Scale and the smoke drift were worse still (they re-rasterised a blur
-      // and a four-octave feTurbulence filter respectively) and are gone
-      // everywhere. This last loop is cheap enough for a desktop and not for
-      // a phone, so phones get a still glow: same picture, no per-frame work.
-      // The hero's main thread is then genuinely idle when you are not
-      // scrolling, which is the whole point.
-      const ambient: gsap.core.Animation[] = [];
-
-      if (!isTouch) {
-        ambient.push(
-          gsap.to(q(`.${styles.glowBreathe}`), {
-            opacity: 0.35,
-            duration: 3.6,
-            ease: "sine.inOut",
-            yoyo: true,
-            repeat: -1,
-          }),
-        );
-
-        // The lamp flicker sits *inside* that same blended container, so it
-        // carries the identical cost despite being a small element.
-        ambient.push(
-          gsap.to(q(`.${styles.gLamp}`), {
-            keyframes: { opacity: [1, 0.6, 1, 0.8, 1] },
-            duration: 2.4,
-            repeat: -1,
-            repeatDelay: 1.3,
-            ease: "none",
-          }),
-        );
-      }
-
-      // Whatever is left idles out when the hero is off screen.
-      if (ambient.length) cleanups.push(pauseWhenOffscreen(root, ambient));
+      /* The ambient glow loops used to live here. They are the only part of
+         the hero that depends on `isTouch`, so they now have their own effect
+         below — see the note there for why that separation matters. */
 
       /* ---------------------------------------------------------------- */
       /* 3. SCROLL SCENES                                                  */
@@ -320,6 +276,60 @@ export function HeroSection() {
     return () => {
       cancelled = true;
       cleanups.forEach((fn) => fn());
+      ctx.revert();
+    };
+    // `isTouch` is deliberately NOT a dependency here — see the ambient effect.
+  }, [ready, reduced]);
+
+  /* --- ambient glow loops (pointer devices only) ------------------------
+     These live in their own effect because they are the only part of the hero
+     that depends on `isTouch`, and `isTouch` comes from a live media-query
+     subscription: the browser can change its reported pointer type *during a
+     session*. A stylus being detached or put away does it on devices that
+     have one, and DevTools' element picker does it in device emulation, which
+     is why inspecting an element replays the hero animation in mobile view
+     and not in desktop view.
+
+     While `isTouch` sat in the main effect's dependencies, every such flip
+     reverted and rebuilt the entire hero — every entrance tween, every scroll
+     scene and every ScrollTrigger — potentially mid-scroll. Scoped here, a
+     pointer change restarts these two loops and nothing else.
+
+     Why they are pointer-only at all: `.glowBreathe` carries
+     `mix-blend-mode: screen` across the whole hero, and a blended element
+     cannot be composited on its own — the browser re-blends it against the
+     photograph over the full viewport whenever anything about it changes. So
+     even opacity, free on an ordinary layer, costs a full-screen blend here
+     on every frame. Phones get a still glow: same picture, no per-frame work.
+     The lamp flicker sits inside that same blended container, so it carries
+     the identical cost despite being a small element. */
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || !ready || reduced || isTouch) return;
+
+    let stopWatching = () => {};
+    const ctx = gsap.context(() => {
+      const q = gsap.utils.selector(root);
+      stopWatching = pauseWhenOffscreen(root, [
+        gsap.to(q(`.${styles.glowBreathe}`), {
+          opacity: 0.35,
+          duration: 3.6,
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: -1,
+        }),
+        gsap.to(q(`.${styles.gLamp}`), {
+          keyframes: { opacity: [1, 0.6, 1, 0.8, 1] },
+          duration: 2.4,
+          repeat: -1,
+          repeatDelay: 1.3,
+          ease: "none",
+        }),
+      ]);
+    }, root);
+
+    return () => {
+      stopWatching();
       ctx.revert();
     };
   }, [ready, reduced, isTouch]);
