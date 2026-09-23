@@ -28,6 +28,7 @@ import {
   pauseWhenOffscreen,
   prepareStrokes,
   runTrace,
+  settle,
   tilt,
   writeHand,
 } from "@/lib/motion/helpers";
@@ -215,6 +216,7 @@ export function MerchSection({
         defaults: { ease: EASE },
         scrollTrigger: { trigger: q(`.${styles.drops}`)[0], start: "top 82%" },
       });
+      settle(dropsTl);
 
       dropsTl
         .fromTo(
@@ -264,6 +266,7 @@ export function MerchSection({
         defaults: { ease: EASE },
         scrollTrigger: { trigger: q(`.${styles.bar}`)[0], start: "top 88%" },
       });
+      settle(bar);
       bar
         .fromTo(q(`.${styles.bar}`), { y: 50, opacity: 0, scale: 0.97 }, { y: 0, opacity: 1, scale: 1, duration: 1.3 }, 0)
         .fromTo(q(`.${styles.barDivider}`), { scaleY: 0 }, { scaleY: 1, duration: 0.8, ease: EASE_IO }, 0.4)

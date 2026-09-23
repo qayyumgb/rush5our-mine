@@ -20,7 +20,7 @@
 
 import { useEffect, useRef } from "react";
 import { gsap } from "@/lib/motion/gsap";
-import { EASE, EASE_IO, headReveal } from "@/lib/motion/helpers";
+import { EASE, EASE_IO, headReveal, settle } from "@/lib/motion/helpers";
 import { useMotion } from "@/components/motion/MotionProvider";
 import Eyebrow from "@/components/ui/Eyebrow";
 import Icon from "@/components/ui/Icon";
@@ -70,6 +70,7 @@ export function CultureSection() {
         defaults: { ease: EASE },
         scrollTrigger: { trigger: q(`.${styles.grid}`)[0], start: "top 84%" },
       });
+      settle(grid);
 
       grid
         // The cross opens from its centre, drawing the grid into existence.

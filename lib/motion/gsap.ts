@@ -32,6 +32,12 @@ export function initGsap() {
   // Symmetrical in/out with a fast middle, for wipes.
   CustomEase.create(EASE_IO, "M0,0 C0.77,0 0.18,1 1,1");
 
+  // Mobile browsers change viewport height when the address bar slides in and
+  // out, which otherwise makes ScrollTrigger refresh and recompute every
+  // trigger point mid-scroll. Ignoring that resize keeps start/end positions
+  // stable for the whole gesture.
+  ScrollTrigger.config({ ignoreMobileResize: true });
+
   // Keeps ScrollTrigger in sync when the tab is throttled or Lenis drives RAF.
   gsap.ticker.lagSmoothing(0);
 }

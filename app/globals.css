@@ -441,7 +441,6 @@ video {
 .accent {
   position: absolute;
   z-index: 4;
-  will-change: transform;
 }
 
 /* -------------------------------------------------------------------------
@@ -452,7 +451,40 @@ video {
    so the button keeps its own hover transform. */
 .magnet {
   display: inline-block;
-  will-change: transform;
+}
+
+/* -------------------------------------------------------------------------
+   GPU COMPOSITING FIX (.gpu-fix)
+
+   Requested for the Galaxy S25 Ultra, where elements stop being painted
+   during scroll and come back when you select or tap them. A standing 3D
+   transform plus `backface-visibility: hidden` pins each animated element to
+   its own compositor layer.
+
+   Applied through `[data-a]` (which already marks every element GSAP reveals)
+   and the runtime split-text nodes, so no element has to be tagged by hand.
+   `.gpu-fix` is exported for anything animated that isn't covered by those.
+
+   NOT applied to `.hand` — it carries `rotate() skewX()` of its own, and
+   `transform` is a single property, so this would overwrite the rotation.
+   `backface-visibility` is safe there and is set separately below.
+
+   Note `transform` here only holds until GSAP writes an inline transform,
+   which wins over this rule; `backface-visibility` is what persists through a
+   tween. Both are listed because the request asked for both. */
+.gpu-fix,
+[data-a],
+.line-inner,
+.word,
+.char {
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.hand {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 /* Section frame: a 950-unit column, centred. */

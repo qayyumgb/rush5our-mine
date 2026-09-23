@@ -15,6 +15,34 @@ import { scramble, splitTitle } from "./split";
 type TL = gsap.core.Timeline;
 
 /* ------------------------------------------------------------------------ */
+/* Settling a finished entrance                                              */
+/* ------------------------------------------------------------------------ */
+
+/**
+ * Pins a one-shot entrance to its finished state once it lands.
+ *
+ * Requested for the Galaxy S25 Ultra, where an element can end a tween in the
+ * right computed state and still not be painted. When the timeline completes
+ * this drops the inline `transform`, `will-change` and `opacity` GSAP left on
+ * every target, so the resting appearance comes from the stylesheet rather
+ * than from a tween's last frame, and nothing depends on a repaint the device
+ * may not fire.
+ *
+ * ONLY for one-shot entrances, never for scrubbed tweens: a scrubbed tween's
+ * inline transform *is* its output, and clearing it would snap the element
+ * back to its start position.
+ */
+export function settle(tl: TL): TL {
+  tl.eventCallback("onComplete", () => {
+    const targets = tl
+      .getChildren(true, true, false)
+      .flatMap((child) => (child as gsap.core.Tween).targets?.() ?? []);
+    if (targets.length) gsap.set(targets, { clearProps: "transform,willChange,opacity" });
+  });
+  return tl;
+}
+
+/* ------------------------------------------------------------------------ */
 /* Handwritten accents                                                       */
 /* ------------------------------------------------------------------------ */
 
@@ -109,7 +137,9 @@ export function headReveal(
 
   writeHand(tl, extraHand ?? head.querySelector(".accent"), 0.7);
 
-  return tl;
+  // Every section's heading lands through this one function, so settling here
+  // covers the hero, concept, culture, merch, videos and FAQ headlines.
+  return settle(tl);
 }
 
 /* ------------------------------------------------------------------------ */

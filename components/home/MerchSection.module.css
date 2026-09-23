@@ -332,7 +332,6 @@
   isolation: isolate;
   border-radius: calc(12 * var(--u));
   background: #0b0b0c;
-  will-change: transform;
 }
 
 .dropMedia {

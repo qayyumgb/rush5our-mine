@@ -27,6 +27,7 @@ import {
   injectTrace,
   lift,
   runTrace,
+  settle,
 } from "@/lib/motion/helpers";
 import useCarousel from "@/lib/motion/useCarousel";
 import { useMotion } from "@/components/motion/MotionProvider";
@@ -306,6 +307,7 @@ export function VideosSection({
         defaults: { ease: EASE },
         scrollTrigger: { trigger: gridRef.current, start: "top 85%" },
       });
+      settle(grid);
       grid
         .fromTo(
           q(`.${styles.card}`),

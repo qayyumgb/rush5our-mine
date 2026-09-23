@@ -25,6 +25,7 @@ import {
   injectTrace,
   prepareStrokes,
   runTrace,
+  settle,
   tilt,
   writeHand,
 } from "@/lib/motion/helpers";
@@ -87,6 +88,7 @@ export function ConceptSection() {
         defaults: { ease: EASE },
         scrollTrigger: { trigger: q(`.${styles.cards}`)[0], start: "top 82%" },
       });
+      settle(cards);
 
       cards
         // rotateX from a bottom origin makes the cards hinge up off the page.
@@ -150,6 +152,7 @@ export function ConceptSection() {
         defaults: { ease: EASE },
         scrollTrigger: { trigger: q(`.${styles.ctaWrap}`)[0], start: "top 88%" },
       });
+      settle(cta);
 
       cta
         .fromTo(
