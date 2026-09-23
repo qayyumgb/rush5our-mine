@@ -54,12 +54,12 @@
 }
 
 .title .l1 {
-  font-size: calc(95.5 * var(--u));
+  font-size: var(--fs-l1);
   letter-spacing: 0.01em;
 }
 
 .title .l2 {
-  font-size: calc(94.3 * var(--u));
+  font-size: var(--fs-l2);
   letter-spacing: 0.01em;
   margin-top: calc(12 * var(--u));
 }

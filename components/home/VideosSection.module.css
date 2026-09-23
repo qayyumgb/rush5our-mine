@@ -42,12 +42,12 @@
 }
 
 .title :global(.line):first-child {
-  font-size: calc(98.9 * var(--u));
+  font-size: var(--fs-l1);
   letter-spacing: 0.027em;
 }
 
 .title :global(.line):last-child {
-  font-size: calc(103.6 * var(--u));
+  font-size: var(--fs-l2);
   letter-spacing: 0.047em;
 }
 

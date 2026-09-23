@@ -58,7 +58,31 @@
      screens the units stop growing and the page becomes a centred column
      (the hero gets its own desktop composition in HeroSection.module.css).
      --------------------------------------------------------------------- */
-  --u: calc(min(100vw, 1040px) / 950); /* sections 2-6 */
+  /* The 900px cap is a desktop type-scale decision, not a measurement. Because
+     sections 2-6 come from 950-wide *phone* mockups, capping at the mockup's
+     own width (or above it, as 1040px did) renders phone typography at full
+     size on a desktop, where it reads as oversized — the hero escapes this by
+     having its own desktop composition. 900px puts `--u` just under 1 so the
+     whole section — headings, copy, cards, gaps — scales down together and
+     keeps the mockup's proportions exactly. Tune this one number to taste:
+     1040 → --u 1.095 (was), 900 → 0.947, 820 → 0.863. Viewports narrower than
+     the cap are unaffected, so nothing about phones changes. */
+  --u: calc(min(100vw, 900px) / 950); /* sections 2-6 */
+
+  /* SECTION HEADING SCALE (sections 2-6).
+
+     One scale for all five, deliberately overriding the mockups. Each mockup
+     sized its own headline for its own composition — 86.1 to 121 units, so
+     the largest was 40% bigger than the smallest. That is invisible on a
+     phone, where only one heading is on screen at a time, but reads as
+     inconsistency once the sections stack on a desktop. Normalised to the
+     Merch values, the smallest of the five, so nothing grew.
+
+     `--fs-l1` is the white line, `--fs-l2` the coloured line below it.
+     Change them here and all five sections follow. The hero is not included:
+     it runs on `--cu` with its own desktop composition. */
+  --fs-l1: calc(86.1 * var(--u));
+  --fs-l2: calc(89.6 * var(--u));
   --hu: calc(100vw / 882); /* hero (phone)  */
   --cu: var(--hu); /* hero copy     */
   --nu: calc(min(100vw, 560px) / 882); /* nav           */

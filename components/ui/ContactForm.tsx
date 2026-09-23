@@ -29,6 +29,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { gsap } from "@/lib/motion/gsap";
 import { useMotion } from "@/components/motion/MotionProvider";
 import styles from "./ContactForm.module.css";
@@ -149,9 +150,17 @@ export function ContactForm({ open, onClose }: ContactFormProps) {
     if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }));
   };
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
-  return (
+  /* Rendered into <body>, not where it sits in the tree.
+     `<ContactForm>` is written inside the FAQ's <section>, and that section
+     carries `isolation: isolate`, which makes it a stacking context — so the
+     overlay's `z-index: 92` only ranked it against the FAQ's own children,
+     and the whole section still painted beneath the nav at `z-index: 50`.
+     A portal moves it out to the document root, where its z-index is
+     compared against the nav's. `VideoPlayer` avoids the same trap by being
+     mounted at the layout root instead. */
+  return createPortal(
     <div
       ref={overlayRef}
       className={styles.overlay}
@@ -271,7 +280,8 @@ export function ContactForm({ open, onClose }: ContactFormProps) {
           {status === "error" && "That didn't send. Try again in a moment."}
         </p>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

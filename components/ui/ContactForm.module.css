@@ -159,6 +159,12 @@
 
 .close {
   position: absolute;
+  /* `.title` below is `position: relative` and comes later in the DOM, so
+     without a z-index it paints over this button and swallows the taps. The
+     h2's box runs the full content width, and at narrow widths the panel's
+     padding shrinks to 24px while this button sits 12px from the edge — so
+     the two overlap on phones and not on desktop. */
+  z-index: 1;
   top: 12px;
   right: 12px;
   width: 42px;
