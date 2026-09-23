@@ -1,12 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="RUSH 5OUR">
   <!-- Brand mark: the skewed red R5 tile from the nav logo.
-       App Router picks this up automatically as the site icon.
-       SWAP: replace with the client's real icon file when supplied. -->
-  <rect width="64" height="64" fill="#040404"/>
-  <!-- Skewed tile, matching the -7deg slant of the nav logo. -->
-  <path d="M14 10h40l-4 44H10z" fill="#EB151F"/>
-  <text x="32" y="44"
-        font-family="Impact, 'Arial Narrow', Haettenschweiler, sans-serif"
-        font-size="30" font-weight="700" text-anchor="middle"
-        fill="#0A0A0A" letter-spacing="0.5">R5</text>
+       App Router picks this file up automatically as the site icon.
+       SWAP: replace with the client's real icon file when supplied.
+
+       Geometry follows `.mark` in components/ui/Logo.module.css: a red tile
+       leaning by -7deg, with the "R5" in near-black. The tile is drawn as a
+       path rather than a skewed rect so it can be sized to fill the icon —
+       the earlier version inset a 44x44 tile inside a 64x64 black square,
+       using under half the pixels, which at a real favicon's 16px read as a
+       black square with a red smudge.
+
+       The background is transparent on purpose: no backing rect, so the tile
+       sits directly on whatever the browser or OS puts behind it, light or
+       dark. Only the letters rely on the red behind them for contrast, and
+       they are inside the tile.
+
+       tan(7deg) = 0.1228, so over the 58-unit height the bottom edge sits
+       7 units left of the top. Letters stay upright: the tile's lean already
+       carries the brand shape, and slanting two condensed glyphs as well
+       costs legibility at the size this is actually seen.
+
+       `textLength` pins the mark's width whatever font the OS resolves.
+       Anton is not available to a favicon renderer and Impact is missing on
+       Android and most Linux systems, so without it a substituted font would
+       change how much of the tile the letters cover. -->
+  <path d="M11 3H59L52 61H4Z" fill="#EB151F"/>
+  <!-- No `font-weight`. Impact ships a single weight, so asking for 700 made
+       the renderer synthesise a bold by smearing the strokes — which is what
+       read as blur, not the size. The face is already heavy on its own.
+       'Arial Narrow Bold' is out of the stack for the same reason. -->
+  <text x="31.5" y="41.7"
+        font-family="Impact, Haettenschweiler, 'Arial Narrow', sans-serif"
+        font-size="27" text-anchor="middle"
+        textLength="32" lengthAdjust="spacingAndGlyphs"
+        fill="#0A0A0A">R5</text>
 </svg>
