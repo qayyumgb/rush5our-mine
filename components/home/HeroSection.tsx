@@ -167,12 +167,6 @@ export function HeroSection() {
         gsap.to(el, {
           y: () => -window.innerHeight * depth,
           ease: "none",
-          // 2D translate, not translate3d. GSAP's default would give each
-          // accent a standing GPU layer for the whole time the hero is in
-          // view, and this device drops those layers' textures and repaints
-          // them empty. These are a few small blocks of text, so painting them
-          // with the document costs nothing and cannot fail that way.
-          force3D: false,
           scrollTrigger: soft,
         });
       });
