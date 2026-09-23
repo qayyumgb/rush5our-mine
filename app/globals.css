@@ -438,10 +438,15 @@ video {
   stroke-width: 3;
 }
 
+/* No `will-change`. Accents are moved by the hero's depth parallax, which is a
+   scrubbed tween — so GSAP already holds a transform on them for as long as
+   the hero is in view, and a standing hint on top of it only pins a layer that
+   the GPU can later evict and fail to repaint. Same failure as the headline:
+   the text stays selectable while its pixels are gone. The parallax tween runs
+   with `force3D: false` so these paint with the document instead. */
 .accent {
   position: absolute;
   z-index: 4;
-  will-change: transform;
 }
 
 /* -------------------------------------------------------------------------

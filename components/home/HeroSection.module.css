@@ -391,7 +391,7 @@
   right: calc(34 * var(--hu));
   top: calc(211 * var(--hu));
   width: calc(161 * var(--hu));
-  will-change: transform;
+  /* No `will-change` — see the note on `.accent` in globals.css. */
 }
 
 .tags {
