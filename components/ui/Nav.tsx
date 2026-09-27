@@ -15,6 +15,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { gsap } from "@/lib/motion/gsap";
 import { EASE, EASE_IO } from "@/lib/motion/helpers";
 import { whenIntroReady } from "@/lib/motion/intro";
@@ -32,6 +33,9 @@ export function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const { ready, reduced, lockScroll, unlockScroll } = useMotion();
+  // Marks the page being viewed. Only exact route matches count, so the
+  // homepage-section links ("/#merch") never read as current.
+  const pathname = usePathname();
 
   /* --- background on scroll ------------------------------------------- */
   useEffect(() => {
@@ -62,7 +66,14 @@ export function Nav() {
       gsap.fromTo(
         targets,
         { y: -24, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1.2, stagger: 0.1, ease: EASE, clearProps: "transform" },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1.2,
+          stagger: 0.1,
+          ease: EASE,
+          clearProps: "transform",
+        },
       );
     });
 
@@ -120,9 +131,19 @@ export function Nav() {
           { yPercent: 0, opacity: 1, duration: 0.9, stagger: 0.07, ease: EASE },
           0.25,
         )
-        .fromTo(foot, { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: EASE }, 0.55);
+        .fromTo(
+          foot,
+          { y: 24, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.8, ease: EASE },
+          0.55,
+        );
     } else {
-      tl.to(items, { yPercent: -60, opacity: 0, duration: 0.3, ease: "power2.in" })
+      tl.to(items, {
+        yPercent: -60,
+        opacity: 0,
+        duration: 0.3,
+        ease: "power2.in",
+      })
         .to(foot, { opacity: 0, duration: 0.25 }, 0)
         .to(
           drawer,
@@ -155,7 +176,9 @@ export function Nav() {
       <header
         ref={navRef}
         id="nav"
-        className={[styles.nav, scrolled ? styles.scrolled : ""].filter(Boolean).join(" ")}
+        className={[styles.nav, scrolled ? styles.scrolled : ""]
+          .filter(Boolean)
+          .join(" ")}
       >
         <div className={styles.inner}>
           <Logo hideUntilRevealed />
@@ -163,7 +186,9 @@ export function Nav() {
           <button
             ref={burgerRef}
             type="button"
-            className={[styles.burger, open ? styles.burgerOpen : ""].filter(Boolean).join(" ")}
+            className={[styles.burger, open ? styles.burgerOpen : ""]
+              .filter(Boolean)
+              .join(" ")}
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             aria-controls="nav-drawer"
@@ -174,7 +199,6 @@ export function Nav() {
             <span />
             <span />
           </button>
-
         </div>
       </header>
 
@@ -193,16 +217,29 @@ export function Nav() {
 
         <nav aria-label="Main">
           <ul className={styles.drawerList}>
-            {navLinks.map((link, i) => (
-              <li key={link.href + link.label} className={styles.drawerItem}>
-                <a href={link.href} className={styles.drawerLink} onClick={close}>
-                  <span className={styles.drawerIndex} aria-hidden="true">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  {link.label}
-                </a>
-              </li>
-            ))}
+            {navLinks.map((link, i) => {
+              const current = link.href === pathname;
+              return (
+                <li key={link.href + link.label} className={styles.drawerItem}>
+                  <a
+                    href={link.href}
+                    className={[
+                      styles.drawerLink,
+                      current ? styles.drawerLinkCurrent : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    aria-current={current ? "page" : undefined}
+                    onClick={close}
+                  >
+                    <span className={styles.drawerIndex} aria-hidden="true">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    {link.label}
+                  </a>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 

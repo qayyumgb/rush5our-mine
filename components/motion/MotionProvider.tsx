@@ -34,6 +34,7 @@ import {
 import Lenis from "lenis";
 import { gsap, ScrollTrigger, initGsap } from "@/lib/motion/gsap";
 import { useReducedMotion } from "@/lib/motion/useMediaQuery";
+import { whenIntroReady } from "@/lib/motion/intro";
 
 interface MotionContextValue {
   /** The visitor asked for reduced motion — skip everything decorative. */
@@ -115,19 +116,49 @@ export function MotionProvider({ children }: { children: ReactNode }) {
   /* --- in-page anchors --------------------------------------------------- */
   // Handled here rather than per-link so every section behaves the same,
   // including the "#" placeholders that must not jump.
+  //
+  // Three kinds of link are caught:
+  //   "#id"   — a section on this page
+  //   "/#id"  — a section on the homepage; smooth-scrolled when already on
+  //             the homepage, otherwise left to navigate normally
+  //   "/"     — the homepage itself (the logo); on the homepage that means
+  //             "back to the top" rather than a reload that replays the intro
+  // Anything else — another route, an external URL, a modified click — is
+  // not touched.
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
-      const link = (e.target as HTMLElement | null)?.closest<HTMLAnchorElement>('a[href^="#"]');
-      if (!link || link.dataset.noScroll === "true") return;
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+        return;
+      }
+      const link = (e.target as HTMLElement | null)?.closest<HTMLAnchorElement>("a[href]");
+      if (!link || link.dataset.noScroll === "true" || link.target === "_blank") return;
 
-      const id = link.getAttribute("href") ?? "";
+      const href = link.getAttribute("href") ?? "";
+      const onHome = window.location.pathname === "/";
+
+      let id: string;
+      if (href.startsWith("#")) id = href;
+      else if (href.startsWith("/#") && onHome) id = href.slice(1);
+      else if (href === "/" && onHome) id = "top";
+      else return;
+
       e.preventDefault();
       if (id.length < 2) return; // bare "#" placeholder — stay put
 
-      const target = document.querySelector(id);
-      if (!target) return;
-
       const lenis = lenisRef.current;
+      if (id === "top") {
+        if (lenis) lenis.scrollTo(0, { duration: 1.6 });
+        else window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+        return;
+      }
+
+      let target: Element | null = null;
+      try {
+        target = document.querySelector(id);
+      } catch {
+        return;
+      }
+      if (!target) return;
       if (lenis) lenis.scrollTo(target as HTMLElement, { duration: 1.6 });
       else target.scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
     };
@@ -135,6 +166,42 @@ export function MotionProvider({ children }: { children: ReactNode }) {
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);
   }, [reduced]);
+
+  /* --- arriving with a hash ---------------------------------------------- */
+  // "/#merch" from another page lands on the homepage, where the preloader
+  // pins the page to the top for its intro. Once the intro gate opens, the
+  // section in the hash is scrolled to — so a menu link from /about still
+  // ends up where it points.
+  useEffect(() => {
+    if (!ready) return;
+    const hash = window.location.hash;
+    if (hash.length < 2) return;
+
+    let cancelled = false;
+    whenIntroReady().then(() => {
+      if (cancelled) return;
+      // A frame for the unlocked page to settle before measuring.
+      requestAnimationFrame(() => {
+        let target: Element | null = null;
+        try {
+          target = document.querySelector(hash);
+        } catch {
+          return; // not a valid selector, e.g. "#!" — nothing to scroll to
+        }
+        if (!target || cancelled) return;
+        const lenis = lenisRef.current;
+        // An absolute offset, not the element: the browser has already made
+        // its own jump to the hash, which Lenis did not see, so its idea of
+        // the current scroll is stale and an element target lands short.
+        const y = target.getBoundingClientRect().top + window.scrollY;
+        if (lenis) lenis.scrollTo(y, { duration: 1.4, force: true });
+        else target.scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [ready, reduced]);
 
   /* --- ready signal ------------------------------------------------------ */
   // Raced against a timeout so a slow or blocked font never strands the page

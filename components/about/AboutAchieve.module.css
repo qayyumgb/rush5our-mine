@@ -1,0 +1,286 @@
+/* =========================================================================
+   ABOUT — section 4, WHAT WE WILL ACHIEVE  (mockups/About/4.png, 950 frame)
+
+   Every number is a pixel measured off the mockup x `--u`. Reference points:
+
+     eyebrow      cap y141..160, label x51..399, rule x422..550 (w129, gap 23)
+     headline     "MORE THAN"   cap y184..275 x52..622
+                  "A NAME."     cap y290..377 x52..482
+                  "A MOVEMENT." cap y387..480 x50..705   (cap ~90, gaps 15/10)
+     note         5 lines, x734..932, y168..459, ~rgb(36) on black; the red
+                  underline sits under the last line
+     list         ring x59..121 (63, 4 stroke), text x162
+                  ring top = title cap top - 9 (item 1: -5)
+                  title cap 22 (2-line pitch 35); desc pitch 29;
+                  title cap bottom -> desc top 15..20;
+                  desc bottom -> hairline 23..29; hairline -> next title 28..32
+                  hairlines x160..885, ~rgb(50)
+                  item tops: 536 654 803 945 1090 1241
+     closing      rule y1404..1406 x51..176; tagline cap y1445..1461 x52..552
+                  headline cap y1476..1538, white x52..436, red x448..896
+                  sweep x465..841, y1552..1607
+     frame bottom 1655
+   ========================================================================= */
+
+.achieve {
+  position: relative;
+  padding: calc(141 * var(--u)) 0 calc(48 * var(--u));
+  background: var(--black);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Statement                                                                 */
+/* ------------------------------------------------------------------------ */
+
+.head {
+  position: relative;
+  padding-left: calc(51 * var(--u));
+}
+
+.eyebrow {
+  gap: calc(23 * var(--u));
+}
+
+.eyebrowLabel {
+  font-size: calc(21 * var(--u));
+  font-weight: 700;
+  letter-spacing: 0.24em;
+}
+
+.eyebrowRule {
+  width: calc(129 * var(--u));
+  height: max(1px, calc(1.5 * var(--u)));
+}
+
+/* Eyebrow cap bottom 160 -> headline cap top 184. */
+.title {
+  margin-top: calc(28 * var(--u));
+}
+
+/* Three lines at a ~90 cap. Set tight, like every headline on the site; the
+   mockup's wider face sets these lines broader (571 for "MORE THAN" against
+   our ~430) and that is the font, not the layout. */
+.title :global(.line) {
+  font-size: calc(95 * var(--u));
+  letter-spacing: 0.02em;
+  margin-left: -0.02em;
+}
+
+/* Cap-to-cap gaps of 15 then 10. `.line` carries a -0.05em block margin of
+   its own, so these are set 5 higher than the measured gaps. */
+.title :global(.line) + :global(.line) {
+  margin-top: calc(20 * var(--u));
+}
+
+.title :global(.line):last-child {
+  margin-top: calc(15 * var(--u));
+}
+
+/* Ghosted marker note. Positioned off the section frame, not the padded
+   head: the mockup's x 734 is frame-relative. Each written line rotates
+   -12deg about its bottom-left, so the box top sits ~40 below the glyphs'
+   visual top (168). */
+.note {
+  left: calc(734 * var(--u));
+  /* Relative to the statement block, whose top is the eyebrow's cap (141).
+     The glyphs' visual top lands on 168 once each line's -12deg rotation
+     lifts its right end. */
+  top: calc(68 * var(--u));
+}
+
+.noteText {
+  /* Lines run 734..932 in the mockup; 40 set "TOMORROW." past the frame. */
+  font-size: calc(36 * var(--u));
+  line-height: 1.46;
+  /* Sampled at ~rgb(36): a note printed into the surface, not on it. */
+  color: rgba(255, 255, 255, 0.15);
+}
+
+.noteUnderline {
+  left: calc(14 * var(--u));
+  top: calc(248 * var(--u));
+  width: calc(158 * var(--u));
+  height: calc(40 * var(--u));
+  opacity: 0.7;
+}
+
+.noteUnderline path {
+  stroke-width: 3.5;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Checked list                                                              */
+/* ------------------------------------------------------------------------ */
+
+/* Headline cap bottom 480 -> item 1 title cap top 536. */
+.list {
+  margin: calc(61 * var(--u)) 0 0;
+  padding: 0 0 0 calc(59 * var(--u));
+  list-style: none;
+}
+
+.item {
+  position: relative;
+}
+
+.itemRow {
+  display: flex;
+  align-items: flex-start;
+  /* Ring right edge 121 -> text 162. */
+  gap: calc(41 * var(--u));
+}
+
+/* Ring sits with its top 9 above the title's cap top. Heavier stroke than
+   the concept cards' rings (4 vs 3), and the tick is a thick red stroke. */
+.ring {
+  flex: none;
+  margin-top: calc(-9 * var(--u));
+  border-width: calc(4 * var(--u));
+}
+
+.ring svg {
+  width: 62%;
+  height: 62%;
+}
+
+.ring :global(.i-stroke) {
+  /* ~7 wide in the mockup: 5 of a 24 viewBox at 39 wide. */
+  stroke-width: 5;
+}
+
+.itemBody {
+  min-width: 0;
+}
+
+/* Oswald bold, cap 22 at a 35 pitch across two lines. "RUSH 5OUR WILL
+   BECOME MORE THAN A NAME." runs 162..746 in the mockup. */
+.itemTitle {
+  --lh: 1.2;
+  font-size: calc(27 * var(--u));
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--white);
+}
+
+.itemTitle span {
+  display: block;
+}
+
+.itemTitle span + span {
+  /* 35 pitch: the 30 line box plus this. */
+  margin-top: calc(5 * var(--u));
+}
+
+/* Title cap bottom -> copy top, 15..20 across the six items. */
+.itemDesc {
+  --lh: 1.21;
+  margin-top: calc(18 * var(--u));
+  font-size: calc(24 * var(--u));
+  font-weight: 350;
+  color: #d9d9d9;
+}
+
+.itemDesc span {
+  display: block;
+}
+
+/* Copy's descender bottom -> hairline 26 in the mockup; our copy is trimmed
+   to its baseline, so 29 here (the rows drift +3 each at 31). Hairline -> next title 30. The hairline
+   starts at the text column (160), not the ring. */
+.hairline {
+  display: block;
+  margin: calc(29 * var(--u)) 0 calc(30 * var(--u)) calc(101 * var(--u));
+  height: 1px;
+  width: calc(725 * var(--u));
+  background: rgba(255, 255, 255, 0.2);
+  transform-origin: left;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Closing                                                                   */
+/* ------------------------------------------------------------------------ */
+
+/* Last copy bottom 1340 -> rule 1404. */
+.closing {
+  position: relative;
+  /* 64 from the copy's descender bottom; 69 from our trimmed baseline. */
+  margin-top: calc(72 * var(--u));
+  padding-left: calc(51 * var(--u));
+}
+
+.closingRule {
+  display: block;
+  width: calc(126 * var(--u));
+  height: max(1px, calc(3 * var(--u)));
+  background: var(--red);
+  transform-origin: left;
+}
+
+/* Rule bottom 1407 -> tagline cap top 1445. Cap 17, 501 wide. */
+.tagline {
+  margin-top: calc(38 * var(--u));
+  font-size: calc(23 * var(--u));
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  color: var(--white);
+}
+
+/* Tagline cap bottom 1461 -> headline cap top 1476. Cap 62. */
+.closingTitle {
+  margin-top: calc(15 * var(--u));
+}
+
+.closingTitle :global(.line) {
+  font-size: calc(65 * var(--u));
+  letter-spacing: 0.02em;
+  margin-left: -0.02em;
+}
+
+/* Headline cap bottom 1538 -> sweep top 1552; x 465..841 in the frame,
+   which is 414 in from this block's padded edge. */
+.sweep {
+  display: block;
+  margin: calc(14 * var(--u)) 0 0 calc(414 * var(--u));
+  width: calc(376 * var(--u));
+  height: calc(55 * var(--u));
+  color: var(--red);
+  overflow: visible;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Desktop                                                                   */
+/* Same rationale as the other About sections: the mockup's own headline
+   scale reads as a billboard past 1024px, so it drops to the shared heading
+   tokens. Everything else keeps its measured size. */
+/* ------------------------------------------------------------------------ */
+
+@media (min-width: 1024px) {
+  .title :global(.line) {
+    font-size: var(--fs-l1);
+  }
+
+  .title :global(.line):last-child {
+    font-size: var(--fs-l2);
+  }
+
+  .title :global(.line) + :global(.line) {
+    margin-top: calc(10 * var(--u));
+  }
+
+  /* The head is shorter with the smaller headline, and the note is
+     positioned off it, so it moves up to stay beside the statement. */
+  .note {
+    left: calc(700 * var(--u));
+    top: calc(24 * var(--u));
+  }
+
+  .noteText {
+    font-size: calc(34 * var(--u));
+  }
+
+  .noteUnderline {
+    top: calc(212 * var(--u));
+    width: calc(134 * var(--u));
+    height: calc(34 * var(--u));
+  }
+}

@@ -32,13 +32,24 @@ export const site = {
   url: "https://rush5our.com",
 } as const;
 
-/** Drawer navigation. Anchors match the section ids rendered on the homepage. */
+/**
+ * Drawer navigation — one entry per page in the client's mockup set
+ * (mockups/: home, About, Merch, Videos, Rush Hunts, Join The Movement,
+ * Contact), in that order.
+ *
+ * ▸ PAGES NOT BUILT YET point at the homepage section that covers the same
+ *   ground, so no link dead-ends. When a page ships, change its href to the
+ *   route (e.g. "/merch") — nothing else needs to change; the drawer marks
+ *   the current page from the href automatically.
+ */
 export const navLinks: NavLink[] = [
-  { label: "The concept", href: "#concept" },
-  { label: "Merch", href: "#merch" },
-  { label: "Videos", href: "#videos" },
-  { label: "The movement", href: "#culture" },
-  { label: "FAQ", href: "#faq" },
+  { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
+  { label: "Merch", href: "/#merch" }, // → "/merch" when built
+  { label: "Videos", href: "/#videos" }, // → "/videos" when built
+  { label: "Rush Hunts", href: "/#concept" }, // → "/rush-hunts" when built
+  { label: "Join the movement", href: "/#culture" }, // → "/join" when built
+  { label: "Contact", href: "/#contact" }, // → "/contact" when built
 ];
 
 /**
@@ -59,8 +70,8 @@ export const socialLinks: SocialLink[] = [
 
 /** Footer utility links. */
 export const footerLinks: NavLink[] = [
-  { label: "Shop", href: "#merch" },
-  { label: "Contact", href: "#contact" },
+  { label: "Shop", href: "/#merch" },
+  { label: "Contact", href: "/#contact" },
   { label: "Terms", href: "#" },
   { label: "Privacy", href: "#" },
 ];

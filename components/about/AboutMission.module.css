@@ -1,0 +1,378 @@
+/* =========================================================================
+   ABOUT — section 5, THE MISSION IS SIMPLE / WELCOME TO THE CULTURE
+   (mockups/About/5.png, 950 frame)
+
+   Every number is a pixel measured off the mockup x `--u`. Reference points:
+
+     eyebrow      cap y126..145, label x63..474, rule x501..678 (w178, gap 27)
+     list         icon squares x64..152 (88) y165..247 (82), 2 stroke,
+                  glyph ~49x46 centred; row pitch 100
+                  title cap 30 at x196, y180 (box top -15); red span follows
+                  desc band y223..244 (title cap bottom +14)
+     tear         y777..793 across the full width, ~rgb(190)
+     welcome      "WELCOME TO"   cap y830..929 x128..818 (centred)
+                  "THE CULTURE." cap y939..1043 x97..874
+                  copy lines y1066/1104/1138 (pitch 38), last one red bold
+                  button x177..776 y1185..1274 (600x90), label cap 38
+                  stats: icons y1305..1354, dividers x325 & 624, white label
+                  cap y1370..1386, red label cap y1397..1429; column centres
+                  171 / 474 / 784
+                  signature x249..690 y1464..1557; sweep x337..626 y1542..1572
+                  tagline cap y1588..1602 x240..701
+     frame bottom 1656
+   ========================================================================= */
+
+.mission {
+  position: relative;
+  overflow: hidden;
+  padding: calc(126 * var(--u)) 0 calc(54 * var(--u));
+  background: var(--black);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Eyebrow                                                                   */
+/* ------------------------------------------------------------------------ */
+
+.head {
+  position: relative;
+  padding-left: calc(63 * var(--u));
+}
+
+.eyebrow {
+  gap: calc(27 * var(--u));
+}
+
+/* Tracked wider than the other About eyebrows: 412 wide for 22 characters. */
+.eyebrowLabel {
+  font-size: calc(21 * var(--u));
+  font-weight: 700;
+  letter-spacing: 0.34em;
+}
+
+.eyebrowRule {
+  width: calc(178 * var(--u));
+  height: max(1px, calc(2 * var(--u)));
+}
+
+/* ------------------------------------------------------------------------ */
+/* Mission list                                                              */
+/* ------------------------------------------------------------------------ */
+
+/* Eyebrow cap bottom 145 -> first square top 165. */
+.list {
+  margin: calc(24 * var(--u)) 0 0;
+  padding: 0 0 0 calc(64 * var(--u));
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  /* Square right edge 152 -> text 196. */
+  gap: calc(44 * var(--u));
+}
+
+/* Squares are 100 apart; each is 82 tall. */
+.item + .item {
+  margin-top: calc(18 * var(--u));
+}
+
+.box {
+  position: relative;
+  flex: none;
+  width: calc(88 * var(--u));
+  height: calc(82 * var(--u));
+  display: grid;
+  place-items: center;
+  color: var(--red);
+}
+
+.boxSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Scoped under .box so it outranks the global .i-stroke defaults. */
+.box .boxEdge {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linejoin: miter;
+  stroke-linecap: butt;
+}
+
+/* Glyph ~49 wide in an 88 square; strokes ~4 in the mockup. */
+.glyph {
+  position: relative;
+  width: calc(50 * var(--u));
+  height: calc(50 * var(--u));
+  overflow: visible;
+}
+
+.glyph :global(.i-stroke) {
+  stroke-width: 1.9;
+}
+
+/* The text block starts 15 below the square's top. */
+.itemBody {
+  min-width: 0;
+  padding-top: calc(15 * var(--u));
+}
+
+/* Oswald bold, cap 30. */
+.itemTitle {
+  --lh: 1.2;
+  font-size: calc(36 * var(--u));
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--white);
+  white-space: nowrap;
+}
+
+.itemTitleRed {
+  color: var(--red);
+}
+
+/* Title cap bottom -> copy cap top 14. */
+.itemDesc {
+  --lh: 1.4;
+  margin-top: calc(14 * var(--u));
+  font-size: calc(22 * var(--u));
+  font-weight: 350;
+  color: #e4e4e4;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Torn edge                                                                 */
+/* ------------------------------------------------------------------------ */
+
+/* Last copy bottom 741 -> tear 777. Breaks out of the frame to run edge to
+   edge, as the tear does in the mockup. */
+.tear {
+  display: block;
+  position: relative;
+  left: 50%;
+  width: 100vw;
+  /* The global media reset caps SVGs at their container. */
+  max-width: none;
+  height: calc(18 * var(--u));
+  margin-top: calc(33 * var(--u));
+  transform: translateX(-50%);
+  overflow: visible;
+}
+
+.tear .tearEdge,
+.tear .tearShadow {
+  fill: none;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+/* The box is stretched to the viewport, so stroke widths are in viewBox
+   units: 2 tall of an 18-tall band comes out ~2px on a phone. */
+.tear .tearEdge {
+  stroke: rgba(255, 255, 255, 0.78);
+  stroke-width: 2;
+}
+
+.tear .tearShadow {
+  stroke: rgba(255, 255, 255, 0.22);
+  stroke-width: 5;
+  transform: translateY(2px);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Welcome                                                                   */
+/* ------------------------------------------------------------------------ */
+
+/* Tear 793 -> headline cap top 830. */
+.welcome {
+  margin-top: calc(41 * var(--u));
+  text-align: center;
+}
+
+.title :global(.line) {
+  font-size: calc(105 * var(--u));
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+/* Cap-to-cap gap 10; `.line` carries -0.05em of its own. */
+.title :global(.line) + :global(.line) {
+  margin-top: calc(16 * var(--u));
+}
+
+/* Headline cap bottom 1043 -> copy top 1066. Three centred lines at a 38
+   pitch; the last is red and bold. */
+.copy {
+  --lh: 1.36;
+  margin-top: calc(28 * var(--u));
+  font-size: calc(28 * var(--u));
+  font-weight: 350;
+  color: #e6e6e6;
+}
+
+.copy span {
+  display: block;
+}
+
+.copyRed {
+  font-weight: 700;
+  color: var(--red);
+}
+
+/* Copy bottom 1164 -> button 1185. */
+.btnWrap {
+  margin-top: calc(21 * var(--u));
+}
+
+.btn {
+  width: calc(600 * var(--u));
+  height: calc(90 * var(--u));
+  gap: calc(30 * var(--u));
+  border-radius: calc(8 * var(--u));
+  font-family: var(--f-ui);
+  font-weight: 700;
+  font-size: calc(46 * var(--u));
+  letter-spacing: 0.02em;
+  /* The mockup's button glows all round, not just below. */
+  box-shadow:
+    0 0 28px -4px rgba(var(--red-rgb), 0.75),
+    0 10px 30px -14px rgba(var(--red-rgb), 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.btn svg {
+  width: calc(44 * var(--u));
+  height: calc(28 * var(--u));
+}
+
+/* Button bottom 1274 -> icons 1305. Three columns with red dividers at 325
+   and 624; centres 171 / 474 / 784. */
+.stats {
+  position: relative;
+  margin-top: calc(31 * var(--u));
+  display: grid;
+  grid-template-columns: calc(325 * var(--u)) calc(299 * var(--u)) calc(326 * var(--u));
+}
+
+.stat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.statDivider {
+  position: absolute;
+  left: 0;
+  top: calc(8 * var(--u));
+  width: max(1px, calc(2 * var(--u)));
+  height: calc(110 * var(--u));
+  background: var(--red);
+  transform-origin: top;
+}
+
+.statIcon {
+  width: calc(50 * var(--u));
+  height: calc(50 * var(--u));
+  color: var(--red);
+  overflow: visible;
+}
+
+.statIcon :global(.i-stroke) {
+  stroke-width: 1.9;
+}
+
+/* Icon bottom 1354 -> label cap top 1370; cap 17, 132 wide. */
+.statTop {
+  margin-top: calc(16 * var(--u));
+  font-size: calc(22 * var(--u));
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--white);
+}
+
+/* Label cap bottom 1386 -> red cap top 1397; cap 32. */
+.statBottom {
+  margin-top: calc(11 * var(--u));
+  font-size: calc(36 * var(--u));
+  letter-spacing: 0.02em;
+  color: var(--red);
+}
+
+/* Red label bottom 1429 -> signature 1464. Centred; the accent is
+   positioned by its own rule so it needs a static, centred home here. */
+/* Scoped under .welcome so it outranks the global .accent (absolute). */
+.welcome .signature {
+  position: relative;
+  display: inline-block;
+  margin-top: calc(35 * var(--u));
+  /* The written line leans less than the smaller notes do. */
+  --rot: -6deg;
+}
+
+/* The one hand-written line on the site that carries a stroke: the mockup
+   signs off with a heavy brush, and at this size the pen alone reads thin. */
+.signatureText {
+  font-size: calc(86 * var(--u));
+  line-height: 1.2;
+  color: var(--white);
+  -webkit-text-stroke: max(1px, calc(1.4 * var(--u))) var(--white);
+}
+
+/* Sweep under the word: x 337..626, y 1542..1572 in the frame. */
+.signatureUnderline {
+  left: calc(70 * var(--u));
+  top: calc(80 * var(--u));
+  width: calc(290 * var(--u));
+  height: calc(31 * var(--u));
+}
+
+.signatureUnderline path {
+  stroke-width: 6;
+}
+
+/* Signature bottom 1557 -> tagline cap top 1588. Cap 15, 462 wide. */
+.tagline {
+  margin-top: calc(24 * var(--u));
+  font-size: calc(20 * var(--u));
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  color: var(--white);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Phones narrower than the frame                                            */
+/* The list titles and copy are set nowrap to hold the mockup's lines; on a  */
+/* narrow phone the unit shrinks with the viewport so they still fit, but    */
+/* the copy floor keeps it legible.                                          */
+/* ------------------------------------------------------------------------ */
+
+@media (max-width: 420px) {
+  .itemDesc {
+    font-size: max(10px, calc(22 * var(--u)));
+    white-space: normal;
+  }
+}
+
+/* ------------------------------------------------------------------------ */
+/* Desktop                                                                   */
+/* The welcome headline drops to the shared heading tokens past 1024px, as   */
+/* every other About headline does.                                          */
+/* ------------------------------------------------------------------------ */
+
+@media (min-width: 1024px) {
+  .title :global(.line) {
+    font-size: var(--fs-l1);
+  }
+
+  .title :global(.line):last-child {
+    font-size: var(--fs-l2);
+    margin-top: calc(12 * var(--u));
+  }
+}

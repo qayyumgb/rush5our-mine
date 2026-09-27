@@ -1,0 +1,205 @@
+/* =========================================================================
+   ABOUT — section 2, WHAT WE STAND FOR  (mockups/About/2.png, 950 frame)
+
+   Every number is a pixel measured off the mockup x `--u`, the shared
+   950-unit column the homepage sections use. Measured reference points:
+
+     eyebrow cap top   157   label 54..353, rule 401..559 (158 wide)
+     headline cap tops 208 / 344 / 479   cap height 123, pitch 136
+     body cap tops     643 / 687 / 732 / 775   (pitch 44)
+     grid              icons top 873, dividers x 325 and 629
+     row 1             icon 873..977, title 1004..1027, rule 1054..1055,
+                       copy 1079..1163;  divider 878..1160
+     row 2             icon top 1225  (row pitch 352)
+     frame bottom      1655
+   ========================================================================= */
+
+.values {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: calc(157 * var(--u)) 0 calc(140 * var(--u));
+  background: var(--black);
+}
+
+/* Red pools in the top-left and bottom-right corners, as sampled from the
+   mockup (its corners read ~rgb(26,0,1) and ~rgb(35,0,1) over pure black).
+   Static gradients, not blurred layers. */
+.atmos {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(42% 26% at 0% 8%, rgba(var(--red-rgb), 0.16), transparent 70%),
+    radial-gradient(46% 28% at 100% 96%, rgba(var(--red-rgb), 0.18), transparent 70%);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Statement                                                                 */
+/* ------------------------------------------------------------------------ */
+
+/* Wrapper the shared `headReveal` animates as one unit. */
+.head {
+  position: relative;
+  padding-left: calc(54 * var(--u));
+}
+
+.eyebrow {
+  gap: calc(48 * var(--u));
+}
+
+.eyebrowLabel {
+  font-size: calc(23.4 * var(--u));
+  letter-spacing: 0.12em;
+}
+
+.eyebrowRule {
+  width: calc(158 * var(--u));
+  height: max(1px, calc(1.5 * var(--u)));
+}
+
+/* Eyebrow cap bottom 177 → headline cap top 208. */
+.title {
+  /* 31 in the mockup; our eyebrow's cap is 4 shorter than the mockup's,
+     so the margin makes up the difference and the headline lands on 208. */
+  margin-top: calc(34 * var(--u));
+}
+
+/* Three lines at a 123 cap. This is the largest type on the site — the
+   mockup's statement fills the column edge to edge. */
+.title :global(.line) {
+  font-size: calc(137 * var(--u));
+  /* The mockup's face is a wider cut than ours: at the same 123 cap it sets
+     "MORE THAN" 737 wide, "CONTENT." 593 and "REAL IMPACT." 842, where our
+     font gives 586 / 469 / 698. Tracking out by 0.09em brings the three
+     lines to 697 / 567 / 846, so the statement fills the column the way the
+     mockup's does. */
+  letter-spacing: 0.035em;
+  margin-left: -0.02em;
+}
+
+/* Gap is a margin, not line-height: `.cz` trims each line to its cap. */
+.title :global(.line) + :global(.line) {
+  margin-top: calc(13 * var(--u));
+}
+
+/* Desktop: the homepage's section headings were all brought down to the
+   shared `--fs-l1` / `--fs-l2` size because the mockup scale read as a
+   billboard on large screens. This heading follows them, so the About page
+   sits at the same scale as the rest of the site above 1024px. Phones keep
+   the mockup's own size. */
+@media (min-width: 1024px) {
+  .title :global(.line) {
+    font-size: var(--fs-l1);
+  }
+
+  .title :global(.line):last-child {
+    font-size: var(--fs-l2);
+  }
+
+  .title :global(.line) + :global(.line) {
+    margin-top: calc(10 * var(--u));
+  }
+}
+
+/* Headline cap bottom 600 → body cap top 643. */
+.body {
+  --lh: 1.467;
+  margin-top: calc(43 * var(--u));
+  font-size: calc(30 * var(--u));
+  color: #dcdcdc;
+}
+
+.bodyLine {
+  display: block;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Values grid                                                               */
+/* ------------------------------------------------------------------------ */
+
+/* Body baseline 802 → icons top 873. The grid is 930 wide from x 14, which
+   puts the three cell centres at 169 / 479 / 789 (mockup 169 / 475 / 789). */
+.grid {
+  margin: calc(75 * var(--u)) 0 0 calc(14 * var(--u));
+  width: calc(930 * var(--u));
+}
+
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  /* Row 1 content runs 873..1163. */
+  min-height: calc(290 * var(--u));
+}
+
+/* Row 2's icons start 352 below row 1's. */
+.row + .row {
+  margin-top: calc(62 * var(--u));
+}
+
+/* Hairline between columns — sampled at rgb(183,16,35), red at ~0.72 over
+   black. Starts 5 below the icons, as in the mockup, and draws downward. */
+.divider {
+  position: absolute;
+  top: calc(5 * var(--u));
+  bottom: 0;
+  width: 1px;
+  background: rgba(var(--red-rgb), 0.72);
+  transform-origin: top;
+  pointer-events: none;
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Icons are 104 square; their strokes measure ~11 wide in the mockup, so
+   the shared 1.6 stroke is heavied up here (2.4 of a 24 viewBox ≈ 10.4). */
+.icon {
+  width: calc(104 * var(--u));
+  height: calc(104 * var(--u));
+  color: var(--red);
+  overflow: visible;
+}
+
+.icon :global(.i-stroke) {
+  stroke-width: 2.4;
+}
+
+/* Icon bottom 977 → title cap top 1004. Cap height 24. */
+.cellTitle {
+  margin-top: calc(27 * var(--u));
+  font-size: calc(27 * var(--u));
+  /* "COMMUNITY" measures 157 wide in the mockup; 0.04em rendered it at 131. */
+  letter-spacing: 0.15em;
+  color: var(--white);
+}
+
+/* Title cap bottom 1027 → rule 1054, 70 x 2. */
+.cellRule {
+  display: block;
+  margin-top: calc(27 * var(--u));
+  width: calc(70 * var(--u));
+  height: max(1px, calc(2 * var(--u)));
+  background: var(--red);
+  transform-origin: center;
+}
+
+/* Rule bottom 1056 → copy cap top 1079. Lines pitch 33. */
+.cellBody {
+  /* 33 pitch at a 25 size. */
+  --lh: 1.32;
+  margin-top: calc(23 * var(--u));
+  /* 10px floor for phones, as the homepage grid does. */
+  font-size: max(10px, calc(25 * var(--u)));
+  color: #dcdcdc;
+}
+
+.cellBody span {
+  display: block;
+}

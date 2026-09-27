@@ -15,7 +15,7 @@ interface LogoProps {
   hideUntilRevealed?: boolean;
 }
 
-export function Logo({ href = "#hero", className, hideUntilRevealed = false }: LogoProps) {
+export function Logo({ href = "/", className, hideUntilRevealed = false }: LogoProps) {
   return (
     <a
       href={href}

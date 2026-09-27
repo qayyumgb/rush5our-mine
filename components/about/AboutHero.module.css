@@ -1,0 +1,405 @@
+/* =========================================================================
+   ABOUT — section 1, "We create moments."
+
+   Every number here is a pixel measured off the About hero mockup (a
+   950 x 1655 phone frame) multiplied by `--au`, the about-hero unit. That
+   keeps the composition proportionally identical to the mockup at any width.
+
+   Measured reference points, in mockup pixels:
+     content left edge   51
+     eyebrow cap top    143   label 52..231, rule 278..420
+     headline cap tops  188 / 275 / 361 / 448   (pitch 87, cap height 79)
+     body cap top       564   lines pitch 33, wraps at 814 wide
+     CTA row top        707   button 404x92, ring 94, gaps 28 and 26
+     hand accent        x 687..896, y 274..460, underline slope ~-12deg
+     cue label cap top 1518   rule 1548..1583, chevron 1601..1614
+
+   Layers, back to front:
+     photo → shade → glow → content → cue
+   ========================================================================= */
+
+.about {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  /* Never shorter than the viewport, never shorter than the mockup ratio. */
+  height: max(calc(1655 * var(--au)), 100vh);
+  height: max(calc(1655 * var(--au)), 100svh);
+  background: var(--black);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Background                                                                */
+/* ------------------------------------------------------------------------ */
+
+/* z-index 0, not -1. `.about` is `isolation: isolate` AND paints its own
+   black background, so a negatively-stacked child would sit behind that
+   background and never be seen. The homepage hero gets away with -1 only
+   because its section has no background of its own. */
+.bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.photo {
+  position: absolute;
+  inset: 0;
+  /* Scales from the upper third, where the subject sits, not the box centre. */
+  transform-origin: 50% 35%;
+}
+
+.photo picture {
+  position: absolute;
+  inset: 0;
+}
+
+.img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 0%;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Almost nothing, deliberately. The photograph is lifted from the mockup
+   with the designer's grading already in it — the sky behind the headline is
+   near-black in the file itself — so any overlay on top only makes the page
+   darker than the design. What remains is a short fade into the page black
+   at the very foot, so the next section meets it without a seam, and no red
+   glow: the mockup has none. */
+.shade {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 0%, transparent 93%, rgba(4, 4, 4, 0.7) 100%);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Content column                                                            */
+/* ------------------------------------------------------------------------ */
+
+.copy {
+  position: relative;
+  z-index: 3;
+  padding: calc(144 * var(--au)) calc(51 * var(--au)) 0;
+}
+
+/* Eyebrow — label 52..231, then a rule 278..420 (143 wide, 47 after). */
+.eyebrow {
+  gap: calc(47 * var(--au));
+}
+
+.eyebrowLabel {
+  font-size: calc(23.4 * var(--au));
+  /* Tighter than the homepage eyebrows: the label measures 52..231 (179
+     wide) in this mockup, and 0.34em rendered it at 234. */
+  letter-spacing: 0.12em;
+  color: var(--red);
+}
+
+.eyebrowRule {
+  width: calc(143 * var(--au));
+  /* max() keeps the hairline visible on low-DPI screens. */
+  height: max(1px, calc(2 * var(--au)));
+}
+
+/* Headline — cap tops 87 apart at a 79 cap height. */
+.title {
+  margin-top: calc(29 * var(--au));
+}
+
+.title :global(.line) {
+  font-size: calc(89 * var(--au));
+  letter-spacing: 0.005em;
+  /* Pulls the first glyph flush left, cancelling its side bearing. */
+  margin-left: -0.02em;
+}
+
+/* The gap between lines is a margin, not line-height. `.cz` trims every box
+   to exactly its cap height, so `--lh` cannot set the distance between two
+   separate `.line` elements — it only affects wrapping inside one. Measured:
+   cap tops 87 apart at a 79 cap, and a bare line pair sits 2 apart. */
+.title :global(.line) + :global(.line) {
+  margin-top: calc(6 * var(--au));
+}
+
+/* Longest line measured at 54..492 — about 440 wide. The 814 figure an
+   earlier pass produced came from the photograph's city lights tripping the
+   white-pixel sampler, not from the text. */
+.body {
+  --lh: 1.22;
+  margin-top: calc(39 * var(--au));
+  max-width: calc(520 * var(--au));
+  font-size: calc(27 * var(--au));
+  color: #cfcfcf;
+}
+
+.bodyLine {
+  display: block;
+}
+
+/* ------------------------------------------------------------------------ */
+/* CTA row                                                                   */
+/* ------------------------------------------------------------------------ */
+
+.ctas {
+  margin-top: calc(27 * var(--au));
+  display: flex;
+  align-items: center;
+}
+
+.btn {
+  width: calc(404 * var(--au));
+  height: calc(92 * var(--au));
+  gap: calc(28 * var(--au));
+  font-family: var(--f-ui);
+  font-weight: 600;
+  font-size: calc(26 * var(--au));
+  letter-spacing: 0.09em;
+}
+
+.btn svg {
+  width: calc(30 * var(--au));
+  height: calc(19 * var(--au));
+}
+
+.playGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(26 * var(--au));
+  margin-left: calc(28 * var(--au));
+}
+
+/* Ring measured at 94 across, x 481..574. */
+.play {
+  position: relative;
+  width: calc(94 * var(--au));
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: calc(4 * var(--au)) solid var(--red);
+  display: grid;
+  place-items: center;
+  background: rgba(4, 4, 4, 0.35);
+  box-shadow:
+    0 0 22px -6px rgba(var(--red-rgb), 0.6),
+    inset 0 0 14px -4px rgba(var(--red-rgb), 0.45);
+  transition:
+    background-color 0.4s,
+    box-shadow 0.45s var(--ease-out),
+    transform 0.45s var(--ease-out);
+}
+
+.play svg {
+  width: 30%;
+  /* Optical centring: a triangle's visual centre sits left of its box. */
+  margin-left: 8%;
+  transition: transform 0.45s var(--ease-out);
+}
+
+.playGroup:hover .play {
+  background: var(--red);
+  transform: scale(1.06);
+  box-shadow: 0 0 40px 0 rgba(255, 30, 30, 0.65);
+}
+
+.playGroup:hover .play svg {
+  transform: scale(1.12);
+}
+
+.playLabel {
+  --lh: 1.676;
+  text-align: left;
+  font-weight: 600;
+  font-size: calc(17.9 * var(--au));
+  letter-spacing: 0.124em;
+  color: #f2f2f2;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Handwritten accent — upper right, measured x 687..896, y 274..460         */
+/* ------------------------------------------------------------------------ */
+
+.accent {
+  /* Left of where the mockup text starts (687). Our hand font is wider per
+     glyph than the one in the mockup, so at a size that matches the block's
+     HEIGHT the lines run wider; anchoring further left keeps the right edge
+     at the mockup's ~896 instead of clipping at the frame. */
+  left: calc(640 * var(--au));
+  /* Each written line rotates -12deg about its bottom-left corner, so the
+     block's right end rises about 55 above its own box. This top puts the
+     rendered glyphs at the mockup's y 274, not the box. Measured render:
+     lines 274..448, underline 430..465. */
+  top: calc(330 * var(--au));
+}
+
+/* Sized to the block's measured HEIGHT (y 274..460 for three lines), not
+   its width. At 22 the width matched but the note came out at about 60% of
+   the mockup's height and read as an afterthought. */
+.accent :global(.hand) {
+  font-size: calc(27 * var(--au));
+  line-height: 1.46;
+  color: #c9c9cd;
+}
+
+/* The red stroke under the last line, measured at x 717..855, y 430..465 —
+   offsets here are relative to `.accent`'s own top-left (640, 330). */
+.accentUnderline {
+  left: calc(77 * var(--au));
+  top: calc(100 * var(--au));
+  width: calc(138 * var(--au));
+  height: calc(35 * var(--au));
+}
+
+.accentUnderline path {
+  stroke-width: 4;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Scroll cue — label, rule, chevron, centred at the foot                    */
+/* ------------------------------------------------------------------------ */
+
+.cueWrap {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: calc(38 * var(--au));
+  display: flex;
+  justify-content: center;
+}
+
+.cueLabel {
+  font-size: calc(15.1 * var(--au));
+  letter-spacing: 0.27em;
+  color: #f0f0f0;
+}
+
+.cueLine {
+  width: max(2px, calc(3 * var(--au)));
+  height: calc(36 * var(--au));
+  margin-top: calc(20 * var(--au));
+}
+
+.cueChev {
+  width: calc(24 * var(--au));
+  height: calc(14 * var(--au));
+  margin-top: calc(18 * var(--au));
+}
+
+/* ========================================================================= */
+/* TABLET PORTRAIT                                                           */
+/* Same rule as the homepage hero: keep the phone composition, but stop it   */
+/* outgrowing the screen height, and centre it.                              */
+/* ========================================================================= */
+
+@media (min-width: 640px) and (orientation: portrait) {
+  .about {
+    /* 0.574 is the mockup's aspect ratio (950 ÷ 1655). */
+    --au: calc(min(100vw, 100vh * 0.574) / 950);
+    --au: calc(min(100vw, 100svh * 0.574) / 950);
+    height: 100vh;
+    height: 100svh;
+  }
+
+  .copy {
+    max-width: calc(950 * var(--au));
+    margin-inline: auto;
+    padding-top: calc(120 * var(--au));
+  }
+
+  /* The note is positioned off the section, not the column: 640 in a 950
+     column is 165 right of the centre line. */
+  .accent {
+    left: calc(50% + 165 * var(--au));
+  }
+
+  .cueWrap {
+    bottom: calc(30 * var(--au));
+  }
+}
+
+/* ========================================================================= */
+/* DESKTOP / LANDSCAPE                                                       */
+/* The same recomposition the homepage hero uses: a 1440 x 860 canvas,       */
+/* subject right of centre with the left edge feathered into darkness, copy  */
+/* bottom-left at 0.74 type scale, the note framing the figure on the right,  */
+/* cue centred at the foot. `--ad` is the canvas unit; `.copy` overrides      */
+/* `--au` for its own subtree so every measured size inside it scales down   */
+/* together, exactly as `--cu` does on the homepage.                          */
+/* ========================================================================= */
+
+@media (min-width: 1024px), (orientation: landscape) and (min-width: 640px) {
+  .about {
+    --ad: min(calc(100vw / 1440), calc(100vh / 860));
+    --ad: min(calc(100vw / 1440), calc(100svh / 860));
+    --au: var(--ad);
+    --x0: calc((100vw - 1440 * var(--ad)) / 2);
+
+    height: 100vh;
+    height: 100svh;
+    min-height: 380px;
+  }
+
+  /* Push the subject right of centre and feather the left edge so the copy
+     sits on clean darkness rather than on the crowd. */
+  .photo picture {
+    left: 14%;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 24%);
+    mask-image: linear-gradient(90deg, transparent, #000 24%);
+  }
+
+  /* The phone crop stands in for a landscape original (see data/about.ts).
+     Its top third is empty sky, so the frame is pulled down to the skyline
+     and the figure. */
+  .img {
+    object-position: 50% 70%;
+  }
+
+  .shade {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(4, 4, 4, 0.4) 0%,
+        transparent 16%,
+        transparent 55%,
+        rgba(4, 4, 4, 0.75) 88%,
+        var(--black) 100%
+      ),
+      linear-gradient(90deg, rgba(4, 4, 4, 0.55), transparent 55%);
+  }
+
+  .copy {
+    --au: calc(var(--ad) * 0.74);
+    position: absolute;
+    left: calc(var(--x0) + 120 * var(--ad));
+    bottom: calc(170 * var(--ad));
+    padding: 0;
+    max-width: none;
+    margin: 0;
+  }
+
+  /* Right of the figure, in the slot the homepage gives "same city". */
+  .accent {
+    left: auto;
+    right: calc(var(--x0) + 120 * var(--ad));
+    top: auto;
+    bottom: calc(300 * var(--ad));
+  }
+
+  .cueWrap {
+    bottom: calc(30 * var(--ad));
+  }
+}
+
+/* Short landscape (a phone turned sideways): the note would land on the
+   copy, so it goes. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .accent {
+    display: none;
+  }
+}

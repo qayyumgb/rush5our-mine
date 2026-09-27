@@ -1,0 +1,290 @@
+/* =========================================================================
+   ABOUT — section 3, HOW WE'RE MAKING IT REAL  (mockups/About/3.png, 950 frame)
+
+   Three numbered rows: a filled icon tile beside a two-tier title, a body
+   paragraph spanning the full column below, a short red rule, and a huge
+   outlined numeral standing to the right of the title. Every number is a
+   pixel measured off the mockup x `--u`. Measured reference points:
+
+     eyebrow        cap y142..156, label x51..452, rule x469..614 (gap 17)
+     icon tile      105 square, corners lightly rounded
+     row1 (icon top 194)  title white y194..247(h53) x184..554(w371)
+                          title red   y256..330(h75) x186..557(w372)
+                          numeral "01" x650..879(w230) top~178 (icon top -16)
+                          body 5 lines from y353, pitch 33
+                          rule y527, x50..151 (w102)
+     row2 (icon top 606)  title white y602..655 x189..293(w105, "THE")
+                          title red   y664..739(h75) x185..462(w278) —
+                          the outer 185..647 a first pass measured is the
+                          numeral's own outline bleeding into the same rows,
+                          not the glyph; filtered out by keeping only runs
+                          of 6+ solid red pixels
+                          numeral "02" x650..905(w256) top~597 (icon top -9)
+                          body 6 lines from y769
+                          rule y975
+     row3 (icon top 1060) title white y1049..1102 x186..396(w211)
+                          title red   y1110..1181(h72) x187..543(w357) —
+                          same numeral-bleed filter as row 2
+                          numeral "03" x650..902(w253) top~1050 (icon top -10)
+                          body: 5-line paragraph from y1210, blank line, then
+                          a 2-line paragraph from y1396
+                          rule y1472
+     footer         tick x473..475 y1529..1566(h38); text y1586..1596(h11)
+                    x264..681(w417); dashes x94..210 and x737..852
+     frame bottom   1655
+   ========================================================================= */
+
+.pillars {
+  position: relative;
+  padding: calc(142 * var(--u)) 0 calc(59 * var(--u));
+  background: var(--black);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Eyebrow                                                                   */
+/* ------------------------------------------------------------------------ */
+
+.head {
+  position: relative;
+  padding-left: calc(51 * var(--u));
+}
+
+.eyebrow {
+  gap: calc(17 * var(--u));
+}
+
+/* Heavier than the shared eyebrow weight: this mockup's label stems
+   measure ~3 of a 15 cap, where the homepage eyebrows sit nearer 2. */
+.eyebrowLabel {
+  font-size: calc(20 * var(--u));
+  font-weight: 700;
+  letter-spacing: 0.25em;
+}
+
+.eyebrowRule {
+  width: calc(145 * var(--u));
+  height: max(1px, calc(1.5 * var(--u)));
+}
+
+/* ------------------------------------------------------------------------ */
+/* Rows                                                                      */
+/* ------------------------------------------------------------------------ */
+
+/* Eyebrow cap bottom 156 -> row 1 icon/title top 194. */
+.rows {
+  margin-top: calc(38 * var(--u));
+}
+
+.row {
+  position: relative;
+  padding-left: calc(50 * var(--u));
+}
+
+/* Rows are separated by a full-width hairline (rows 1-2 only): the rule
+   sits 30 above it, the next row's icon 45-51 below it. */
+.row + .row {
+  margin-top: calc(48 * var(--u));
+}
+
+.hairline {
+  display: block;
+  margin-top: calc(30 * var(--u));
+  /* Runs 49..897 in the mockup, not to the frame edge. */
+  margin-right: calc(53 * var(--u));
+  height: 1px;
+  /* Sampled at ~rgb(75..100) over black. */
+  background: rgba(255, 255, 255, 0.34);
+  transform-origin: left;
+}
+
+.rowHead {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: calc(32 * var(--u));
+}
+
+.iconTile {
+  flex: none;
+  width: calc(105 * var(--u));
+  height: calc(105 * var(--u));
+  /* Square in the mockup: the top row of the tile is red from x 50 on. */
+  border-radius: calc(2 * var(--u));
+  background: var(--red);
+  display: grid;
+  place-items: center;
+}
+
+/* White glyph on the red tile, ~66% of the tile's width (globe 68..137
+   in a 50..154 tile). Strokes measure 4-5 in the mockup: 1.7 of a 24
+   viewBox at 68 wide is 4.8. */
+.icon {
+  width: calc(68 * var(--u));
+  height: calc(68 * var(--u));
+  color: var(--white);
+  overflow: visible;
+}
+
+.icon :global(.i-stroke) {
+  stroke-width: 1.7;
+}
+
+.title {
+  padding-top: calc(1 * var(--u));
+}
+
+.title :global(.line) {
+  display: block;
+}
+
+/* Set tight, like every other headline on the site. The mockup's face is a
+   wider cut than ours ("WHAT WE'RE" 371 wide there, ~250 here at the same
+   53 cap), and tracking the letters out to fill that width was tried and
+   reads nothing like the mockup's heavy, close-set title. Cap height is
+   what matches; width is the font's. */
+.titleWhite {
+  font-size: calc(53 * var(--u));
+  letter-spacing: 0.02em;
+}
+
+/* Gap from the white line's cap bottom to the red line's cap top is 9 in
+   the mockup, on every row. */
+.titleRed {
+  margin-top: calc(9 * var(--u));
+  font-size: calc(74 * var(--u));
+  letter-spacing: 0.005em;
+}
+
+/* The huge outlined numeral standing behind the title's right shoulder.
+   Stroked, not filled — the mockup's numerals are a thin red outline over
+   black, at every row the same stroke weight and left edge. Positioned
+   absolutely so its width (narrower for "01" than "02"/"03") never disturbs
+   the title/body column.
+
+   Sized off the glyph's rendered HEIGHT (mockup ~175-181), not font-size —
+   in this font the two are close to 1:1, unlike most of the type on this
+   page. The two digits sit close together, as in the mockup; its wider
+   face makes its numerals broader than ours, and that is left alone. */
+.numeral {
+  position: absolute;
+  z-index: 0;
+  left: calc(650 * var(--u));
+  /* -12 splits the mockup's -16 (row 1) and -9/-10 (rows 2-3). */
+  top: calc(-12 * var(--u));
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: calc(180 * var(--u));
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: max(1px, calc(2 * var(--u))) rgba(var(--red-rgb), 0.9);
+  user-select: none;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Title red cap bottom to body cap top: 23/26/29 across the three rows —
+   the spread comes from the red line's own height varying by 1-2u at this
+   scale, not from a real difference in the gap. One value covers it. */
+/* 24 at a 33 pitch: "We're building a real-world movement that connects"
+   spans 51..626 in the mockup, and 27 set it 13% wider than that. */
+.body {
+  --lh: 1.375;
+  margin-top: calc(31 * var(--u));
+  font-size: calc(24 * var(--u));
+  /* Inter is a variable font; the mockup's copy is set a step lighter than
+     the 400 the rest of the site uses. */
+  font-weight: 350;
+  color: #d9d9d9;
+}
+
+/* Only row 3 has a second paragraph. Its gap (56 between the two
+   paragraphs' cap lines) is the normal 33 pitch plus this much again. */
+.body + .body {
+  /* Renders the paragraphs' cap lines 56 apart, as measured (1340 -> 1396). */
+  margin-top: calc(32 * var(--u));
+}
+
+.bodyLine {
+  display: block;
+}
+
+/* Last body line's cap bottom to the rule: ~23-24 on every row. */
+.rule {
+  display: block;
+  position: relative;
+  z-index: 1;
+  margin-top: calc(30 * var(--u));
+  width: calc(102 * var(--u));
+  height: max(1px, calc(2 * var(--u)));
+  background: var(--red);
+  transform-origin: left;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Footer                                                                    */
+/* ------------------------------------------------------------------------ */
+
+/* Row 3's rule to the footer tick: 1529 - 1476 (rule bottom) = 53. */
+.footer {
+  margin-top: calc(53 * var(--u));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.footerTick {
+  display: block;
+  width: max(1px, calc(2 * var(--u)));
+  height: calc(37 * var(--u));
+  background: var(--red);
+  transform-origin: top;
+}
+
+/* Tick bottom (1566) to text cap top (1586): 20. */
+.footerRow {
+  margin-top: calc(20 * var(--u));
+  display: flex;
+  align-items: center;
+  gap: calc(55 * var(--u));
+}
+
+.footerDash {
+  display: block;
+  width: calc(116 * var(--u));
+  height: 1px;
+  background: rgba(255, 255, 255, 0.35);
+  transform-origin: center;
+}
+
+/* Tracked out for the same reason the titles are: the mockup's label
+   measures 417 wide, ours only reached 356 at 0.24em. */
+.footerLabel {
+  font-size: calc(15 * var(--u));
+  letter-spacing: 0.39em;
+  color: #f0f0f0;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Desktop                                                                   */
+/* Same rationale as the homepage sections and AboutValues: the mockup's own
+   scale reads as a billboard past 1024px, so the title tiers drop to the
+   shared heading tokens and the row rhythm tightens to match. */
+/* ------------------------------------------------------------------------ */
+
+@media (min-width: 1024px) {
+  .titleWhite {
+    font-size: calc(0.61 * var(--fs-l1));
+  }
+
+  .titleRed {
+    font-size: calc(0.61 * var(--fs-l2));
+    margin-top: calc(6 * var(--u));
+  }
+
+  .numeral {
+    font-size: calc(110 * var(--u));
+  }
+}
