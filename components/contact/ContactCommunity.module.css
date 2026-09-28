@@ -1,0 +1,335 @@
+/* =========================================================================
+   CONTACT — section 4, CONNECT WITH THE COMMUNITY
+   (mockups/Contact/4.png, a 1024 x 1536 phone frame)
+
+   Every number is a pixel measured off the mockup x `--k` (1/1024 of the
+   viewport, capped at the shared 900px column).
+
+     eyebrow      cap y100..112 x287..726; rule y133..137 x448..575 (w128)
+     headline     "CONNECT WITH"  cap y177..289 (h113) x110..914 (w805)
+                  "THE COMMUNITY" cap y305..417 (h113) x92..959 (w868),
+                  red from 295; leans ~12deg; centred
+     subline      cap y456..472 (h17) x123..894 (w772), white
+     cards        y534..932 (h399); x49..343, 365..660, 682..977 (w295, 22
+                  apart); 2 red, radius ~8
+       marks      tiktok 114x131 at +26, youtube 145x105 at +36,
+                  instagram 130x129 at +24 — all centred
+       name       cap +192..+224 (h29); handle cap +247..+268 (h22)
+       button     241 x 73 at +299, 2 white, radius ~6; label cap 23
+     panel        y965..1459 (h495) x49..977; 2 red, radius ~8
+       headline   "BE PART OF" cap +46..+103 (h58) x90..389
+                  "WHAT'S NEXT." cap +115..+181 (h67) x95..488; leans ~9deg
+       body       caps +216 / +255 / +294 (pitch 39, cap 26)
+       script     x95..408 y+352..+446 (cut x88..418, y1308..1418)
+       photo      x500..975, full panel height, fading to black leftward
+     frame        1536 tall
+   ========================================================================= */
+
+.section {
+  --k: calc(min(100vw, 900px) / 1024);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: calc(96 * var(--k)) 0 calc(77 * var(--k));
+  background: var(--black);
+  text-align: center;
+}
+
+.atmos {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: url("/assets/images/contact-community-bg.webp") top center / calc(1024 * var(--k)) auto no-repeat;
+}
+
+.col {
+  position: relative;
+  z-index: 1;
+  width: calc(1024 * var(--k));
+  margin-inline: auto;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Statement                                                                 */
+/* ------------------------------------------------------------------------ */
+
+.head {
+  position: relative;
+}
+
+.eyebrow {
+  display: flex;
+  justify-content: center;
+  gap: calc(31 * var(--k));
+  font-size: calc(18 * var(--k));
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  color: #c9c9c9;
+}
+
+/* Eyebrow cap bottom 112 -> rule 133. */
+.rule {
+  display: block;
+  margin: calc(15 * var(--k)) auto 0;
+  width: calc(128 * var(--k));
+  height: max(1px, calc(4 * var(--k)));
+  background: var(--red);
+  transform-origin: center;
+}
+
+/* Rule bottom 137 -> headline cap top 177. */
+.title {
+  margin-top: calc(40 * var(--k));
+}
+
+/* Two lines at a 113 cap, leaning like the hero's headline; stretched to
+   the mockup's width with a hair of stroke, the hero's treatment. */
+.title :global(.line) {
+  text-align: center;
+  transform: skewX(-12deg);
+  font-size: calc(128 * var(--k));
+  letter-spacing: 0.005em;
+}
+
+.title :global(.line) + :global(.line) {
+  margin-top: calc(12 * var(--k));
+}
+
+.title :global(.line-inner) {
+  display: inline-block;
+  transform: scaleX(1.13);
+}
+
+.title :global(.char) {
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 240px 240px, 100% 100%;
+  background-repeat: repeat, no-repeat;
+  -webkit-text-stroke: max(0.5px, calc(1.4 * var(--k))) rgba(255, 255, 255, 0.5);
+}
+
+.title :global(.char.t-white) {
+  background-image: var(--grunge), linear-gradient(180deg, #fff 0%, #f0f0f0 50%, #cfcfcf 100%);
+}
+
+.title :global(.char.t-red) {
+  background-image: var(--grunge), linear-gradient(180deg, #ff2b34 0%, var(--red) 50%, #b40e17 100%);
+  -webkit-text-stroke: max(0.5px, calc(1.4 * var(--k))) rgba(255, 60, 70, 0.5);
+}
+
+/* Headline cap bottom 417 -> subline cap top 456. Cap 17, 772 wide. */
+.subline {
+  margin-top: calc(39 * var(--k));
+  font-size: calc(23 * var(--k));
+  font-weight: 500;
+  letter-spacing: 0.45em;
+  color: var(--white);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Network cards                                                             */
+/* ------------------------------------------------------------------------ */
+
+/* Subline cap bottom 472 -> cards 534. */
+.grid {
+  margin: calc(62 * var(--k)) 0 0 calc(49 * var(--k));
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, calc(295 * var(--k)));
+  column-gap: calc(22 * var(--k));
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: calc(399 * var(--k));
+  border: max(1.5px, calc(2 * var(--k))) solid var(--red);
+  border-radius: calc(8 * var(--k));
+  background: var(--black);
+}
+
+/* Marks sit in a 168-tall slot from the card's top; each at the height the
+   mockup gives it (they are not centred as a set). */
+.logo {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: auto;
+}
+
+.card:nth-child(1) .logo {
+  width: calc(134 * var(--k));
+  margin-top: calc(24 * var(--k));
+}
+
+.card:nth-child(2) .logo {
+  width: calc(165 * var(--k));
+  margin-top: calc(34 * var(--k));
+}
+
+.card:nth-child(3) .logo {
+  width: calc(150 * var(--k));
+  margin-top: calc(22 * var(--k));
+}
+
+/* Name cap top +192; Oswald medium, cap 29, tracked. */
+.name {
+  margin-top: calc(192 * var(--k));
+  font-size: calc(33 * var(--k));
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--white);
+}
+
+/* Name cap bottom +224 -> handle cap top +247. */
+.handle {
+  margin-top: calc(23 * var(--k));
+  font-size: calc(26 * var(--k));
+  font-weight: 400;
+  color: var(--white);
+}
+
+/* Handle cap bottom +268 -> button +299. */
+.btnWrap {
+  margin-top: calc(35 * var(--k));
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(22 * var(--k));
+  width: calc(241 * var(--k));
+  height: calc(73 * var(--k));
+  border: max(1.5px, calc(2 * var(--k))) solid var(--white);
+  border-radius: calc(6 * var(--k));
+  background: #030303;
+  color: var(--white);
+  font-size: calc(27 * var(--k));
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  transition:
+    background-color 0.4s,
+    color 0.4s,
+    transform 0.45s var(--ease-out);
+}
+
+.btn:hover {
+  background: var(--white);
+  color: var(--black);
+  transform: translateY(-2px);
+}
+
+.btnArrow {
+  width: calc(26 * var(--k));
+  height: calc(17 * var(--k));
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Panel                                                                     */
+/* ------------------------------------------------------------------------ */
+
+/* Cards bottom 932 -> panel 965. */
+.panel {
+  position: relative;
+  overflow: hidden;
+  margin: calc(33 * var(--k)) 0 0 calc(49 * var(--k));
+  width: calc(928 * var(--k));
+  height: calc(495 * var(--k));
+  border: max(1.5px, calc(2 * var(--k))) solid var(--red);
+  border-radius: calc(8 * var(--k));
+  background: var(--black);
+  text-align: left;
+}
+
+.photo {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: calc(475 * var(--k));
+  object-fit: cover;
+  object-position: right center;
+  transform-origin: 60% 50%;
+  /* The cut begins a little left of where the mockup's photo fades out, so
+     its own black is feathered into the panel's. */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 22%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 22%);
+}
+
+/* Copy from x 90: 41 in from the panel's edge. */
+.panelCopy {
+  position: relative;
+  z-index: 1;
+  padding: calc(46 * var(--k)) 0 0 calc(41 * var(--k));
+}
+
+.panelTitle :global(.line) {
+  transform: skewX(-9deg);
+  font-size: calc(64 * var(--k));
+  letter-spacing: 0.01em;
+}
+
+.panelTitle :global(.line):last-child {
+  margin-top: calc(12 * var(--k));
+  font-size: calc(74 * var(--k));
+}
+
+.panelTitle :global(.line-inner) {
+  display: inline-block;
+  transform: scaleX(1.06);
+  transform-origin: 0 50%;
+}
+
+/* Headline cap bottom +181 -> body cap top +216. Cap 26 at a 39 pitch. */
+.panelBody {
+  --lh: 1.39;
+  margin-top: calc(35 * var(--k));
+  font-size: calc(28 * var(--k));
+  font-weight: 400;
+  color: var(--white);
+  white-space: nowrap;
+}
+
+.panelBody span {
+  display: block;
+}
+
+/* Body cap bottom +294 -> script cut top +343 (the glyphs start at +352). */
+.thanks {
+  display: block;
+  margin: calc(28 * var(--k)) 0 0 calc(-2 * var(--k));
+  width: calc(330 * var(--k));
+  height: calc(110 * var(--k));
+  max-width: none;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Desktop                                                                   */
+/* ------------------------------------------------------------------------ */
+
+@media (min-width: 1024px) {
+  .title :global(.line) {
+    font-size: var(--fs-l1);
+  }
+
+  .title :global(.line):last-child {
+    font-size: var(--fs-l2);
+  }
+
+  .title :global(.line) + :global(.line) {
+    margin-top: calc(14 * var(--k));
+  }
+}

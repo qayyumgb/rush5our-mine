@@ -32,7 +32,17 @@ export type IconName =
   | "trophy"
   | "video"
   | "heart"
-  | "growth";
+  | "growth"
+  | "send"
+  | "handshake"
+  | "cloudUp"
+  | "user"
+  | "tag"
+  | "pencil"
+  | "clockGear"
+  | "instagram"
+  | "tiktok"
+  | "youtubeSolid";
 
 interface IconSpec {
   viewBox: string;
@@ -48,18 +58,22 @@ export const ICONS: Record<IconName, IconSpec> = {
     render: <path d="M8.5 5.8v12.4l9.8-6.2z" fill="currentColor" />,
   },
 
+  /** A QR code: three finder squares and a scatter of modules. */
   qr: {
     viewBox: "0 0 24 24",
     render: (
       <>
+        <rect className={S} x="2" y="2" width="8" height="8" rx=".8" />
+        <rect x="4.5" y="4.5" width="3" height="3" fill="currentColor" />
+        <rect className={S} x="14" y="2" width="8" height="8" rx=".8" />
+        <rect x="16.5" y="4.5" width="3" height="3" fill="currentColor" />
+        <rect className={S} x="2" y="14" width="8" height="8" rx=".8" />
+        <rect x="4.5" y="16.5" width="3" height="3" fill="currentColor" />
         <path
-          className={S}
-          d="M2.5 7.5V4a1.5 1.5 0 0 1 1.5-1.5h3.5M16.5 2.5H20A1.5 1.5 0 0 1 21.5 4v3.5M21.5 16.5V20a1.5 1.5 0 0 1-1.5 1.5h-3.5M7.5 21.5H4A1.5 1.5 0 0 1 2.5 20v-3.5"
+          d="M13 13h2v2h-2zM17 13h2v2h-2zM20 15h2v2h-2zM14 17h2v2h-2zM17 19h3v3h-3zM12 20h2v2h-2z"
+          fill="currentColor"
         />
-        <rect className={S} x="7" y="7" width="4" height="4" rx=".6" />
-        <rect className={S} x="13" y="7" width="4" height="4" rx=".6" />
-        <rect className={S} x="7" y="13" width="4" height="4" rx=".6" />
-        <rect className={S} x="13" y="13" width="4" height="4" rx=".6" />
+        <path className={S} d="M12 2v7M12 16v2M2.5 12h3M9 12h2" />
       </>
     ),
   },
@@ -256,6 +270,125 @@ export const ICONS: Record<IconName, IconSpec> = {
         <path className={S} d="M3.5 21.5v-5.5h4v5.5zM10 21.5v-9h4v9zM16.5 21.5V9h4v12.5z" />
         <path className={S} d="M3.5 11.5l6-5.5 4.5 3.5L21 3.5M17 3.5h4v4" />
       </>
+    ),
+  },
+
+  /** Paper plane — "submit a find". */
+  send: {
+    viewBox: "0 0 24 24",
+    render: (
+      <>
+        <path className={S} d="M2.5 12.2 21.5 3.4 15.6 21.5l-3.9-6.4z" />
+        <path className={S} d="M11.7 15.1 21.5 3.4" />
+      </>
+    ),
+  },
+
+  /** Two clasped hands — "collaborations". */
+  handshake: {
+    viewBox: "0 0 24 24",
+    render: (
+      <>
+        <path className={S} d="m11 17 2 2a1 1 0 1 0 3-3" />
+        <path
+          className={S}
+          d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"
+        />
+        <path className={S} d="m21 3 1 11h-2M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3M3 4h8" />
+      </>
+    ),
+  },
+
+  /** Cloud with an upward arrow — "submit content". */
+  cloudUp: {
+    viewBox: "0 0 32 28",
+    render: (
+      <>
+        <path className={S} d="M9 22.5H8a5.5 5.5 0 0 1-.6-11 7.5 7.5 0 0 1 14.4-1.6A5.5 5.5 0 0 1 24 22.5h-1" />
+        <path className={S} d="M16 26.5V12.5M11 17.5l5-5 5 5" />
+      </>
+    ),
+  },
+
+  /** Head and shoulders — the name field. */
+  user: {
+    viewBox: "0 0 24 24",
+    render: (
+      <>
+        <circle className={S} cx="12" cy="7.5" r="4.5" />
+        <path className={S} d="M3.5 21.5c0-4.7 3.8-7.5 8.5-7.5s8.5 2.8 8.5 7.5z" />
+      </>
+    ),
+  },
+
+  /** Price tag on a tilt — the subject field. */
+  tag: {
+    viewBox: "0 0 24 24",
+    render: (
+      <>
+        <path className={S} d="M2.5 12.6V4a1.5 1.5 0 0 1 1.5-1.5h8.6a2 2 0 0 1 1.4.6l7.4 7.4a2 2 0 0 1 0 2.8l-7.2 7.2a2 2 0 0 1-2.8 0L3.1 14a2 2 0 0 1-.6-1.4z" />
+        <circle cx="7.3" cy="7.3" r="1.5" fill="currentColor" />
+      </>
+    ),
+  },
+
+  /** Pencil — the message field. */
+  pencil: {
+    viewBox: "0 0 24 24",
+    render: (
+      <>
+        <path className={S} d="M4 20l1-4.5L16.6 3.9a2 2 0 0 1 2.8 0l.7.7a2 2 0 0 1 0 2.8L8.5 19z" />
+        <path className={S} d="M14.6 5.9l3.5 3.5M5 15.5l3.5 3.5" />
+      </>
+    ),
+  },
+
+  /** Clock face inside a cog — "response time". */
+  clockGear: {
+    viewBox: "0 0 24 24",
+    render: (
+      <>
+        <path
+          className={S}
+          d="M12 2.5l1.6 1.9 2.4-.7.8 2.3 2.4.8-.7 2.4 1.9 1.6-1.9 1.6.7 2.4-2.4.8-.8 2.3-2.4-.7L12 21.5l-1.6-1.9-2.4.7-.8-2.3-2.4-.8.7-2.4L3.6 12l1.9-1.6-.7-2.4 2.4-.8.8-2.3 2.4.7z"
+        />
+        <circle className={S} cx="12" cy="12" r="4.6" />
+        <path className={S} d="M12 9.6V12l1.7 1.2" />
+      </>
+    ),
+  },
+
+  instagram: {
+    viewBox: "0 0 24 24",
+    render: (
+      <>
+        <rect className={S} x="2.5" y="2.5" width="19" height="19" rx="5.5" />
+        <circle className={S} cx="12" cy="12" r="4.4" />
+        <circle cx="17.6" cy="6.4" r="1.25" fill="currentColor" />
+      </>
+    ),
+  },
+
+  /** Filled, unlike the stroked set: the mark is a solid shape. */
+  tiktok: {
+    viewBox: "4 1.5 17 20",
+    render: (
+      <path
+        fill="currentColor"
+        d="M16.5 2h-3v13.2a2.6 2.6 0 1 1-2.1-2.55V9.5a5.7 5.7 0 1 0 5.1 5.67V8.9a6.9 6.9 0 0 0 4 1.28V7.1a4 4 0 0 1-4-4.1z"
+      />
+    ),
+  },
+
+  /** Filled tile with a cut-out play triangle. */
+  youtubeSolid: {
+    viewBox: "1 4 22 16",
+    render: (
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="M2 9.2A4.2 4.2 0 0 1 6.2 5h11.6A4.2 4.2 0 0 1 22 9.2v5.6a4.2 4.2 0 0 1-4.2 4.2H6.2A4.2 4.2 0 0 1 2 14.8zm8.2-.3v6.2l5.4-3.1z"
+      />
     ),
   },
 

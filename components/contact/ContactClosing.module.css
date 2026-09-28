@@ -1,0 +1,317 @@
+/* =========================================================================
+   CONTACT — section 5, THIS IS ONLY THE BEGINNING
+   (mockups/Contact/5.png, a 1024 x 1536 phone frame)
+
+   Every number is a pixel measured off the mockup x `--k` (1/1024 of the
+   viewport, capped at the shared 900px column).
+
+     eyebrow      cap y88..100 x287..720; rule y118..120 x455..567 (w113)
+     mark         R5 red brush x170..876 y154..479 (cut x160..890,
+                  y140..490); "RUSH 5OUR." white x202..875 y416..578 (cut
+                  x190..890, y405..585)
+     headline     "THIS IS ONLY"   cap y624..735 (h112) x183..840 (w658)
+                  "THE BEGINNING." cap y749..864 (h116) x105..933 (w829),
+                  red; leans ~12deg; centred
+     body         caps y898 / 941 / 983 (pitch ~42), lines 744 / 581 / 637
+                  wide, white, centred
+     button       x76..947 (w872) y1050..1168 (h119); label cap 41
+     strip        icons ~70 tall from y1219..1229, centres x 162 / 396 /
+                  632 / 870; dividers x276, 511, 749, y1245..1369, red at
+                  ~half; labels caps 1317 and 1350 (h19, pitch 33)
+     footer       text cap y1451..1463 x173..842; dashes y1455..1457 (h3)
+                  x53..147 and x841..969, white
+     frame        1536 tall
+   ========================================================================= */
+
+.section {
+  --k: calc(min(100vw, 900px) / 1024);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: calc(85 * var(--k)) 0 calc(73 * var(--k));
+  background: var(--black);
+  text-align: center;
+}
+
+.atmos {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: url("/assets/images/contact-closing-bg.webp") top center / calc(1024 * var(--k)) auto no-repeat;
+}
+
+.col {
+  position: relative;
+  z-index: 1;
+  width: calc(1024 * var(--k));
+  margin-inline: auto;
+}
+
+.head {
+  position: relative;
+}
+
+.eyebrow {
+  display: flex;
+  justify-content: center;
+  gap: calc(31 * var(--k));
+  font-size: calc(18 * var(--k));
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  color: #c9c9c9;
+}
+
+/* Eyebrow cap bottom 100 -> rule 118. */
+.rule {
+  display: block;
+  margin: calc(11 * var(--k)) auto 0;
+  width: calc(113 * var(--k));
+  height: max(1px, calc(3 * var(--k)));
+  background: var(--red);
+  transform-origin: center;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Mark                                                                      */
+/* ------------------------------------------------------------------------ */
+
+/* Rule bottom 121 -> cut top 140. The two cuts overlap, so they are laid
+   out absolutely inside a box the height of both (140..585). */
+.mark {
+  position: relative;
+  margin-top: calc(19 * var(--k));
+  height: calc(445 * var(--k));
+}
+
+.r5,
+.script {
+  position: absolute;
+  max-width: none;
+}
+
+.r5 {
+  left: calc(160 * var(--k));
+  top: 0;
+  width: calc(730 * var(--k));
+  height: calc(350 * var(--k));
+}
+
+.script {
+  left: calc(190 * var(--k));
+  top: calc(265 * var(--k));
+  width: calc(700 * var(--k));
+  height: calc(180 * var(--k));
+}
+
+/* ------------------------------------------------------------------------ */
+/* Statement                                                                 */
+/* ------------------------------------------------------------------------ */
+
+/* Cut bottom 585 -> headline cap top 624. */
+.title {
+  margin-top: calc(39 * var(--k));
+}
+
+.title :global(.line) {
+  text-align: center;
+  transform: skewX(-12deg);
+  font-size: calc(127 * var(--k));
+  letter-spacing: 0.005em;
+}
+
+.title :global(.line):last-child {
+  font-size: calc(131 * var(--k));
+  margin-top: calc(10 * var(--k));
+}
+
+.title :global(.line-inner) {
+  display: inline-block;
+  transform: scaleX(1.14);
+}
+
+.title :global(.char) {
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 240px 240px, 100% 100%;
+  background-repeat: repeat, no-repeat;
+  -webkit-text-stroke: max(0.5px, calc(1.4 * var(--k))) rgba(255, 255, 255, 0.5);
+}
+
+.title :global(.char.t-white) {
+  background-image: var(--grunge), linear-gradient(180deg, #fff 0%, #f0f0f0 50%, #cfcfcf 100%);
+}
+
+.title :global(.char.t-red) {
+  background-image: var(--grunge), linear-gradient(180deg, #ff2b34 0%, var(--red) 50%, #b40e17 100%);
+  -webkit-text-stroke: max(0.5px, calc(1.4 * var(--k))) rgba(255, 60, 70, 0.5);
+}
+
+/* Headline cap bottom 864 -> body cap top 898. Three centred lines at a
+   42 pitch. */
+.body {
+  --lh: 1.4;
+  margin-top: calc(34 * var(--k));
+  font-size: calc(30 * var(--k));
+  font-weight: 400;
+  color: var(--white);
+}
+
+.body span {
+  display: block;
+}
+
+/* Body cap bottom 1011 -> button 1050. */
+.btnWrap {
+  margin-top: calc(44 * var(--k));
+}
+
+.btn {
+  width: calc(872 * var(--k));
+  height: calc(119 * var(--k));
+  gap: calc(34 * var(--k));
+  border-radius: calc(10 * var(--k));
+  font-family: var(--f-ui);
+  font-weight: 500;
+  font-size: calc(46 * var(--k));
+  letter-spacing: 0.03em;
+  /* Same finish as the hero's button: deep face, hot rim, glow all round. */
+  background: linear-gradient(180deg, #a80410 0%, #86020a 55%, #a60309 100%);
+  box-shadow:
+    0 0 46px -2px rgba(var(--red-rgb), 0.9),
+    0 0 14px rgba(var(--red-rgb), 0.55),
+    inset 0 0 0 max(1.5px, calc(2 * var(--k))) rgba(255, 46, 60, 0.95),
+    inset 0 0 22px rgba(255, 30, 40, 0.35);
+}
+
+.btn svg {
+  width: calc(46 * var(--k));
+  height: calc(29 * var(--k));
+}
+
+/* ------------------------------------------------------------------------ */
+/* Strip                                                                     */
+/* ------------------------------------------------------------------------ */
+
+/* Button bottom 1168 -> icons 1219. Four equal columns, 236 each, centred
+   on 162 / 396 / 632 / 870 — a 944 row from x 40. */
+.strip {
+  margin: calc(51 * var(--k)) 0 0 calc(40 * var(--k));
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, calc(236 * var(--k)));
+}
+
+.pillar {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Dividers run 1245..1369: 26 below the icons' top, ending at the labels'
+   foot. Sampled at ~rgb(135,3,12), the red at a little over half. */
+.divider {
+  position: absolute;
+  left: 0;
+  top: calc(26 * var(--k));
+  width: max(1px, calc(2 * var(--k)));
+  height: calc(124 * var(--k));
+  background: rgba(var(--red-rgb), 0.58);
+  transform-origin: top;
+}
+
+.icon {
+  height: calc(78 * var(--k));
+  width: auto;
+  color: var(--red);
+  overflow: visible;
+}
+
+.icon :global(.i-stroke) {
+  stroke-width: 1.5;
+}
+
+/* Icon bottom ~1295 -> label cap top 1317. Cap 19, pitch 33, Oswald. */
+.label {
+  margin-top: calc(21 * var(--k));
+  font-size: calc(24 * var(--k));
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  line-height: calc(33 * var(--k));
+  color: var(--white);
+}
+
+.label span {
+  display: block;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Footer                                                                    */
+/* ------------------------------------------------------------------------ */
+
+/* Labels' foot 1367 -> footer cap top 1451. */
+.foot {
+  position: relative;
+  margin-top: calc(84 * var(--k));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footLine {
+  display: flex;
+  align-items: center;
+  font-size: calc(15 * var(--k));
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: #f2f2f2;
+}
+
+.footItem {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Runs are 24 apart around each dot. */
+.dot {
+  margin: 0 calc(18 * var(--k));
+  font-size: calc(14 * var(--k));
+}
+
+.dash {
+  position: absolute;
+  top: 50%;
+  width: calc(95 * var(--k));
+  height: max(1px, calc(3 * var(--k)));
+  background: #ececec;
+  transform: translateY(-50%);
+}
+
+.dashL {
+  left: calc(53 * var(--k));
+  transform-origin: right;
+}
+
+.dashR {
+  right: calc(55 * var(--k));
+  width: calc(129 * var(--k));
+  transform-origin: left;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Desktop                                                                   */
+/* ------------------------------------------------------------------------ */
+
+@media (min-width: 1024px) {
+  .title :global(.line) {
+    font-size: var(--fs-l1);
+  }
+
+  .title :global(.line):last-child {
+    font-size: var(--fs-l2);
+    margin-top: calc(12 * var(--k));
+  }
+}

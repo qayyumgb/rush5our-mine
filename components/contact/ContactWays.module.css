@@ -1,0 +1,335 @@
+/* =========================================================================
+   CONTACT — section 2, HOW CAN WE CONNECT?
+   (mockups/Contact/2.png, a 1024 x 1536 phone frame)
+
+   Every number is a pixel measured off the mockup x `--k`, this section's
+   unit: 1/1024 of the viewport, capped at the shared 900px column, so the
+   composition scales with the phone and then sits centred on a desktop.
+
+     eyebrow      cap y103..115 (h13) x279..722, ~rgb(201); word gaps ~31
+     rule         y140..143 (h4) x451..572 (w122)
+     headline     cap y187..272 (h86) x67..967, white to x~560, red from 569;
+                  leans ~10deg (left edge 81 -> 67 over 80 rows)
+     brush        y289..317 x182..888 (cut y284..322, x170..900)
+     subline      cap y341..355 (h15) x208..795 (w588), ~rgb(206)
+     cards        cols 48..497 and 530..979 (450 wide, 33 apart), rows from
+                  399 and 906 (30 apart); frame 2 red, radius ~8
+     card inside  icon top +43 (h72..94, centred), title cap +149 (h37),
+                  body cap +215, pitch 37 (two lines) / 35 (three),
+                  script cap +303 (h40), button top +373 (384 x 76)
+     button       2 white, radius ~8, face #030303; label cap 28 from x+75,
+                  arrow 28 wide ending at x+335
+     tagline      cap y1454..1467 (h14) x249..772; red dashes y1460..1462
+                  x51..215 and x810..972
+     frame        1536 tall
+   ========================================================================= */
+
+.ways {
+  --k: calc(min(100vw, 900px) / 1024);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: calc(98 * var(--k)) 0 calc(69 * var(--k));
+  background: var(--black);
+  text-align: center;
+}
+
+/* The mockup's own grunge up both edges, lifted from the file with the type
+   and cards removed. Static image, nothing re-rasterises on scroll. */
+.atmos {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: url("/assets/images/contact-ways-bg.webp") top center / calc(1024 * var(--k)) auto no-repeat;
+}
+
+.col {
+  position: relative;
+  z-index: 1;
+  width: calc(1024 * var(--k));
+  margin-inline: auto;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Statement                                                                 */
+/* ------------------------------------------------------------------------ */
+
+.head {
+  position: relative;
+}
+
+.eyebrow {
+  display: flex;
+  justify-content: center;
+  gap: calc(31 * var(--k));
+  font-size: calc(18 * var(--k));
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  color: #c9c9c9;
+}
+
+/* Eyebrow cap bottom 115 -> rule 140. */
+.rule {
+  display: block;
+  margin: calc(19 * var(--k)) auto 0;
+  width: calc(122 * var(--k));
+  height: max(1px, calc(4 * var(--k)));
+  background: var(--red);
+  transform-origin: center;
+}
+
+/* Rule bottom 144 -> headline cap top 187. */
+.title {
+  margin-top: calc(43 * var(--k));
+}
+
+/* One line, leaning ~10deg like the hero's headline, at the mockup's 86 cap.
+   Its face is wider than ours, so the line is stretched to its 901 width
+   with a hair of stroke for the weight — the same treatment as the hero. */
+.title :global(.line) {
+  text-align: center;
+  transform: skewX(-10deg);
+  font-size: calc(97 * var(--k));
+  letter-spacing: 0.005em;
+}
+
+.title :global(.line-inner) {
+  display: inline-block;
+  transform: scaleX(1.05);
+}
+
+.title :global(.char) {
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 240px 240px, 100% 100%;
+  background-repeat: repeat, no-repeat;
+  -webkit-text-stroke: max(0.5px, calc(1.4 * var(--k))) rgba(255, 255, 255, 0.5);
+}
+
+.title :global(.char.t-white) {
+  background-image: var(--grunge), linear-gradient(180deg, #fff 0%, #f0f0f0 50%, #cfcfcf 100%);
+}
+
+.title :global(.char.t-red) {
+  background-image: var(--grunge), linear-gradient(180deg, #ff2b34 0%, var(--red) 50%, #b40e17 100%);
+  -webkit-text-stroke: max(0.5px, calc(1.4 * var(--k))) rgba(255, 60, 70, 0.5);
+}
+
+/* Headline cap bottom 272 -> brush crop top 284. */
+.brush {
+  display: block;
+  margin: calc(14 * var(--k)) 0 0 calc(170 * var(--k));
+  width: calc(730 * var(--k));
+  height: calc(38 * var(--k));
+  max-width: none;
+}
+
+/* Brush crop bottom 322 -> subline cap top 341. Cap 15, 588 wide. */
+.subline {
+  margin-top: calc(19 * var(--k));
+  font-size: calc(21 * var(--k));
+  font-weight: 500;
+  letter-spacing: 0.4em;
+  color: #cecece;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Cards                                                                     */
+/* ------------------------------------------------------------------------ */
+
+/* Subline cap bottom 355 -> card top 399. */
+.grid {
+  margin: calc(44 * var(--k)) 0 0 calc(48 * var(--k));
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, calc(450 * var(--k)));
+  column-gap: calc(33 * var(--k));
+  row-gap: calc(30 * var(--k));
+  /* Rows share a height so the two buttons of a row line up, as they do
+     in the mockup: it sets its rows by the taller card. */
+  align-items: stretch;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: calc(25 * var(--k)) calc(14 * var(--k)) calc(29 * var(--k));
+  /* Two-line cards are 478 tall in the mockup; three-line ones reach 497
+     on their own. The button is pinned to the foot either way. */
+  min-height: calc(478 * var(--k));
+  border: max(1.5px, calc(2 * var(--k))) solid var(--red);
+  border-radius: calc(8 * var(--k));
+  /* The card's own black hides the grunge behind it, as in the mockup. */
+  background: var(--black);
+}
+
+/* Icons are centred on a line 79 below the card top (the 72-tall envelope
+   at +43, the 91-tall QR at +34), so they sit in a 108 slot from +25 and
+   titles start on the same line regardless. Strokes ~6 wide in the mockup
+   at ~100 across: 1.5 of a 24 viewBox. */
+.icon {
+  height: calc(108 * var(--k));
+  width: auto;
+  max-width: calc(140 * var(--k));
+  color: var(--red);
+  overflow: visible;
+}
+
+.icon :global(.i-stroke) {
+  stroke-width: 1.5;
+}
+
+/* Icon slot bottom 537 -> title cap top 548. Cap 37, leaning like the
+   headline. */
+.cardTitle {
+  margin-top: calc(12 * var(--k));
+  font-size: calc(43 * var(--k));
+  letter-spacing: 0.01em;
+  color: var(--white);
+  transform: skewX(-9deg);
+  white-space: nowrap;
+}
+
+/* Title cap bottom 584 -> body cap top 614. Cap ~24, pitch 37. */
+/* Inter sets wider than the mockup's face: 25 here matches the mockup's
+   line widths (327 / 374 for the two-line cards) at a cap 2 short. */
+.cardBody {
+  --lh: 1.44;
+  margin-top: calc(30 * var(--k));
+  font-size: calc(25 * var(--k));
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  color: var(--white);
+  white-space: nowrap;
+}
+
+.cardBody span {
+  display: block;
+}
+
+/* The mockup tightens the title-to-copy gap to 24 on its three-line cards
+   (215 vs 205 from the card top), so their buttons still land level. */
+.card[data-lines="3"] .cardBody {
+  margin-top: calc(24 * var(--k));
+}
+
+/* Body cap bottom 674 -> script cap top 702. The mockup's script is a brush
+   face the site does not carry; the hand face is the nearest, left in its
+   own case and leaned to match. */
+.script {
+  margin-top: calc(36 * var(--k));
+  font-family: var(--f-hand);
+  font-size: calc(46 * var(--k));
+  line-height: 1;
+  color: #ff0a12;
+  transform: skewX(-8deg);
+  white-space: nowrap;
+}
+
+/* Script cap bottom 741 -> button top 772. The button is pinned to the
+   card's foot, so a two-line card and a three-line card in one row end
+   level. */
+.btnWrap {
+  margin-top: auto;
+  padding-top: calc(20 * var(--k));
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(28 * var(--k));
+  width: calc(384 * var(--k));
+  height: calc(76 * var(--k));
+  border: max(1.5px, calc(2 * var(--k))) solid var(--white);
+  border-radius: calc(8 * var(--k));
+  background: #030303;
+  color: var(--white);
+  font-size: calc(29 * var(--k));
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  transition:
+    background-color 0.4s,
+    color 0.4s,
+    transform 0.45s var(--ease-out);
+}
+
+.btn:hover {
+  background: var(--white);
+  color: var(--black);
+  transform: translateY(-2px);
+}
+
+.btnArrow {
+  width: calc(28 * var(--k));
+  height: calc(18 * var(--k));
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Tagline                                                                   */
+/* ------------------------------------------------------------------------ */
+
+/* Last card bottom 1402 -> tagline cap top 1454. */
+.foot {
+  position: relative;
+  margin-top: calc(46 * var(--k));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tagline {
+  font-size: calc(19 * var(--k));
+  font-weight: 500;
+  letter-spacing: 0.33em;
+  color: #cecece;
+}
+
+/* Red dashes level with the tagline's middle: x 51..215 and 810..972. */
+.dash {
+  position: absolute;
+  top: 50%;
+  width: calc(165 * var(--k));
+  height: max(1px, calc(3 * var(--k)));
+  background: var(--red);
+  transform: translateY(-50%);
+}
+
+.dashL {
+  left: calc(51 * var(--k));
+  transform-origin: right;
+}
+
+.dashR {
+  right: calc(52 * var(--k));
+  transform-origin: left;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Desktop                                                                   */
+/* The column is capped at 900px; only the headline needs to step down from */
+/* phone-poster scale, as every other page's headlines do.                  */
+/* ------------------------------------------------------------------------ */
+
+@media (min-width: 1024px) {
+  .title :global(.line) {
+    font-size: calc(0.9 * var(--fs-l1));
+  }
+
+  .brush {
+    margin-left: calc(230 * var(--k));
+    width: calc(600 * var(--k));
+    height: calc(31 * var(--k));
+  }
+}

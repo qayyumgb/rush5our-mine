@@ -1,0 +1,302 @@
+/* =========================================================================
+   CONTACT — section 1, CONNECT WITH THE MOVEMENT
+   (mockups/Contact/1.png, an 887 x 1774 phone frame)
+
+   Every number is a pixel measured off the mockup x `--k`, this page's
+   unit: 1/887 of the viewport, capped at the same 900px column the shared
+   `--u` stops at, so the composition scales with the phone and then sits
+   centred on a desktop. Measured reference points:
+
+     eyebrow      cap y134..148 (h15), x179..705 centred, word gaps ~48
+     rule         y177..179 (h3) x375..510 (w136)
+     headline     "CONNECT"   cap y230..409 (h180) x104..807
+                  "WITH THE"  cap y428..594 (h167) x116..786
+                  "MOVEMENT." cap y613..778 (h166) x60..829, red
+                  every line slants ~8deg (left edge drifts 20px over 150)
+     brush        red sweep y780..848, x140..800, thick through 240..500
+     body         5 centred lines, cap tops 898/946/996/1042/1088 (pitch 48)
+     red button   x85..801 (w717) y1173..1301 (h129), radius ~13, cap 43
+     outline btn  x92..794 (w703) y1332..1453 (h122), 3 stroke, radius ~16,
+                  plane 271..315 then label cap y1374..1411 from x369
+     tagline      cap y1515..1528 (h14) x160..722; second "REAL" white
+     rule         y1556..1558 x376..510 (w135)
+     R5 mark      y1560..1773, x60..829, ~rgb(110,10,15), cut by the foot
+     frame        1774 tall
+   ========================================================================= */
+
+.hero {
+  --k: calc(min(100vw, 900px) / 887);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  min-height: calc(1774 * var(--k));
+  padding: calc(134 * var(--k)) 0 0;
+  background: var(--black);
+  text-align: center;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Atmosphere                                                                */
+/* ------------------------------------------------------------------------ */
+
+/* The mockup's own artwork at the mockup's own size: red grunge up both
+   edges and the ghosted R5 at the foot, on black. Three static images, no
+   blur, no blend — nothing re-rasterises on scroll. Cut as two edge strips
+   and a centre band so that on a phone they tile back into the mockup
+   exactly, and on a desktop the strips hug the viewport's edges while the
+   mark stays centred under the column. */
+.atmos {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    url("/assets/images/contact-hero-edge-l.webp") left top / calc(110 * var(--k)) auto no-repeat,
+    url("/assets/images/contact-hero-edge-r.webp") right top / calc(110 * var(--k)) auto no-repeat,
+    url("/assets/images/contact-hero-mark.webp") center bottom / calc(667 * var(--k)) auto no-repeat;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Copy column                                                               */
+/* ------------------------------------------------------------------------ */
+
+.copy {
+  position: relative;
+  z-index: 1;
+  width: calc(887 * var(--k));
+  margin-inline: auto;
+}
+
+/* Three words, 48 apart, in the mid grey the mockup uses for its quiet
+   caps (sampled ~rgb(150)). */
+.eyebrow {
+  display: flex;
+  justify-content: center;
+  gap: calc(48 * var(--k));
+  font-size: calc(21 * var(--k));
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  color: #b3b2b0;
+}
+
+/* Eyebrow cap bottom 148 -> rule 177. */
+.rule {
+  display: block;
+  margin: calc(18 * var(--k)) auto 0;
+  width: calc(136 * var(--k));
+  height: max(1px, calc(3 * var(--k)));
+  background: var(--red);
+  transform-origin: center;
+}
+
+/* Rule bottom 180 -> headline cap top 230. */
+.title {
+  margin-top: calc(59 * var(--k));
+}
+
+/* The one headline on the site that leans: every line of the mockup's is
+   set at about 8 degrees in a heavier, wider cut than ours. Each line is
+   skewed to match, stretched to the mockup's measured width (its cap height
+   already matches), and given a hair of stroke for the weight. The mask
+   boxes stay upright, so the characters still rise straight out of them. */
+.title :global(.line) {
+  text-align: center;
+  transform: skewX(-8deg);
+  --sx: 1;
+}
+
+.title :global(.line-inner) {
+  display: inline-block;
+  transform: scaleX(var(--sx));
+}
+
+/* CONNECT 104..807 in the mockup against ~655 here at a matching cap. */
+.title :global(.line):nth-child(1) {
+  --sx: 1.07;
+  font-size: calc(188 * var(--k));
+  letter-spacing: 0.005em;
+}
+
+/* WITH THE 116..786 against ~635. */
+.title :global(.line):nth-child(2) {
+  --sx: 1.09;
+  font-size: calc(175 * var(--k));
+  letter-spacing: 0.005em;
+}
+
+/* MOVEMENT. 60..829 against ~745 once the cap matches. */
+.title :global(.line):nth-child(3) {
+  --sx: 1.03;
+  font-size: calc(170 * var(--k));
+  letter-spacing: 0.005em;
+}
+
+/* The mockup's white is a lit, scratched surface — bright at the top
+   (~243) falling to ~210 at the baseline — and its red darkens the same
+   way (211 -> 156). Painted through the type with the shared grunge noise
+   on top, the way the homepage hero's grunge treatment works. */
+.title :global(.char) {
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 240px 240px, 100% 100%;
+  background-repeat: repeat, no-repeat;
+  -webkit-text-stroke: max(0.5px, calc(1.6 * var(--k))) rgba(255, 255, 255, 0.55);
+}
+
+.title :global(.char.t-white) {
+  background-image: var(--grunge), linear-gradient(180deg, #fff 0%, #f2f2f2 45%, #cfcfcf 100%);
+}
+
+.title :global(.char.t-red) {
+  background-image: var(--grunge), linear-gradient(180deg, #ff2b34 0%, var(--red) 50%, #b40e17 100%);
+  -webkit-text-stroke: max(0.5px, calc(1.6 * var(--k))) rgba(255, 60, 70, 0.55);
+}
+
+/* Cap-to-cap gaps of 19 between all three lines. */
+.title :global(.line) + :global(.line) {
+  margin-top: calc(25 * var(--k));
+}
+
+/* Red brush under "MOVEMENT.": the crop is x 85..815, y 798..852 of the
+   mockup, placed at exactly that (the red line's cap ends at 778). */
+.brush {
+  display: block;
+  margin: calc(20 * var(--k)) 0 0 calc(85 * var(--k));
+  width: calc(730 * var(--k));
+  height: calc(54 * var(--k));
+  max-width: none;
+}
+
+/* Brush bottom 852 -> body cap top 898. Five centred lines at a 48 pitch. */
+.body {
+  --lh: 1.41;
+  margin-top: calc(49 * var(--k));
+  font-size: calc(34 * var(--k));
+  font-weight: 400;
+  color: var(--white);
+}
+
+.body span {
+  display: block;
+}
+
+/* Last body cap bottom 1118 -> red button 1173. Outline button 31 below. */
+.btnWrap {
+  margin-top: calc(31 * var(--k));
+}
+
+.btnWrap:first-of-type {
+  margin-top: calc(55 * var(--k));
+}
+
+.btn {
+  width: calc(717 * var(--k));
+  height: calc(129 * var(--k));
+  gap: calc(40 * var(--k));
+  border-radius: calc(13 * var(--k));
+  font-family: var(--f-ui);
+  font-weight: 700;
+  font-size: calc(46 * var(--k));
+  letter-spacing: 0.04em;
+  /* Sampled: a deep red face (~rgb(134,2,9) to rgb(166,1,9)) under a hot
+     2px rim (~rgb(250,42,57)), lit all round by its own glow. */
+  background: linear-gradient(180deg, #a80410 0%, #86020a 55%, #a60309 100%);
+  box-shadow:
+    0 0 46px -2px rgba(var(--red-rgb), 0.9),
+    0 0 14px rgba(var(--red-rgb), 0.55),
+    inset 0 0 0 max(1.5px, calc(2 * var(--k))) rgba(255, 46, 60, 0.95),
+    inset 0 0 22px rgba(255, 30, 40, 0.35);
+}
+
+.btn svg {
+  width: calc(41 * var(--k));
+  height: calc(26 * var(--k));
+}
+
+/* White outline on black: same size as the red one, a 3 stroke, a little
+   rounder. The plane sits 54 before the label. */
+.btnOutline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(703 * var(--k));
+  height: calc(122 * var(--k));
+  gap: calc(54 * var(--k));
+  border: max(2px, calc(3 * var(--k))) solid var(--white);
+  border-radius: calc(16 * var(--k));
+  color: var(--white);
+  background: #080808;
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.08);
+  font-size: calc(41 * var(--k));
+  letter-spacing: 0.05em;
+  transition:
+    background-color 0.4s,
+    color 0.4s,
+    border-color 0.4s,
+    transform 0.45s var(--ease-out);
+}
+
+.btnOutline:hover {
+  background: var(--white);
+  color: var(--black);
+  transform: translateY(-2px);
+}
+
+.btnOutline .btnIcon {
+  width: calc(50 * var(--k));
+  height: calc(50 * var(--k));
+  overflow: visible;
+}
+
+.btnOutline .btnIcon :global(.i-stroke) {
+  stroke-width: 1.5;
+}
+
+/* Outline button bottom 1453 -> tagline cap top 1515. Cap 14, 563 wide. */
+.tagline {
+  margin-top: calc(62 * var(--k));
+  font-size: calc(20 * var(--k));
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  color: #9e9e9e;
+}
+
+.taglineAccent {
+  font-weight: 600;
+  color: var(--white);
+}
+
+/* Tagline cap bottom 1528 -> rule 1556. */
+.rule2 {
+  margin-top: calc(28 * var(--k));
+  width: calc(135 * var(--k));
+}
+
+/* ------------------------------------------------------------------------ */
+/* Desktop                                                                   */
+/* The column is already capped at 900px, so only the headline needs to     */
+/* come down from phone-poster scale, as every other page's headlines do.   */
+/* ------------------------------------------------------------------------ */
+
+@media (min-width: 1024px) {
+  .title :global(.line):nth-child(1) {
+    font-size: calc(1.35 * var(--fs-l1));
+  }
+
+  .title :global(.line):nth-child(2),
+  .title :global(.line):nth-child(3) {
+    font-size: calc(1.3 * var(--fs-l1));
+  }
+
+  .title :global(.line) + :global(.line) {
+    margin-top: calc(14 * var(--k));
+  }
+
+  /* Narrower headline, narrower brush under it. */
+  .brush {
+    margin-left: calc(210 * var(--k));
+    width: calc(490 * var(--k));
+    height: calc(48 * var(--k));
+  }
+}

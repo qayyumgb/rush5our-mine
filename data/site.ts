@@ -49,7 +49,7 @@ export const navLinks: NavLink[] = [
   { label: "Videos", href: "/#videos" }, // → "/videos" when built
   { label: "Rush Hunts", href: "/#concept" }, // → "/rush-hunts" when built
   { label: "Join the movement", href: "/#culture" }, // → "/join" when built
-  { label: "Contact", href: "/#contact" }, // → "/contact" when built
+  { label: "Contact", href: "/contact" },
 ];
 
 /**
@@ -71,7 +71,7 @@ export const socialLinks: SocialLink[] = [
 /** Footer utility links. */
 export const footerLinks: NavLink[] = [
   { label: "Shop", href: "/#merch" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Contact", href: "/contact" },
   { label: "Terms", href: "#" },
   { label: "Privacy", href: "#" },
 ];
