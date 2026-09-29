@@ -3,7 +3,7 @@
  *
  * Composed like the About and Contact pages: one independent section
  * component per mockup, each with its own stylesheet, all reading from
- * data/hunts.ts. Sections 1-3 are built so far; the rest drop in below them.
+ * data/hunts.ts. Sections 1-5 are built so far; the rest drop in below them.
  *
  * No `Preloader` — the branded intro belongs to the homepage's first visit.
  * The shared footer follows from the root layout.
@@ -13,6 +13,8 @@ import Nav from "@/components/ui/Nav";
 import HuntsHero from "@/components/hunts/HuntsHero";
 import HuntsSteps from "@/components/hunts/HuntsSteps";
 import HuntsRewards from "@/components/hunts/HuntsRewards";
+import HuntsMap from "@/components/hunts/HuntsMap";
+import HuntsFinds from "@/components/hunts/HuntsFinds";
 import { huntsHero } from "@/data/hunts";
 import { site } from "@/data/site";
 
@@ -39,6 +41,12 @@ export default function RushHuntsPage() {
 
         {/* 3 — LIVE REWARDS */}
         <HuntsRewards />
+
+        {/* 4 — HUNT MAP */}
+        <HuntsMap />
+
+        {/* 5 — FOUND IN THE WILD */}
+        <HuntsFinds />
       </main>
     </>
   );

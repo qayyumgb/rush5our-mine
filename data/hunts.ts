@@ -184,3 +184,230 @@ export const huntsRewards: HuntsRewardsContent = {
   ],
   script: "More than rewards. A bigger experience.",
 };
+
+/* ------------------------------------------------------------------------ */
+/* Section 4 — HUNT MAP (mockups/Rush Hunts/4.png)                           */
+/* ------------------------------------------------------------------------ */
+
+export type HuntPinKind = "active" | "recent" | "special";
+
+export interface HuntPin {
+  kind: HuntPinKind;
+  /** Position on the map artwork, in its own 950 x 620 pixels. */
+  x: number;
+  y: number;
+  /** Read out for the pin. */
+  label: string;
+}
+
+export interface NearbyHunt {
+  name: string;
+  distance: string;
+  href: string;
+}
+
+export interface HuntsMapContent {
+  eyebrow: string;
+  titleWhite: string;
+  titleRed: string;
+  subline: string;
+  /** Body copy, one entry per line; `strong` lines are set in full white. */
+  body: { text: string; strong?: boolean }[];
+  legend: { kind: HuntPinKind; label: string }[];
+  /**
+   * BACKEND SEAM: the map is artwork lifted from the mockup, not a live map.
+   * Pins are placed on that picture by pixel. When a real map (Mapbox,
+   * Google Maps) replaces it, swap `pins` for coordinates and render them
+   * with that map's markers.
+   */
+  map: {
+    src: string;
+    width: number;
+    height: number;
+    alt: string;
+    city: string;
+    pins: HuntPin[];
+  };
+  /** Read out for the script artwork over the map. */
+  script: string;
+  /** BACKEND SEAM: points at the full map once that page exists. */
+  locate: { label: string; href: string };
+  nearby: {
+    titleWhite: string;
+    titleRed: string;
+    viewAll: { label: string; href: string };
+    /** BACKEND SEAM: the list takes any number of hunts. */
+    hunts: NearbyHunt[];
+    cta: { label: string; href: string };
+  };
+  foot: string;
+}
+
+export const huntsMap: HuntsMapContent = {
+  eyebrow: "Rush Hunts",
+  titleWhite: "Hunt",
+  titleRed: "Map",
+  subline: "Real city. Real stickers. Real opportunities.",
+  body: [
+    { text: "Stickers are hidden all over the city." },
+    { text: "New drops happen weekly." },
+    { text: "Find a location. Make a move.", strong: true },
+  ],
+  legend: [
+    { kind: "active", label: "Active hunt" },
+    { kind: "recent", label: "Recent find" },
+    { kind: "special", label: "Special drop" },
+  ],
+  map: {
+    src: "/assets/images/hunts-map-city.webp",
+    width: 950,
+    height: 620,
+    alt: "Map of Orlando, Florida, marked with Rush Hunt locations",
+    city: "Orlando, FL",
+    pins: [
+      { kind: "recent", x: 468, y: 188, label: "Recent find" },
+      { kind: "special", x: 695, y: 194, label: "Special drop" },
+      { kind: "active", x: 310, y: 236, label: "Active hunt" },
+      { kind: "active", x: 566.5, y: 251.5, label: "Active hunt" },
+      { kind: "active", x: 694.5, y: 268.5, label: "Active hunt" },
+      { kind: "recent", x: 626, y: 388, label: "Recent find" },
+      { kind: "active", x: 747.5, y: 410, label: "Active hunt" },
+      { kind: "active", x: 313, y: 441.5, label: "Active hunt" },
+      { kind: "active", x: 475, y: 468.5, label: "Active hunt" },
+      { kind: "special", x: 308, y: 518, label: "Special drop" },
+    ],
+  },
+  script: "Same city. Bigger hunts.",
+  locate: { label: "Use My Location", href: "#hunt-map" },
+  nearby: {
+    titleWhite: "Nearby",
+    titleRed: "hunts",
+    viewAll: { label: "View all", href: "#hunt-map" },
+    hunts: [
+      { name: "Downtown Orlando", distance: "0.8 mi", href: "#hunt-map" },
+      { name: "Lake Eola", distance: "1.4 mi", href: "#hunt-map" },
+      { name: "Millenia", distance: "2.1 mi", href: "#hunt-map" },
+    ],
+    cta: { label: "View full map", href: "#hunt-map" },
+  },
+  foot: "Explore. Find. Claim. Repeat.",
+};
+
+/* ------------------------------------------------------------------------ */
+/* Section 5 — FOUND IN THE WILD (mockups/Rush Hunts/5.png)                  */
+/* ------------------------------------------------------------------------ */
+
+export interface CommunityFind {
+  /** The find's number, as printed: "#038". */
+  number: string;
+  status: string;
+  /** Where it was found, under the number. */
+  place: string;
+  /** The chip over the photograph. */
+  location: string;
+  reward: string;
+  photo: { src: string; width: number; height: number; alt: string };
+  href: string;
+}
+
+export interface HuntsFindsContent {
+  eyebrow: string;
+  titleWhite: string;
+  titleRed: string;
+  subline: string;
+  rewardLabel: string;
+  /**
+   * BACKEND SEAM: the carousel takes any number of finds. The first is the
+   * mockup's own; the mockup shows only the edge of the second, so its
+   * reward, and the three after it, are stand-ins. Their photographs are
+   * crops of the hero picture. Replace with real finds.
+   */
+  finds: CommunityFind[];
+  swipe: string;
+  cta: { label: string; href: string };
+  foot: string;
+}
+
+export const huntsFinds: HuntsFindsContent = {
+  eyebrow: "Community finds",
+  titleWhite: "Found in",
+  titleRed: "the wild.",
+  subline: "Real people. Real finds. Real winners.",
+  rewardLabel: "Reward",
+  finds: [
+    {
+      number: "#038",
+      status: "Found",
+      place: "Downtown Orlando",
+      location: "Orlando, FL",
+      reward: "$100",
+      photo: {
+        src: "/assets/images/hunts-finds-1.webp",
+        width: 634,
+        height: 476,
+        alt: "A Rush Hunt sticker on a pole in downtown Orlando at night",
+      },
+      href: "#finds",
+    },
+    {
+      number: "#037",
+      status: "Found",
+      place: "Found near Park Ave",
+      location: "Winter Park",
+      reward: "$50",
+      photo: {
+        src: "/assets/images/hunts-finds-2.webp",
+        width: 634,
+        height: 476,
+        alt: "A Rush Hunt sticker on a pole beside a dark street",
+      },
+      href: "#finds",
+    },
+    {
+      number: "#036",
+      status: "Found",
+      place: "Lake Eola Park",
+      location: "Orlando, FL",
+      reward: "$75",
+      photo: {
+        src: "/assets/images/hunts-finds-3.webp",
+        width: 634,
+        height: 476,
+        alt: "Red light reflected on a wet street at night",
+      },
+      href: "#finds",
+    },
+    {
+      number: "#035",
+      status: "Found",
+      place: "Mall at Millenia",
+      location: "Millenia",
+      reward: "Merch",
+      photo: {
+        src: "/assets/images/hunts-finds-4.webp",
+        width: 634,
+        height: 476,
+        alt: "A Rush Hunt sticker on a pole at night",
+      },
+      href: "#finds",
+    },
+    {
+      number: "#034",
+      status: "Found",
+      place: "Mills 50 District",
+      location: "Orlando, FL",
+      reward: "$100",
+      photo: {
+        src: "/assets/images/hunts-finds-5.webp",
+        width: 634,
+        height: 476,
+        alt: "A Rush Hunt sticker, close up",
+      },
+      href: "#finds",
+    },
+  ],
+  swipe: "Swipe the finds",
+  // BACKEND SEAM: points at the community gallery once that page exists.
+  cta: { label: "See all community finds", href: "#finds" },
+  foot: "Found one? Your story could be next.",
+};

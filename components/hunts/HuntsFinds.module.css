@@ -1,0 +1,589 @@
+/* =========================================================================
+   RUSH HUNTS — section 5, FOUND IN THE WILD
+   (mockups/Rush Hunts/5.png, a 950 x 1655 phone frame)
+
+   Every number is a pixel measured off the mockup x `--u`, the shared
+   950-unit column.
+
+     eyebrow      red label cap y125..145 (h21) x316..631; rules 3 tall,
+                  x53..279 and x670..896
+     headline     "FOUND IN"  cap y174..306 (h133) x107..844, white
+                  "THE WILD." cap y324..452 (h129) x75..880, red
+     subline      cap y472..488 (h17) x77..870, white, tracked
+     cards        637 x 636 at x54, y529; pitch 674; 1.5 red, radius ~14
+                  photo 634 x 476; grey hairline y1007; strip below
+                  chip x79..269, y555..616
+                  number cap y1044..1084 x87; rule x224, y1038..1089
+                  status cap y1053..1074 x255; place cap top 1111 x88
+                  rule x436, y1032..1139
+                  reward label cap y1048..1061 x487; reward y1077..1125 x479
+                  chevron 17 x 32 at x644, y1071
+     controls     arrows 45 x 44 at x57 and x848, y1213
+                  label cap y1209..1224, centred
+                  dots 18 across, pitch 41.7, first centred on x391.5,
+                  y1252..1269
+     button       x54..896, y1318..1426
+     foot         rules y1479 and y1540, x53..897; label cap y1502..1517
+     frame        1655 tall
+
+   Everything from the cards down sits in `.stage`, whose origin is the
+   cards' top edge, mockup y 529: a top of N there is mockup y 529 + N.
+   ========================================================================= */
+
+.section {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: calc(125 * var(--u)) 0 0;
+  background: var(--black);
+}
+
+/* The mockup's own grunge in the corners, lifted from the file with the
+   type and cards removed. Static image, nothing re-rasterises on scroll. */
+.atmos {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: url("/assets/images/hunts-finds-bg.webp") top center / calc(950 * var(--u)) auto no-repeat;
+}
+
+.frame {
+  position: relative;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Statement                                                                 */
+/* ------------------------------------------------------------------------ */
+
+/* Eyebrow cap top 125 -> cards 529. */
+.head {
+  position: relative;
+  height: calc(404 * var(--u));
+  text-align: center;
+}
+
+.eyebrow {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.eyebrowLabel {
+  font-size: calc(24.5 * var(--u));
+  font-weight: 500;
+  letter-spacing: 0.4em;
+  /* Balances the trailing letter-space so the label centres optically. */
+  padding-left: 0.4em;
+  color: var(--red);
+}
+
+.eyebrowRule {
+  position: absolute;
+  top: calc(50% - 1 * var(--u));
+  width: calc(227 * var(--u));
+  height: max(1px, calc(2.5 * var(--u)));
+  background: var(--red);
+}
+
+.ruleL {
+  left: calc(53 * var(--u));
+  transform-origin: right;
+}
+
+.ruleR {
+  left: calc(670 * var(--u));
+  transform-origin: left;
+}
+
+/* Eyebrow cap bottom 145 -> headline cap top 174. */
+.title {
+  margin-top: calc(32 * var(--u));
+}
+
+/* Upright and very wide: each line is stretched to its measured width. */
+.title :global(.line) {
+  text-align: center;
+  font-size: calc(149 * var(--u));
+  letter-spacing: -0.022em;
+  white-space: nowrap;
+  -webkit-text-stroke: 0.012em currentColor;
+}
+
+.title :global(.line-inner) {
+  display: inline-block;
+  transform: scaleX(1.6);
+}
+
+/* Headline line 1 cap bottom 306 -> line 2 cap top 324. */
+.title :global(.line):last-child {
+  margin-top: calc(12 * var(--u));
+  font-size: calc(148.5 * var(--u));
+}
+
+.title :global(.line):last-child :global(.line-inner) {
+  transform: scaleX(1.585);
+}
+
+.title :global(.line):first-child :global(.char) {
+  color: #fff;
+}
+
+/* A deeper red than the brand's: sampled rgb(197,5,21). */
+.title :global(.line):last-child :global(.char) {
+  color: #c70617;
+}
+
+/* Headline cap bottom 452 -> subline cap top 472. */
+.subline {
+  margin-top: calc(19 * var(--u));
+  font-size: calc(23 * var(--u));
+  font-weight: 400;
+  letter-spacing: 0.365em;
+  padding-left: 0.365em;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Carousel                                                                  */
+/* ------------------------------------------------------------------------ */
+
+/* Mockup y 529 -> 1655. */
+.stage {
+  position: relative;
+  height: calc(1126 * var(--u));
+}
+
+/* The window the cards slide through: the column's width, a little taller
+   than the cards so their glow is not cut. */
+.viewport {
+  position: absolute;
+  left: 0;
+  top: calc(-12 * var(--u));
+  width: calc(950 * var(--u));
+  height: calc(660 * var(--u));
+  overflow: hidden;
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.dragging {
+  cursor: grabbing;
+}
+
+.track {
+  display: flex;
+  gap: calc(37 * var(--u));
+  margin: 0;
+  padding: calc(12 * var(--u)) 0 0 calc(54 * var(--u));
+  list-style: none;
+  width: max-content;
+}
+
+.slide {
+  flex: none;
+}
+
+/* Offsets inside the card are from its padding box, 1.5 inside the edge. */
+.card {
+  position: relative;
+  display: block;
+  width: calc(637 * var(--u));
+  height: calc(636 * var(--u));
+  border: max(1px, calc(1.6 * var(--u))) solid #f5061d;
+  border-radius: calc(15 * var(--u));
+  background: #030303;
+  overflow: hidden;
+  color: #fff;
+  -webkit-user-drag: none;
+}
+
+.photo {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: calc(477 * var(--u));
+  overflow: hidden;
+  /* Hairline under the photograph, y 1007. */
+  border-bottom: max(1px, calc(2 * var(--u))) solid #747474;
+  box-sizing: content-box;
+}
+
+.photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  max-width: none;
+  pointer-events: none;
+  transition: transform 1.2s var(--ease-out);
+}
+
+.card:hover .photo img {
+  transform: scale(1.04);
+}
+
+/* Chip: x79..269, y555..616. */
+.chip {
+  position: absolute;
+  left: calc(24 * var(--u));
+  top: calc(25 * var(--u));
+  display: flex;
+  align-items: center;
+  min-width: calc(191 * var(--u));
+  height: calc(62 * var(--u));
+  padding: 0 calc(16 * var(--u)) 0 calc(22 * var(--u));
+  gap: calc(19 * var(--u));
+  border: max(1px, calc(1.6 * var(--u))) solid #7a7a78;
+  border-radius: calc(13 * var(--u));
+  background: rgba(0, 0, 0, 0.94);
+  font-size: calc(21.2 * var(--u));
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.chipPin {
+  flex: none;
+  width: calc(17 * var(--u));
+  height: calc(24 * var(--u));
+  fill: #f0061c;
+}
+
+/* The strip: y1009..1164. Children are placed from the card's own origin. */
+.info {
+  position: absolute;
+  inset: 0;
+}
+
+.number,
+.status,
+.place,
+.rewardLabel,
+.reward {
+  position: absolute;
+  white-space: nowrap;
+}
+
+/* Number: cap y1044..1084, x87. */
+.number {
+  left: calc(31 * var(--u));
+  top: calc(515.5 * var(--u));
+  font-size: calc(47 * var(--u));
+  letter-spacing: 0.01em;
+  color: #fff;
+  -webkit-text-stroke: 0;
+  transform: scaleX(1.11);
+  transform-origin: 0 50%;
+}
+
+.rule1,
+.rule2 {
+  position: absolute;
+  width: max(1px, calc(1.6 * var(--u)));
+  background: #838383;
+}
+
+/* x224, y1038..1089. */
+.rule1 {
+  left: calc(168 * var(--u));
+  top: calc(507.5 * var(--u));
+  height: calc(52 * var(--u));
+}
+
+/* x436, y1032..1139. */
+.rule2 {
+  left: calc(380.5 * var(--u));
+  top: calc(501.5 * var(--u));
+  height: calc(108 * var(--u));
+  width: max(1px, calc(2 * var(--u)));
+}
+
+/* Status: cap y1053..1074, x255. */
+.status {
+  left: calc(199.5 * var(--u));
+  top: calc(524.5 * var(--u));
+  font-size: calc(26 * var(--u));
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  color: #e80a1e;
+}
+
+/* Place: cap top 1111, x88. */
+.place {
+  left: calc(31 * var(--u));
+  top: calc(582.5 * var(--u));
+  font-size: calc(24.4 * var(--u));
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: #f4f4f4;
+}
+
+/* Reward label: cap y1048..1061, x487. */
+.rewardLabel {
+  left: calc(431.5 * var(--u));
+  top: calc(518.5 * var(--u));
+  font-size: calc(18 * var(--u));
+  font-weight: 400;
+  letter-spacing: 0.26em;
+  color: #bababc;
+}
+
+/* Reward: y1077..1125, x479. */
+.reward {
+  left: calc(423 * var(--u));
+  top: calc(550.5 * var(--u));
+  font-size: calc(50 * var(--u));
+  letter-spacing: 0.01em;
+  color: #dc0316;
+  -webkit-text-stroke: 0;
+  transform: scaleX(1.27);
+  transform-origin: 0 50%;
+}
+
+/* Chevron: 17 x 32 at x644, y1071. */
+.chev {
+  position: absolute;
+  left: calc(588.5 * var(--u));
+  top: calc(540.5 * var(--u));
+  width: calc(17 * var(--u));
+  height: calc(32 * var(--u));
+  fill: none;
+  stroke: #ee0a20;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+  transition: transform 0.45s var(--ease-out);
+}
+
+.card:hover .chev {
+  transform: translateX(calc(5 * var(--u)));
+}
+
+/* ------------------------------------------------------------------------ */
+/* Controls                                                                  */
+/* ------------------------------------------------------------------------ */
+
+/* Mockup y 1200..1280. */
+.controls {
+  position: absolute;
+  left: 0;
+  top: calc(671 * var(--u));
+  width: calc(950 * var(--u));
+  height: calc(80 * var(--u));
+}
+
+.arrow {
+  position: absolute;
+  top: calc(13 * var(--u));
+  display: grid;
+  place-items: center;
+  width: calc(45 * var(--u));
+  height: calc(44 * var(--u));
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #f2061d;
+  cursor: pointer;
+  transition:
+    transform 0.4s var(--ease-out),
+    opacity 0.3s;
+}
+
+/* A larger hit area than the 45 glyph. */
+.arrow::before {
+  content: "";
+  position: absolute;
+  inset: calc(-14 * var(--u));
+}
+
+.arrow svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+}
+
+.arrowL {
+  left: calc(57 * var(--u));
+}
+
+.arrowR {
+  left: calc(848 * var(--u));
+}
+
+.arrowL:hover:not(:disabled) {
+  transform: translateX(calc(-5 * var(--u)));
+}
+
+.arrowR:hover:not(:disabled) {
+  transform: translateX(calc(5 * var(--u)));
+}
+
+.arrow:disabled {
+  cursor: default;
+}
+
+/* Label: cap y1209..1224. */
+.swipe {
+  position: absolute;
+  left: 0;
+  top: calc(9 * var(--u));
+  width: 100%;
+  text-align: center;
+  font-size: calc(21.5 * var(--u));
+  font-weight: 400;
+  letter-spacing: 0.325em;
+  padding-left: 0.325em;
+  color: #fff;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Dots: y1252..1269, first centred on x391.5, pitch 41.7. */
+.dots {
+  position: absolute;
+  left: calc(383.5 * var(--u));
+  top: calc(52 * var(--u));
+  display: flex;
+  gap: calc(23.7 * var(--u));
+}
+
+.dot {
+  position: relative;
+  width: calc(18 * var(--u));
+  height: calc(18 * var(--u));
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #525252;
+  cursor: pointer;
+  transition:
+    background-color 0.4s,
+    transform 0.4s var(--ease-out);
+}
+
+.dot::before {
+  content: "";
+  position: absolute;
+  inset: calc(-11 * var(--u));
+}
+
+.dot:hover {
+  background: #8a8a8a;
+}
+
+.dotActive,
+.dotActive:hover {
+  background: #f4011a;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Button                                                                    */
+/* ------------------------------------------------------------------------ */
+
+/* x54..896, y1318..1426. */
+.ctaWrap {
+  position: absolute;
+  left: calc(54 * var(--u));
+  top: calc(789 * var(--u));
+}
+
+.ctaMagnet {
+  display: block;
+}
+
+.cta {
+  width: calc(843 * var(--u));
+  height: calc(109 * var(--u));
+  gap: calc(18 * var(--u));
+  border-radius: calc(11 * var(--u));
+  font-family: var(--f-ui);
+  font-weight: 600;
+  font-size: calc(40 * var(--u));
+  letter-spacing: 0.03em;
+  /* Bright along the rim, deeper through the middle: sampled
+     rgb(206,3,21) at the edge to rgb(144,9,19) inside. */
+  background:
+    radial-gradient(80% 130% at 50% 50%, rgba(110, 8, 16, 0.6), transparent 72%),
+    linear-gradient(180deg, #d30418 0%, #b80517 50%, #d30418 100%);
+  box-shadow:
+    0 0 0 max(1px, calc(1.5 * var(--u))) #ff0a20 inset,
+    0 0 calc(18 * var(--u)) rgba(var(--red-rgb), 0.4);
+}
+
+.cta svg {
+  width: calc(29 * var(--u));
+  height: calc(21 * var(--u));
+}
+
+/* The mockup's arrow is as heavy as the label's stems. */
+.cta svg path {
+  stroke-width: 2.3;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Foot                                                                      */
+/* ------------------------------------------------------------------------ */
+
+/* Rules y1479 and y1540; label cap y1502..1517. */
+.foot {
+  position: absolute;
+  left: 0;
+  top: calc(950 * var(--u));
+  width: calc(950 * var(--u));
+  height: calc(63 * var(--u));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.footLabel {
+  font-size: calc(21.5 * var(--u));
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  padding-left: 0.22em;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.footRule {
+  position: absolute;
+  left: calc(53 * var(--u));
+  width: calc(845 * var(--u));
+  height: max(1px, calc(2 * var(--u)));
+  background: #5f5e5c;
+  transform-origin: center;
+}
+
+.footTop {
+  top: 0;
+}
+
+.footBottom {
+  bottom: 0;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Desktop                                                                   */
+/* The column is narrower than the window here, so the next card fades out  */
+/* at its right edge rather than ending on a hard one.                       */
+/* ------------------------------------------------------------------------ */
+
+@media (min-width: 1024px) {
+  .viewport {
+    -webkit-mask-image: linear-gradient(90deg, #000 0, #000 88%, transparent 100%);
+    mask-image: linear-gradient(90deg, #000 0, #000 88%, transparent 100%);
+  }
+}

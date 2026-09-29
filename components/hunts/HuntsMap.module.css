@@ -1,0 +1,766 @@
+/* =========================================================================
+   RUSH HUNTS — section 4, HUNT MAP
+   (mockups/Rush Hunts/4.png, a 950 x 1655 phone frame)
+
+   Every number is a pixel measured off the mockup x `--u`, the shared
+   950-unit column.
+
+     eyebrow      red label cap y125..142 (h18) x59..265; rule 2 tall,
+                  x290..462
+     headline     one line, cap y168..285 (h118)
+                  "HUNT" x56..488, white; "MAP" x529..900, red
+     subline      cap y306..320 (h15) x65..887, grey, tracked
+     copy         three lines, cap tops 349 / 377 / 406, x56; the last white
+     legend       pills y448..502, x56..309 / 355..594 / 640..895
+     map          artwork cut y440..1060, full width
+                  pins, crowns, city label and controls placed on it
+     script       cut x45..214, y522..749
+     zoom         x53..119, y834..966
+     locate       x647..900, y952..1017
+     card         x53..900, y1054..1475, 1.5 red, radius ~16
+                  rows x80..870, 59 tall, tops 1148 / 1214 / 1279
+                  button x75..875, y1367..1447
+     foot         label cap y1531..1544 x290..657; rules x65..196, x751..884
+     frame        1655 tall
+
+   Everything from the legend down sits in `.stage`, whose origin is the
+   map's top edge, mockup y 440: a top of N there is mockup y 440 + N.
+   ========================================================================= */
+
+.section {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: calc(127 * var(--u)) 0 0;
+  background: var(--black);
+}
+
+/* The mockup's own rock grunge and map, lifted from the file with the type,
+   pins and panels removed. Static image, nothing re-rasterises on scroll. */
+.atmos {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  z-index: -1;
+  width: calc(950 * var(--u));
+  margin-left: calc(-475 * var(--u));
+  pointer-events: none;
+  background: url("/assets/images/hunts-map-bg.webp") top center / 100% auto no-repeat;
+}
+
+.frame {
+  position: relative;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Statement                                                                 */
+/* ------------------------------------------------------------------------ */
+
+.head {
+  position: relative;
+  padding-left: calc(56 * var(--u));
+  /* Eyebrow cap top 127 -> map top 440. */
+  height: calc(313 * var(--u));
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+}
+
+.eyebrowLabel {
+  margin-left: calc(2 * var(--u));
+  font-size: calc(24.5 * var(--u));
+  font-weight: 500;
+  letter-spacing: 0.213em;
+  color: var(--red);
+}
+
+.eyebrowRule {
+  width: calc(173 * var(--u));
+  height: max(1px, calc(2 * var(--u)));
+  margin-left: calc(18 * var(--u));
+  background: var(--red);
+  transform-origin: left;
+}
+
+/* Eyebrow cap bottom 142 -> headline cap top 168. */
+.title {
+  margin-top: calc(24 * var(--u));
+}
+
+/* One line, set from the left. The mockup's face is a very wide grotesque,
+   so each word is stretched to its measured width; offsets are in em so the
+   pair keeps its proportions when the headline steps down on desktop. */
+.title :global(.line) {
+  text-align: left;
+  font-size: calc(132.4 * var(--u));
+  letter-spacing: -0.018em;
+  white-space: nowrap;
+  -webkit-text-stroke: 0.014em currentColor;
+}
+
+.title :global(.line-inner) {
+  display: block;
+}
+
+.word {
+  display: inline-block;
+  transform-origin: 0 100%;
+}
+
+.wordWhite {
+  margin-left: -0.052em;
+  transform: scaleX(1.835);
+}
+
+.wordRed {
+  margin-left: 1.566em;
+  transform: scaleX(1.72);
+}
+
+/* A worn face: brighter at the top, greying toward the foot. */
+.wordWhite :global(.char) {
+  color: #ededed;
+}
+
+.wordRed :global(.char) {
+  color: #e50319;
+}
+
+/* Headline cap bottom 285 -> subline cap top 306. */
+.subline {
+  margin-top: calc(23 * var(--u));
+  margin-left: calc(8 * var(--u));
+  font-size: calc(20.6 * var(--u));
+  font-weight: 400;
+  letter-spacing: 0.343em;
+  color: #d2d2d2;
+  white-space: nowrap;
+}
+
+/* Subline cap bottom 320 -> copy cap top 349; pitch 28.5. */
+.body {
+  --lh: 1.19;
+  margin-top: calc(28 * var(--u));
+  margin-left: calc(-2 * var(--u));
+  font-size: calc(24 * var(--u));
+  font-weight: 400;
+  letter-spacing: 0;
+  color: #cfcfcf;
+  white-space: nowrap;
+}
+
+.body span {
+  display: block;
+}
+
+.strong {
+  color: #fff;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Stage                                                                     */
+/* ------------------------------------------------------------------------ */
+
+/* Mockup y 440 -> 1655. */
+.stage {
+  position: relative;
+  height: calc(1215 * var(--u));
+}
+
+/* The map picture in its window. It repeats what `.atmos` shows behind it,
+   so at rest the two are one image; zoomed, the window's top edge fades out
+   under the legend. */
+.viewport {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(950 * var(--u));
+  height: calc(620 * var(--u));
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 13%, #000 100%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 13%, #000 100%);
+}
+
+.mapInner {
+  position: absolute;
+  inset: 0;
+  transform: scale(var(--z, 1));
+  transform-origin: 50% 55%;
+  transition: transform 0.7s var(--ease-out);
+}
+
+.mapImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+
+/* City label: cap y764..789, x358..563. */
+.city {
+  position: absolute;
+  left: calc(357 * var(--u));
+  top: calc(322.5 * var(--u));
+  font-size: calc(31.5 * var(--u));
+  font-weight: 700;
+  line-height: calc(26 * var(--u));
+  height: calc(26 * var(--u));
+  display: flex;
+  align-items: center;
+  letter-spacing: 0.085em;
+  color: #939393;
+  white-space: nowrap;
+  transform: scaleX(1.08);
+  transform-origin: 0 50%;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Pins                                                                      */
+/* ------------------------------------------------------------------------ */
+
+.pins {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A zero-size anchor at the pin's centre; everything hangs off it. */
+.pin {
+  position: absolute;
+  left: calc(var(--x) * var(--u));
+  top: calc(var(--y) * var(--u));
+  width: 0;
+  height: 0;
+}
+
+/* Markers keep their size as the picture zooms, as a map's pins do. */
+.dot,
+.crownBox {
+  transform: scale(calc(1 / var(--z, 1)));
+  transition: transform 0.7s var(--ease-out);
+}
+
+/* 29 across: a white 12.5 core in a red face, in a wide glow. */
+.dot {
+  position: absolute;
+  left: calc(-14.5 * var(--u));
+  top: calc(-14.5 * var(--u));
+  width: calc(29 * var(--u));
+  height: calc(29 * var(--u));
+  border-radius: 50%;
+  background: radial-gradient(circle closest-side, #fff 0%, #f4f4f4 40%, #ee0420 47%, #e2021c 100%);
+  box-shadow:
+    0 0 calc(10 * var(--u)) calc(2 * var(--u)) rgba(238, 4, 32, 0.75),
+    0 0 calc(34 * var(--u)) calc(8 * var(--u)) rgba(238, 4, 32, 0.38);
+}
+
+.recent .dot {
+  background: radial-gradient(circle closest-side, #fff 0%, #ededed 44%, #7c7c7c 50%, #6f6f6f 100%);
+  box-shadow:
+    0 0 calc(10 * var(--u)) calc(2 * var(--u)) rgba(255, 255, 255, 0.4),
+    0 0 calc(26 * var(--u)) calc(4 * var(--u)) rgba(255, 255, 255, 0.1);
+}
+
+.ring {
+  position: absolute;
+  left: calc(-16 * var(--u));
+  top: calc(-16 * var(--u));
+  width: calc(32 * var(--u));
+  height: calc(32 * var(--u));
+  border-radius: 50%;
+  border: max(1px, calc(1.5 * var(--u))) solid rgba(238, 4, 32, 0.9);
+  opacity: 0;
+}
+
+.recent .ring {
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.special .ring {
+  left: calc(-30 * var(--u));
+  top: calc(-30 * var(--u));
+  width: calc(60 * var(--u));
+  height: calc(60 * var(--u));
+  border-radius: calc(14 * var(--u));
+}
+
+/* Special drop: a 58 black tile, radius 12, holding the crown. */
+.crownBox {
+  position: absolute;
+  left: calc(-29 * var(--u));
+  top: calc(-29 * var(--u));
+  display: grid;
+  place-items: center;
+  width: calc(58 * var(--u));
+  height: calc(58 * var(--u));
+  border-radius: calc(12 * var(--u));
+  background: #080304;
+  box-shadow:
+    0 0 calc(14 * var(--u)) calc(2 * var(--u)) rgba(238, 4, 32, 0.55),
+    0 0 calc(40 * var(--u)) calc(8 * var(--u)) rgba(238, 4, 32, 0.3);
+}
+
+.crownBox img {
+  display: block;
+  margin-top: calc(-6 * var(--u));
+  width: calc(54 * var(--u));
+  height: calc(48 * var(--u));
+  max-width: none;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Legend                                                                    */
+/* ------------------------------------------------------------------------ */
+
+.legend {
+  position: absolute;
+  left: 0;
+  top: calc(8 * var(--u));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pill {
+  position: absolute;
+  top: 0;
+  left: calc(56 * var(--u));
+  display: flex;
+  align-items: center;
+  width: calc(254 * var(--u));
+  height: calc(55 * var(--u));
+  border: max(1px, calc(1.2 * var(--u))) solid #555553;
+  border-radius: calc(9 * var(--u));
+  background: #010101;
+  font-size: calc(16.6 * var(--u));
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: #f2f2f2;
+  white-space: nowrap;
+}
+
+.pill:nth-child(2) {
+  left: calc(355 * var(--u));
+  width: calc(240 * var(--u));
+}
+
+.pill:nth-child(3) {
+  left: calc(640 * var(--u));
+  width: calc(256 * var(--u));
+}
+
+.pillLabel {
+  position: absolute;
+  left: calc(82 * var(--u));
+  top: 50%;
+  transform: translateY(-50%);
+  line-height: 1;
+}
+
+.pill:nth-child(2) .pillLabel {
+  left: calc(72 * var(--u));
+}
+
+.pill:nth-child(3) .pillLabel {
+  left: calc(84 * var(--u));
+}
+
+/* Red dot 23 across, centred on x 101. */
+.legendDot {
+  position: absolute;
+  left: calc(33 * var(--u));
+  top: 50%;
+  width: calc(23 * var(--u));
+  height: calc(23 * var(--u));
+  margin-top: calc(-11.5 * var(--u));
+  border-radius: 50%;
+  background: #ee0420;
+  box-shadow: 0 0 calc(12 * var(--u)) calc(2 * var(--u)) rgba(238, 4, 32, 0.6);
+}
+
+.legendDotRecent {
+  left: calc(25 * var(--u));
+  width: calc(21 * var(--u));
+  height: calc(21 * var(--u));
+  margin-top: calc(-10.5 * var(--u));
+  background: #ececec;
+  box-shadow: 0 0 calc(10 * var(--u)) calc(1 * var(--u)) rgba(255, 255, 255, 0.35);
+}
+
+/* Crown glyph 35 across at x 666: the 54 cut scaled to 46. */
+.legendCrown {
+  position: absolute;
+  left: calc(20 * var(--u));
+  top: calc(5 * var(--u));
+  width: calc(46 * var(--u));
+  height: calc(41 * var(--u));
+  max-width: none;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Script and controls                                                       */
+/* ------------------------------------------------------------------------ */
+
+.script {
+  position: absolute;
+  left: calc(45 * var(--u));
+  top: calc(82 * var(--u));
+  width: calc(170 * var(--u));
+  height: calc(228 * var(--u));
+  max-width: none;
+  pointer-events: none;
+}
+
+.zoom {
+  position: absolute;
+  left: calc(53 * var(--u));
+  top: calc(394 * var(--u));
+  display: flex;
+  flex-direction: column;
+  width: calc(67 * var(--u));
+  height: calc(133 * var(--u));
+  border: max(1px, calc(1.2 * var(--u))) solid #777675;
+  border-radius: calc(9 * var(--u));
+  background: #010101;
+  overflow: hidden;
+}
+
+.zoomBtn {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #fff;
+  cursor: pointer;
+  transition:
+    background-color 0.3s,
+    opacity 0.3s;
+}
+
+.zoomBtn + .zoomBtn {
+  border-top: 1px solid #222121;
+}
+
+.zoomBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.zoomBtn:disabled {
+  cursor: default;
+}
+
+.zoomBtn svg {
+  width: calc(24 * var(--u));
+  height: calc(24 * var(--u));
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 5;
+  transition: opacity 0.3s;
+}
+
+.locate {
+  position: absolute;
+  left: calc(647 * var(--u));
+  top: calc(512 * var(--u));
+  display: flex;
+  align-items: center;
+  width: calc(254 * var(--u));
+  height: calc(66 * var(--u));
+  padding-left: calc(28 * var(--u));
+  gap: calc(17 * var(--u));
+  border: max(1px, calc(1.6 * var(--u))) solid #777776;
+  border-radius: calc(11 * var(--u));
+  background: #010101;
+  color: #fff;
+  font-size: calc(19.5 * var(--u));
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  white-space: nowrap;
+  transition:
+    border-color 0.3s,
+    background-color 0.3s;
+}
+
+.locate:hover {
+  border-color: #fff;
+  background: #141414;
+}
+
+.locateIcon {
+  flex: none;
+  width: calc(28 * var(--u));
+  height: calc(28 * var(--u));
+  fill: currentColor;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Nearby hunts                                                              */
+/* ------------------------------------------------------------------------ */
+
+/* Offsets inside the card are from its padding box, 1.5 inside the edge. */
+.card {
+  position: absolute;
+  left: calc(53 * var(--u));
+  top: calc(614 * var(--u));
+  width: calc(848 * var(--u));
+  height: calc(422 * var(--u));
+  border: max(1px, calc(1.5 * var(--u))) solid #e00318;
+  border-radius: calc(17 * var(--u));
+  /* Sampled: ~rgb(15,0,0) across the head, ~rgb(28,0,1) along the foot and
+     up the left edge. */
+  background:
+    radial-gradient(60% 50% at 0% 0%, rgba(235, 10, 30, 0.2), transparent 70%),
+    linear-gradient(180deg, #0f0000 0%, #120000 60%, #1c0001 100%);
+  box-shadow:
+    0 0 calc(10 * var(--u)) rgba(var(--red-rgb), 0.4),
+    inset 0 0 calc(30 * var(--u)) rgba(var(--red-rgb), 0.14);
+}
+
+.target {
+  position: absolute;
+  left: calc(14.5 * var(--u));
+  top: calc(6.5 * var(--u));
+  width: calc(80 * var(--u));
+  height: calc(80 * var(--u));
+  max-width: none;
+}
+
+/* Title: cap y1085..1118 (h34), x151..395, italic. */
+.cardTitle {
+  position: absolute;
+  left: calc(96 * var(--u));
+  top: calc(31.5 * var(--u));
+  font-size: calc(38.5 * var(--u));
+  letter-spacing: 0.01em;
+  color: #f2f2f2;
+  white-space: nowrap;
+  -webkit-text-stroke: 0;
+}
+
+.slant {
+  display: inline-block;
+  transform: skewX(-10deg) scaleX(1.157);
+  transform-origin: 0 100%;
+}
+
+.red {
+  color: #f0021f;
+}
+
+/* View all: x738..866, cap y1098..1116. */
+.viewAll {
+  position: absolute;
+  right: calc(32 * var(--u));
+  top: calc(34.5 * var(--u));
+  display: flex;
+  align-items: center;
+  gap: calc(15 * var(--u));
+  height: calc(34 * var(--u));
+  font-size: calc(24.5 * var(--u));
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: #f0021f;
+  white-space: nowrap;
+}
+
+.viewAllArrow,
+.rowArrow {
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+  transition: transform 0.45s var(--ease-out);
+}
+
+.viewAllArrow {
+  width: calc(26 * var(--u));
+  height: calc(23 * var(--u));
+}
+
+.viewAll:hover .viewAllArrow,
+.rowLink:hover .rowArrow {
+  transform: translateX(calc(5 * var(--u)));
+}
+
+/* Rows: x80..870, 59 tall, tops 1148 / 1214 / 1279. */
+.rows {
+  position: absolute;
+  left: calc(25.5 * var(--u));
+  top: calc(92.5 * var(--u));
+  width: calc(791 * var(--u));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row + .row {
+  margin-top: calc(6.5 * var(--u));
+}
+
+.rowLink {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: calc(59 * var(--u));
+  border-radius: calc(7 * var(--u));
+  background: rgba(255, 190, 190, 0.05);
+  color: #fff;
+  font-size: calc(21.7 * var(--u));
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background-color 0.3s;
+}
+
+.rowLink:hover {
+  background: rgba(255, 190, 190, 0.11);
+}
+
+.rowDot {
+  position: absolute;
+  left: calc(22.5 * var(--u));
+  top: 50%;
+  width: calc(21 * var(--u));
+  height: calc(21 * var(--u));
+  margin-top: calc(-10 * var(--u));
+  border-radius: 50%;
+  background: #ee0420;
+}
+
+.rowName {
+  position: absolute;
+  left: calc(69 * var(--u));
+}
+
+.rowDist {
+  position: absolute;
+  left: calc(589 * var(--u));
+  font-weight: 400;
+  color: #a3a3a3;
+}
+
+.rowArrow {
+  position: absolute;
+  left: calc(746 * var(--u));
+  width: calc(25 * var(--u));
+  height: calc(24 * var(--u));
+}
+
+/* Button: x75..875, y1367..1447. */
+.ctaWrap {
+  position: absolute;
+  left: calc(20.5 * var(--u));
+  top: calc(312.5 * var(--u));
+}
+
+.ctaMagnet {
+  display: block;
+}
+
+.cta {
+  width: calc(801 * var(--u));
+  height: calc(81 * var(--u));
+  gap: calc(24 * var(--u));
+  padding-left: calc(5 * var(--u));
+  border-radius: calc(11 * var(--u));
+  font-family: var(--f-ui);
+  font-weight: 500;
+  font-size: calc(33 * var(--u));
+  letter-spacing: 0.01em;
+  /* A brushed face: bright along the rim, deeper through the middle. */
+  background:
+    radial-gradient(70% 120% at 50% 50%, rgba(120, 0, 10, 0.45), transparent 70%),
+    linear-gradient(180deg, #ea0522 0%, #c9031b 50%, #e30420 100%);
+  box-shadow:
+    0 0 calc(22 * var(--u)) rgba(var(--red-rgb), 0.55),
+    inset 0 0 calc(10 * var(--u)) rgba(255, 60, 70, 0.45);
+}
+
+.cta svg {
+  width: calc(29 * var(--u));
+  height: calc(19 * var(--u));
+}
+
+/* The mockup's arrow is as heavy as the label's stems. */
+.cta svg path {
+  stroke-width: 2.6;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Foot                                                                      */
+/* ------------------------------------------------------------------------ */
+
+/* Label cap y1531..1544. */
+.foot {
+  position: absolute;
+  left: 0;
+  top: calc(1091 * var(--u));
+  width: calc(950 * var(--u));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.footLabel {
+  font-size: calc(19.5 * var(--u));
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  padding-left: 0.12em;
+  color: #a6a6a6;
+  white-space: nowrap;
+}
+
+.footRule {
+  position: absolute;
+  top: 50%;
+  width: calc(133 * var(--u));
+  height: max(1px, calc(2 * var(--u)));
+  background: #6f6f6f;
+}
+
+.footL {
+  left: calc(65 * var(--u));
+  transform-origin: right;
+}
+
+.footR {
+  left: calc(751 * var(--u));
+  transform-origin: left;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Desktop                                                                   */
+/* The column is narrower than the window here, so the map and grunge fade  */
+/* out at its sides rather than ending on a hard edge.                       */
+/* ------------------------------------------------------------------------ */
+
+@media (min-width: 1024px) {
+  .atmos {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+  }
+
+  .viewport {
+    -webkit-mask-image:
+      linear-gradient(180deg, transparent 0, #000 13%, #000 100%),
+      linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+    mask-image:
+      linear-gradient(180deg, transparent 0, #000 13%, #000 100%),
+      linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+  }
+}
