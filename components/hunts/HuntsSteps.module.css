@@ -1,0 +1,318 @@
+/* =========================================================================
+   RUSH HUNTS — section 2, HOW RUSH HUNTS WORK
+   (mockups/Rush Hunts/2.png, a 950 x 1655 phone frame)
+
+   Every number is a pixel measured off the mockup x `--u`, the shared
+   950-unit column.
+
+     eyebrow      red label cap y118..140 (h23) x357..593; rules 2 tall,
+                  x82..330 and x620..869
+     headline     "HOW RUSH HUNTS" cap y166..257 (h92) x71..882 (w812)
+                  "WORK"           cap y266..360 (h95) x300..652, red
+                  upright, heavy: stems 24 at a 92 cap
+     subline      cap y387..405 (h19) x165..786, white, tracked
+     cards        x62..891 (w830), 2 hot red, radius ~12
+                  tops 445 / 691 / 946 / 1203, heights 195 / 198 / 203 / 213
+                  disc 96 at x96, number cap 48; hairline x223, inset 37;
+                  icon ~120 centred on x326; text from x458
+                  title cap 40; title -> copy 22; copy pitch 33
+     chevrons     42 x 22 at x455, 18 below each card
+     script       cut x95..805, y1460..1608
+     frame        1655 tall
+   ========================================================================= */
+
+.section {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: calc(118 * var(--u)) 0 calc(47 * var(--u));
+  background: var(--black);
+}
+
+/* The mockup's own grunge up both edges, lifted from the file with the type
+   and cards removed. Static image, nothing re-rasterises on scroll. */
+.atmos {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: url("/assets/images/hunts-steps-bg.webp") top center / calc(950 * var(--u)) auto no-repeat;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Statement                                                                 */
+/* ------------------------------------------------------------------------ */
+
+.head {
+  position: relative;
+  text-align: center;
+}
+
+.eyebrow {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* The condensed UI face, bold: 237 wide at a 23 cap in the mockup. */
+.eyebrowLabel {
+  font-size: calc(27 * var(--u));
+  font-weight: 700;
+  letter-spacing: 0.39em;
+  /* Balances the trailing letter-space so the label centres optically. */
+  padding-left: 0.39em;
+  color: var(--red);
+}
+
+.eyebrowRule {
+  position: absolute;
+  top: 50%;
+  width: calc(249 * var(--u));
+  height: max(1px, calc(2 * var(--u)));
+  background: var(--red);
+}
+
+.ruleL {
+  left: calc(82 * var(--u));
+  transform-origin: right;
+}
+
+.ruleR {
+  left: calc(620 * var(--u));
+  transform-origin: left;
+}
+
+/* Eyebrow cap bottom 140 -> headline cap top 166. */
+.title {
+  margin-top: calc(28 * var(--u));
+}
+
+/* Upright and heavy. The mockup's face is wider than ours, so each line is
+   stretched to its measured width, with a hair of stroke for the weight. */
+.title :global(.line) {
+  text-align: center;
+  font-size: calc(103.5 * var(--u));
+  letter-spacing: 0.005em;
+  -webkit-text-stroke: max(0.5px, calc(1.6 * var(--u))) currentColor;
+}
+
+.title :global(.line-inner) {
+  display: inline-block;
+  transform: scaleX(1.22);
+}
+
+/* "WORK" is set much wider than the line above it: 353 across at a 95 cap,
+   where our face gives ~235. */
+.title :global(.line):last-child {
+  margin-top: calc(4 * var(--u));
+  font-size: calc(108 * var(--u));
+}
+
+.title :global(.line):last-child :global(.line-inner) {
+  transform: scaleX(1.5);
+}
+
+.title :global(.t-white) {
+  color: #fff;
+}
+
+/* Headline cap bottom 360 -> subline cap top 387. */
+.subline {
+  margin-top: calc(27 * var(--u));
+  font-size: calc(26 * var(--u));
+  font-weight: 400;
+  letter-spacing: 0.4em;
+  padding-left: 0.4em;
+  color: var(--white);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Steps                                                                     */
+/* ------------------------------------------------------------------------ */
+
+/* Subline cap bottom 405 -> first card 445. */
+.steps {
+  margin: calc(40 * var(--u)) 0 0 calc(62 * var(--u));
+  padding: 0;
+  list-style: none;
+  width: calc(830 * var(--u));
+}
+
+.step {
+  position: relative;
+}
+
+/* Card-to-card gaps of 52 / 58 / 55, less the 1 the borders add. */
+.step + .step {
+  margin-top: calc(54 * var(--u));
+}
+
+.step:nth-child(2) {
+  margin-top: calc(51 * var(--u));
+}
+
+.step:nth-child(3) {
+  margin-top: calc(57 * var(--u));
+}
+
+.card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: calc(195 * var(--u));
+  border: max(1.5px, calc(2 * var(--u))) solid #ee0420;
+  border-radius: calc(12 * var(--u));
+  /* A faint red bloom in the left corners, as sampled (~rgb(34,0,0) at the
+     frame falling to black by x 300), and a soft glow off the frame. */
+  background:
+    radial-gradient(60% 120% at 0% 100%, rgba(var(--red-rgb), 0.16), transparent 60%),
+    radial-gradient(40% 90% at 0% 0%, rgba(var(--red-rgb), 0.08), transparent 60%),
+    #030101;
+  box-shadow:
+    0 0 14px rgba(var(--red-rgb), 0.35),
+    inset 0 0 12px rgba(var(--red-rgb), 0.12);
+}
+
+.step:nth-child(2) .card {
+  min-height: calc(198 * var(--u));
+}
+
+.step:nth-child(3) .card {
+  min-height: calc(203 * var(--u));
+}
+
+.step:nth-child(4) .card {
+  min-height: calc(213 * var(--u));
+}
+
+/* Red disc, 96 across at x 96 (34 in from the card's edge): a bright 6 rim
+   around a darker, lit face. */
+.disc {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: calc(96 * var(--u));
+  height: calc(96 * var(--u));
+  margin-left: calc(32 * var(--u));
+  border-radius: 50%;
+  /* Sampled along a radius: ~rgb(190,7,28) at the centre easing to
+     rgb(145,2,24) by 38, then the rim at rgb(225,2,32) from 43 out. */
+  background: radial-gradient(circle closest-side, #c0071d 0%, #ab0519 50%, #8f0216 84%, #e4021f 87%, #ee0322 100%);
+  box-shadow: 0 0 16px rgba(var(--red-rgb), 0.45);
+  color: #fff;
+  font-family: var(--f-ui);
+  font-weight: 700;
+  font-size: calc(60 * var(--u));
+  line-height: 1;
+}
+
+/* Hairline at x 223, inset 37 top and bottom. */
+.divider {
+  flex: none;
+  align-self: stretch;
+  width: max(1px, calc(1.5 * var(--u)));
+  margin: calc(37 * var(--u)) 0 calc(37 * var(--u)) calc(31 * var(--u));
+  background: rgba(var(--red-rgb), 0.6);
+  transform-origin: top;
+}
+
+/* Icons are the mockup's own, each cut as a 130 x 138 box centred on the
+   glyph, which sits on x 326 and the card's middle. */
+.icon {
+  flex: none;
+  width: calc(130 * var(--u));
+  height: calc(138 * var(--u));
+  margin-left: calc(37 * var(--u));
+  margin-right: calc(-5 * var(--u));
+  max-width: none;
+}
+
+/* Text from x 458: 70 past the icon. */
+.text {
+  margin-left: calc(70 * var(--u));
+  padding: calc(20 * var(--u)) 0;
+  min-width: 0;
+}
+
+/* Display face, cap 40, stretched to the mockup's width. No added stroke:
+   the mockup's titles are a clean heavy cut, and a stroke on top of the
+   stretch clogs the counters at this size. */
+.stepTitle {
+  font-size: calc(43 * var(--u));
+  letter-spacing: 0.01em;
+  color: #fff;
+  white-space: nowrap;
+  -webkit-text-stroke: 0;
+}
+
+.stretch {
+  display: inline-block;
+  transform: scaleX(1.18);
+  transform-origin: 0 50%;
+}
+
+.red {
+  color: #f0021f;
+}
+
+/* Title cap bottom -> copy cap top 22; copy pitch 33. */
+.stepBody {
+  --lh: 1.32;
+  margin-top: calc(22 * var(--u));
+  font-size: calc(25 * var(--u));
+  font-weight: 350;
+  letter-spacing: 0;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.stepBody span {
+  display: block;
+}
+
+/* Chevron: 42 x 22 at x 455 of the frame (393 into the list), 18 below the
+   card. Out of flow, in the gap. */
+.chev {
+  position: absolute;
+  left: calc(393 * var(--u));
+  bottom: calc(-40 * var(--u));
+  width: calc(42 * var(--u));
+  height: calc(22 * var(--u));
+  fill: none;
+  stroke: #f0021f;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Script                                                                    */
+/* ------------------------------------------------------------------------ */
+
+/* Last card bottom 1415 -> cut top 1460; cut x 95..805. */
+.script {
+  display: block;
+  margin: calc(45 * var(--u)) 0 0 calc(95 * var(--u));
+  width: calc(710 * var(--u));
+  height: calc(148 * var(--u));
+  max-width: none;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Desktop                                                                   */
+/* The headline steps down to the shared heading tokens past 1024px, as     */
+/* every other section's does.                                               */
+/* ------------------------------------------------------------------------ */
+
+@media (min-width: 1024px) {
+  .title :global(.line) {
+    font-size: var(--fs-l1);
+  }
+
+  .title :global(.line):last-child {
+    font-size: var(--fs-l2);
+    margin-top: calc(10 * var(--u));
+  }
+}

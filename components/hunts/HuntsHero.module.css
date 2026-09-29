@@ -1,0 +1,413 @@
+/* =========================================================================
+   RUSH HUNTS — section 1, YOU FOUND A RUSH HUNT STICKER.
+   (mockups/Rush Hunts/1.png, a 950 x 1655 phone frame)
+
+   Every number is a pixel measured off the mockup x `--au`, the same
+   full-bleed unit the About hero uses (1/950 of the viewport).
+
+     headline     three lines on a ~3deg rising tilt, leaning ~9deg
+                  "YOU FOUND A" cap 223..309 at its left end, x54..536
+                  "RUSH HUNT"   cap 322..424, x51..584, red
+                  "STICKER."    cap 437..536, x51..453
+                  (each line's right end sits ~20..28 higher than its left)
+     script       red brush script + stroke, cut x45..595 y515..665
+     body         3 lines, caps 693 / 728 / 765 (pitch 36), x52..571
+     red button   x51..542 (w492) y840..930 (h91); label cap 31
+     outline btn  x50..542 y954..1046 (h93), 1 white; play disc 51 at
+                  x105; label cap 30 from x189
+     cue          label cap 1474..1490 x254..691; red dashes 133 x 2 at
+                  x83 and x731; red arrow 27 x 36 at y1521
+     frame        1655 tall
+   ========================================================================= */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  /* Never shorter than the viewport, never shorter than the mockup ratio. */
+  height: max(calc(1655 * var(--au)), 100vh);
+  height: max(calc(1655 * var(--au)), 100svh);
+  background: var(--black);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Background                                                                */
+/* ------------------------------------------------------------------------ */
+
+.bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.photo {
+  position: absolute;
+  inset: 0;
+  /* Scales from the sticker, not the box centre. */
+  transform-origin: 80% 42%;
+}
+
+.img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Anchored right so the pole and its sticker survive any crop. */
+  object-position: 100% 0%;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* The photograph carries the mockup's grading already; only the foot fades
+   to the page black so the next section meets it without a seam. */
+.shade {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 0%, transparent 94%, rgba(4, 4, 4, 0.7) 100%);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Copy column                                                               */
+/* ------------------------------------------------------------------------ */
+
+.copy {
+  position: relative;
+  z-index: 3;
+  padding: calc(227 * var(--au)) 0 0 calc(46 * var(--au));
+}
+
+/* Every line rises to the right by ~3deg and leans ~9deg, each about its
+   own bottom-left corner — so the three left edges stay in a column, as
+   they do in the mockup, where a tilt on the whole block would walk the
+   lower lines to the right. */
+.title {
+  width: max-content;
+}
+
+.title :global(.line) {
+  transform: rotate(-3.2deg) skewX(-9deg);
+  transform-origin: 0 100%;
+  letter-spacing: 0.005em;
+  /* The mask only has to hide the characters below the line before they
+     rise; to the right it is left open, since the line is stretched past
+     its own box. */
+  overflow: visible;
+  clip-path: inset(-8% -40% -2% -4%);
+}
+
+.title :global(.line-inner) {
+  display: inline-block;
+  transform: scaleX(var(--sx, 1));
+  transform-origin: 0 50%;
+}
+
+.title :global(.line):nth-child(1) {
+  --sx: 1.09;
+  font-size: calc(95 * var(--au));
+}
+
+.title :global(.line):nth-child(2) {
+  --sx: 1.16;
+  margin-top: calc(13 * var(--au));
+  font-size: calc(114 * var(--au));
+}
+
+.title :global(.line):nth-child(3) {
+  --sx: 1.16;
+  margin-top: calc(13 * var(--au));
+  font-size: calc(111 * var(--au));
+}
+
+/* The mockup's type is a lit surface with a hair more weight than our
+   face: the treatment the Contact hero's headline uses. */
+.title :global(.char) {
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 240px 240px, 100% 100%;
+  background-repeat: repeat, no-repeat;
+  -webkit-text-stroke: max(0.5px, calc(1.3 * var(--au))) rgba(255, 255, 255, 0.5);
+}
+
+.title :global(.char.t-white) {
+  background-image: var(--grunge), linear-gradient(180deg, #fff 0%, #f2f2f2 50%, #d2d2d2 100%);
+}
+
+.title :global(.char.t-red) {
+  background-image: var(--grunge), linear-gradient(180deg, #ff2b34 0%, var(--red) 50%, #b40e17 100%);
+  -webkit-text-stroke: max(0.5px, calc(1.3 * var(--au))) rgba(255, 60, 70, 0.5);
+}
+
+/* Script cut: x45..595, y515..665. Placed absolutely off the copy block
+   (whose origin is x51, y223) so the headline's tilt cannot move it. */
+.script {
+  position: absolute;
+  left: calc(45 * var(--au));
+  top: calc(515 * var(--au));
+  width: calc(550 * var(--au));
+  height: calc(150 * var(--au));
+  max-width: none;
+}
+
+/* Body caps at 693 / 728 / 765. Positioned off the frame, like the script:
+   the headline above it is rotated, so its layout box is not its picture. */
+.body {
+  /* 36 pitch at 22.5. */
+  --lh: 1.6;
+  position: absolute;
+  left: calc(51 * var(--au));
+  top: calc(693 * var(--au));
+  /* Inter sets wider than the mockup's face: 22.5 matches its 520 line. */
+  font-size: calc(22.5 * var(--au));
+  letter-spacing: -0.005em;
+  font-weight: 350;
+  color: var(--white);
+  white-space: nowrap;
+}
+
+.body span {
+  display: block;
+}
+
+.btnWrap {
+  position: absolute;
+  left: calc(51 * var(--au));
+  top: calc(840 * var(--au));
+}
+
+.btnWrap + .btnWrap {
+  top: calc(954 * var(--au));
+}
+
+.btn {
+  width: calc(492 * var(--au));
+  height: calc(91 * var(--au));
+  gap: calc(26 * var(--au));
+  border-radius: calc(6 * var(--au));
+  font-family: var(--f-ui);
+  font-weight: 500;
+  font-size: calc(38 * var(--au));
+  letter-spacing: 0;
+  /* The label sits 13 right of centre in the mockup (x 147..472). */
+  padding-left: calc(26 * var(--au));
+  /* A flat, bright red here — sampled rgb(236,4,22) — not the deep-faced
+     glowing button of the Contact page. */
+  background: linear-gradient(180deg, #f00a1c, #e60416);
+}
+
+.btn svg {
+  width: calc(38 * var(--au));
+  height: calc(24 * var(--au));
+}
+
+.btnOutline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: calc(492 * var(--au));
+  height: calc(93 * var(--au));
+  padding-left: calc(54 * var(--au));
+  gap: calc(34 * var(--au));
+  border: max(1px, calc(1.5 * var(--au))) solid rgba(255, 255, 255, 0.92);
+  border-radius: calc(6 * var(--au));
+  color: var(--white);
+  background: rgba(0, 0, 0, 0.72);
+  box-shadow: none;
+  font-size: calc(36 * var(--au));
+  letter-spacing: 0;
+  transition:
+    background-color 0.4s,
+    color 0.4s,
+    transform 0.45s var(--ease-out);
+}
+
+.btnOutline:hover {
+  background: var(--white);
+  color: var(--black);
+  transform: translateY(-2px);
+}
+
+/* White disc, black triangle; inverts with the button on hover. */
+.playDisc {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: calc(51 * var(--au));
+  height: calc(51 * var(--au));
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--black);
+  transition:
+    background-color 0.4s,
+    color 0.4s;
+}
+
+.playDisc svg {
+  width: 34%;
+  margin-left: 8%;
+}
+
+.btnOutline:hover .playDisc {
+  background: var(--black);
+  color: var(--white);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Cue                                                                       */
+/* ------------------------------------------------------------------------ */
+
+/* Label cap top 1474; its box carries ~3 of leading above the cap. */
+.cue {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  top: calc(1477 * var(--au));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cueRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(950 * var(--au));
+}
+
+.cueLabel {
+  font-size: calc(23 * var(--au));
+  font-weight: 400;
+  letter-spacing: 0.26em;
+  color: #fff;
+}
+
+.cueDash {
+  position: absolute;
+  top: 50%;
+  width: calc(133 * var(--au));
+  height: max(1px, calc(2 * var(--au)));
+  background: var(--red);
+}
+
+.cueDashL {
+  left: calc(83 * var(--au));
+  transform-origin: right;
+}
+
+.cueDashR {
+  left: calc(731 * var(--au));
+  transform-origin: left;
+}
+
+/* Label cap bottom 1490 -> arrow 1521..1556. */
+.cueArrow {
+  margin-top: calc(18 * var(--au));
+  width: calc(27 * var(--au));
+  height: calc(46 * var(--au));
+}
+
+.cueArrow svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: none;
+  stroke: var(--red);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ========================================================================= */
+/* TABLET PORTRAIT                                                           */
+/* Same rule as the About hero: keep the phone composition, but stop it      */
+/* outgrowing the screen height, and centre it.                              */
+/* ========================================================================= */
+
+@media (min-width: 640px) and (orientation: portrait) {
+  .hero {
+    --au: calc(min(100vw, 100vh * 0.574) / 950);
+    --au: calc(min(100vw, 100svh * 0.574) / 950);
+    height: 100vh;
+    height: 100svh;
+  }
+
+  .copy {
+    width: calc(950 * var(--au));
+    margin-inline: auto;
+  }
+
+  /* Arrow foot at 1556 of 1655, held to the bottom edge. */
+  .cue {
+    top: auto;
+    bottom: calc(99 * var(--au));
+  }
+}
+
+/* ========================================================================= */
+/* DESKTOP / LANDSCAPE                                                       */
+/* The same recomposition the homepage and About heroes use: a 1440 x 860    */
+/* canvas, the photograph held to the right with its left edge feathered     */
+/* into darkness, copy on the left at 0.74 scale, cue centred at the foot.   */
+/* `.copy` overrides `--au` for its own subtree so every measured size       */
+/* inside it scales down together.                                           */
+/* ========================================================================= */
+
+@media (min-width: 1024px), (orientation: landscape) and (min-width: 640px) {
+  .hero {
+    --ad: min(calc(100vw / 1440), calc(100vh / 860));
+    --ad: min(calc(100vw / 1440), calc(100svh / 860));
+    --au: var(--ad);
+    --x0: calc((100vw - 1440 * var(--ad)) / 2);
+
+    height: 100vh;
+    height: 100svh;
+    min-height: 380px;
+  }
+
+  /* The photograph is a phone crop; on a wide screen it takes the right
+     60%, cropped to the band that holds the sticker whole. */
+  .photo {
+    left: 40%;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 30%);
+    mask-image: linear-gradient(90deg, transparent, #000 30%);
+  }
+
+  .img {
+    object-position: 100% 32%;
+  }
+
+  .shade {
+    background: linear-gradient(
+      180deg,
+      rgba(4, 4, 4, 0.4) 0%,
+      transparent 16%,
+      transparent 70%,
+      rgba(4, 4, 4, 0.75) 92%,
+      var(--black) 100%
+    );
+  }
+
+  /* The copy keeps its phone-frame coordinates (everything inside is placed
+     off y 223), shrunk to 0.74 and moved as one block. */
+  .copy {
+    --au: calc(var(--ad) * 0.74);
+    position: absolute;
+    left: calc(var(--x0) + 120 * var(--ad) - 51 * var(--au));
+    top: calc(50% - 640 * var(--au));
+    width: calc(650 * var(--au));
+    height: calc(1060 * var(--au));
+    padding-left: calc(51 * var(--au));
+  }
+
+  .cue {
+    top: auto;
+    bottom: calc(34 * var(--ad));
+    --au: calc(var(--ad) * 0.74);
+  }
+}

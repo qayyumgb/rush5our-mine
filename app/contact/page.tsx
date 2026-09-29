@@ -18,7 +18,7 @@ import { contactHero } from "@/data/contact";
 import { site } from "@/data/site";
 
 export const metadata: Metadata = {
-  title: `Contact — ${site.name}`,
+  title: "Contact",
   description: contactHero.bodyLines.join(" "),
   openGraph: {
     title: `Contact — ${site.name}`,
