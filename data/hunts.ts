@@ -411,3 +411,46 @@ export const huntsFinds: HuntsFindsContent = {
   cta: { label: "See all community finds", href: "#finds" },
   foot: "Found one? Your story could be next.",
 };
+
+/* ------------------------------------------------------------------------ */
+/* Section 6 — THE HUNT HAS STARTED (mockups/Rush Hunts/6.png)               */
+/* ------------------------------------------------------------------------ */
+
+export interface HuntsClosingContent {
+  eyebrow: string;
+  /** Headline lines in order; the `red` line is italic, over a brush stroke. */
+  title: { text: string; red?: boolean }[];
+  /** The four-beat line; the `red` run closes it. */
+  strap: { text: string; red?: boolean }[];
+  bodyLines: string[];
+  shout: string;
+  cta: { label: string; href: string };
+  /** Read out for the wordmark artwork at the foot. */
+  mark: string;
+  tag: string;
+}
+
+export const huntsClosing: HuntsClosingContent = {
+  eyebrow: "Rush Hunts",
+  title: [
+    { text: "The hunt" },
+    { text: "has started." },
+    { text: "Are you in?", red: true },
+  ],
+  strap: [
+    { text: "Find it." },
+    { text: "Scan it." },
+    { text: "Prove it." },
+    { text: "Win it.", red: true },
+  ],
+  bodyLines: [
+    "This is more than a game.",
+    "This is a movement.",
+    "You’re not just watching RUSH HUNTS.",
+  ],
+  shout: "You can be part of the next one.",
+  // → "/join" when the Join The Movement page is built.
+  cta: { label: "Join the movement", href: "/#culture" },
+  mark: "RUSH 5OUR",
+  tag: "The hunt is real.",
+};

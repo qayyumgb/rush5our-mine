@@ -1,0 +1,324 @@
+/* =========================================================================
+   RUSH HUNTS — section 6, THE HUNT HAS STARTED
+   (mockups/Rush Hunts/6.png, a 950 x 1655 phone frame)
+
+   Every number is a pixel measured off the mockup x `--u`, the shared
+   950-unit column.
+
+     eyebrow      red label cap y159..181 (h23) x368..582; rules 2 tall,
+                  x62..341 and x609..886
+     headline     "THE HUNT"     cap y227..376 (h150) x120..838, white
+                  "HAS STARTED." cap y387..530 (h144) x62..918, white
+                  "ARE YOU IN?"  cap y556..727 (h172) x50..905, red, italic
+     brush        cut x110..889, y730..779
+     strap        cap y818..844 (h27); white x63..691, red x725..881
+     copy         three lines, tops 923 / 968 / 1013, centred
+     shout        cap y1061..1106 (h46) x135..815, red
+     button       x64..886, y1174..1327, radius ~16, in a wide red glow
+                  label cap y1229..1279 x187..700; arrow x726..769
+     wordmark     cut x335..614, y1445..1514; rules 2 tall, x72..263 and
+                  x684..876, y1488
+     tagline      cap y1525..1540 x292..658
+     frame        1655 tall
+   ========================================================================= */
+
+.section {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: calc(159 * var(--u)) 0 calc(115 * var(--u));
+  background: var(--black);
+}
+
+/* The mockup's own grunge up both edges, lifted from the file with the type
+   and button removed. Static image, nothing re-rasterises on scroll. */
+.atmos {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: url("/assets/images/hunts-closing-bg.webp") top center / calc(950 * var(--u)) auto no-repeat;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Statement                                                                 */
+/* ------------------------------------------------------------------------ */
+
+.head {
+  position: relative;
+  text-align: center;
+}
+
+.eyebrow {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.eyebrowLabel {
+  font-size: calc(27 * var(--u));
+  font-weight: 500;
+  letter-spacing: 0.33em;
+  /* Balances the trailing letter-space so the label centres optically. */
+  padding-left: 0.33em;
+  color: var(--red);
+}
+
+.eyebrowRule {
+  position: absolute;
+  top: calc(50% - 1 * var(--u));
+  width: calc(280 * var(--u));
+  height: max(1px, calc(2 * var(--u)));
+  background: var(--red);
+}
+
+.ruleL {
+  left: calc(62 * var(--u));
+  transform-origin: right;
+}
+
+.ruleR {
+  left: calc(608 * var(--u));
+  transform-origin: left;
+}
+
+/* Eyebrow cap bottom 181 -> headline cap top 227. */
+.title {
+  margin-top: calc(48 * var(--u));
+}
+
+/* Upright and heavy, each line stretched to its measured width. The
+   mockup sets its words close, so the word space is pulled in. */
+.title :global(.line) {
+  text-align: center;
+  font-size: calc(170.3 * var(--u));
+  letter-spacing: -0.021em;
+  word-spacing: -0.1em;
+  white-space: nowrap;
+  -webkit-text-stroke: 0.01em currentColor;
+}
+
+.title :global(.line-inner) {
+  display: inline-block;
+  transform: scaleX(1.34);
+}
+
+.title :global(.line):first-child :global(.char),
+.title :global(.line):nth-child(2) :global(.char) {
+  color: #f1f1f1;
+}
+
+/* Line 1 cap bottom 376 -> line 2 cap top 387. */
+.title :global(.line):nth-child(2) {
+  margin-top: calc(6 * var(--u));
+  /* Its full stop hangs: the words centre 14 right of the column's. */
+  padding-left: calc(28 * var(--u));
+  font-size: calc(162 * var(--u));
+  letter-spacing: -0.014em;
+  word-spacing: -0.09em;
+}
+
+.title :global(.line):nth-child(2) :global(.line-inner) {
+  transform: scaleX(1.115);
+}
+
+/* Line 2 cap bottom 530 -> line 3 cap top 556. The red line leans. */
+.lineRed:global(.line) {
+  margin-top: calc(21 * var(--u));
+  font-size: calc(195 * var(--u));
+  letter-spacing: -0.014em;
+  word-spacing: -0.09em;
+}
+
+.lineRed :global(.line-inner) {
+  transform: skewX(-5deg) scaleX(1.06);
+}
+
+.lineRed :global(.char) {
+  color: #e00a1d;
+}
+
+/* Brush: x110, y730 — 3 below the headline's cap bottom. */
+.brush {
+  display: block;
+  margin: calc(3 * var(--u)) 0 0 calc(110 * var(--u));
+  width: calc(780 * var(--u));
+  height: calc(50 * var(--u));
+  max-width: none;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Copy                                                                      */
+/* ------------------------------------------------------------------------ */
+
+/* Brush cut bottom 780 -> strap cap top 818. */
+.strap {
+  margin-top: calc(39 * var(--u));
+  text-align: center;
+  font-size: calc(31.5 * var(--u));
+  font-weight: 400;
+  letter-spacing: 0.202em;
+  padding-left: 0.202em;
+  color: #fff;
+  white-space: nowrap;
+  /* The mockup's face is wider than ours. */
+  transform: scaleX(1.3);
+}
+
+.beat {
+  display: inline-block;
+}
+
+.beat + .beat {
+  margin-left: 0.62em;
+}
+
+.beatRed {
+  font-weight: 600;
+  color: #f2061d;
+}
+
+/* Strap cap bottom 844 -> copy top 923; pitch 45. */
+.body {
+  --lh: 1.31;
+  margin-top: calc(80 * var(--u));
+  text-align: center;
+  font-size: calc(34.4 * var(--u));
+  font-weight: 400;
+  letter-spacing: 0;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.body span {
+  display: block;
+}
+
+/* Copy -> shout cap top 1061. */
+.shout {
+  margin-top: calc(23 * var(--u));
+  text-align: center;
+  font-size: calc(53 * var(--u));
+  letter-spacing: 0;
+  color: #e20a1d;
+  white-space: nowrap;
+  -webkit-text-stroke: 0;
+}
+
+.stretch {
+  display: inline-block;
+  transform: scaleX(1);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Button                                                                    */
+/* ------------------------------------------------------------------------ */
+
+/* Shout cap bottom 1106 -> button 1174. */
+.btnWrap {
+  position: relative;
+  margin: calc(66 * var(--u)) 0 0 calc(64 * var(--u));
+  width: calc(823 * var(--u));
+  height: calc(154 * var(--u));
+}
+
+/* The wide halo behind the button: ~rgb(74,6,7) at its edge, gone by 60
+   out. A layer of its own so it can breathe without repainting the face. */
+.glow {
+  position: absolute;
+  inset: calc(-85 * var(--u));
+  border-radius: calc(90 * var(--u));
+  background: radial-gradient(closest-side, rgba(255, 20, 40, 0.75) 0%, rgba(255, 20, 40, 0.42) 60%, transparent 100%);
+  filter: blur(calc(14 * var(--u)));
+  pointer-events: none;
+}
+
+.btnMagnet {
+  position: relative;
+  display: block;
+}
+
+.btn {
+  width: calc(823 * var(--u));
+  height: calc(154 * var(--u));
+  gap: calc(26 * var(--u));
+  padding-top: calc(4 * var(--u));
+  border-radius: calc(17 * var(--u));
+  font-family: var(--f-ui);
+  font-weight: 600;
+  font-size: calc(62 * var(--u));
+  letter-spacing: 0.015em;
+  /* Bright along the rim, deeper through the middle: sampled
+     rgb(247,26,43) at the edge to rgb(181,12,25) inside. */
+  background:
+    radial-gradient(75% 120% at 50% 50%, rgba(150, 6, 22, 0.55), transparent 75%),
+    linear-gradient(180deg, #ee1a2c 0%, #c10f1f 50%, #ee1a2c 100%);
+  box-shadow:
+    0 0 0 max(1px, calc(2 * var(--u))) #ff2a3c inset,
+    0 0 calc(16 * var(--u)) rgba(255, 30, 50, 0.7);
+}
+
+.btn svg {
+  width: calc(44 * var(--u));
+  height: calc(34 * var(--u));
+}
+
+/* The mockup's arrow is as heavy as the label's stems. */
+.btn svg path {
+  stroke-width: 2.4;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Foot                                                                      */
+/* ------------------------------------------------------------------------ */
+
+/* Button bottom 1327 -> wordmark cut 1445. */
+.foot {
+  position: relative;
+  margin-top: calc(118 * var(--u));
+  height: calc(96 * var(--u));
+}
+
+.mark {
+  position: absolute;
+  left: calc(335 * var(--u));
+  top: 0;
+  width: calc(280 * var(--u));
+  height: calc(70 * var(--u));
+  max-width: none;
+}
+
+/* Rules at y 1488: 43 below the cut's top. */
+.footRule {
+  position: absolute;
+  top: calc(43 * var(--u));
+  width: calc(192 * var(--u));
+  height: max(1px, calc(2 * var(--u)));
+  background: #dcdcdc;
+}
+
+.footL {
+  left: calc(72 * var(--u));
+  transform-origin: right;
+}
+
+.footR {
+  left: calc(684 * var(--u));
+  transform-origin: left;
+}
+
+/* Tagline: cap y1525..1540, 80 below the cut's top. */
+.tag {
+  position: absolute;
+  left: 0;
+  top: calc(81 * var(--u));
+  width: 100%;
+  text-align: center;
+  font-size: calc(21.5 * var(--u));
+  font-weight: 400;
+  letter-spacing: 0.488em;
+  padding-left: 0.488em;
+  color: #fff;
+  white-space: nowrap;
+}
