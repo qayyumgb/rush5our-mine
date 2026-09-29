@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { fontVariables } from "./fonts";
 import { site } from "@/data/site";
 import { MotionProvider } from "@/components/motion/MotionProvider";
+import Footer from "@/components/ui/Footer";
 import { VideoPlayerProvider } from "@/components/ui/VideoPlayer";
 import Cursor from "@/components/ui/Cursor";
 import "./globals.css";
@@ -81,6 +82,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <MotionProvider>
           <VideoPlayerProvider>
             {children}
+            {/* One footer for every page, after its sections. */}
+            <Footer />
             <Cursor />
           </VideoPlayerProvider>
         </MotionProvider>

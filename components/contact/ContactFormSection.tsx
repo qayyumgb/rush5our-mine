@@ -57,8 +57,12 @@ export function ContactFormSection() {
   const { ready, reduced } = useMotion();
 
   const [values, setValues] = useState<Values>(EMPTY);
-  const [errors, setErrors] = useState<Partial<Record<keyof Values, string>>>({});
-  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [errors, setErrors] = useState<Partial<Record<keyof Values, string>>>(
+    {},
+  );
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">(
+    "idle",
+  );
 
   useEffect(() => {
     const root = rootRef.current;
@@ -78,12 +82,20 @@ export function ContactFormSection() {
       /* --- eyebrow ------------------------------------------------------ */
       const head = gsap.timeline({
         defaults: { ease: EASE },
-        scrollTrigger: { trigger: q(`.${styles.eyebrow}`)[0], start: "top 85%" },
+        scrollTrigger: {
+          trigger: q(`.${styles.eyebrow}`)[0],
+          start: "top 85%",
+        },
       });
       (q(`.${styles.eyebrowWord}`) as HTMLElement[]).forEach((w, i) => {
         head.add(scramble(w, 0.8), i * 0.12);
       });
-      head.fromTo(q(`.${styles.rule}`), { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: EASE_IO }, 0.2);
+      head.fromTo(
+        q(`.${styles.rule}`),
+        { scaleX: 0 },
+        { scaleX: 1, duration: 0.9, ease: EASE_IO },
+        0.2,
+      );
 
       /* --- panels ------------------------------------------------------- */
       (q(`.${styles.panel}`) as HTMLElement[]).forEach((panel) => {
@@ -92,20 +104,45 @@ export function ContactFormSection() {
           defaults: { ease: EASE },
           scrollTrigger: { trigger: panel, start: "top 80%" },
         });
-        tl.fromTo(panel, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 1.1 }, 0);
+        tl.fromTo(
+          panel,
+          { y: 40, opacity: 0 },
+          { y: 0, opacity: 1, duration: 1.1 },
+          0,
+        );
         const title = inP(`.${styles.title}`)[0] as HTMLElement | undefined;
         if (title) charsIn(tl, splitTitle(title), 0.2);
-        tl.fromTo(inP(`.${styles.subline}`), { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9 }, 0.6);
+        tl.fromTo(
+          inP(`.${styles.subline}`),
+          { y: 14, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.9 },
+          0.6,
+        );
         // Each panel has only some of these; GSAP warns on an empty target
         // list, so the lists are checked first.
-        const rows = inP(`.${styles.field}, .${styles.row}, .${styles.divider}, .${styles.response}`);
+        const rows = inP(
+          `.${styles.field}, .${styles.row}, .${styles.divider}, .${styles.response}`,
+        );
         if (rows.length) {
-          tl.fromTo(rows, { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, stagger: 0.08 }, 0.7);
+          tl.fromTo(
+            rows,
+            { y: 18, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.9, stagger: 0.08 },
+            0.7,
+          );
         }
         tl.fromTo(
           inP(".i-stroke"),
-          { strokeDashoffset: (_i: number, el: Element) => Number((el as SVGElement).dataset.len ?? 0) },
-          { strokeDashoffset: 0, duration: 1, stagger: 0.04, ease: "power2.inOut" },
+          {
+            strokeDashoffset: (_i: number, el: Element) =>
+              Number((el as SVGElement).dataset.len ?? 0),
+          },
+          {
+            strokeDashoffset: 0,
+            duration: 1,
+            stagger: 0.04,
+            ease: "power2.inOut",
+          },
           0.9,
         );
         const submit = inP(`.${styles.submitWrap}`);
@@ -113,7 +150,13 @@ export function ContactFormSection() {
           tl.fromTo(
             submit,
             { opacity: 0, clipPath: "inset(0 50% 0 50%)" },
-            { opacity: 1, clipPath: "inset(0 0% 0 0%)", duration: 1, ease: EASE_IO, clearProps: "clipPath" },
+            {
+              opacity: 1,
+              clipPath: "inset(0 0% 0 0%)",
+              duration: 1,
+              ease: EASE_IO,
+              clearProps: "clipPath",
+            },
             1.1,
           );
         }
@@ -124,16 +167,32 @@ export function ContactFormSection() {
           tl.fromTo(
             noteLines,
             { clipPath: "inset(-40% 100% -40% 0)" },
-            { clipPath: "inset(-40% 0% -40% 0)", duration: 0.7, stagger: 0.18, ease: EASE_IO, clearProps: "clipPath" },
+            {
+              clipPath: "inset(-40% 0% -40% 0)",
+              duration: 0.7,
+              stagger: 0.18,
+              ease: EASE_IO,
+              clearProps: "clipPath",
+            },
             0.9,
           )
             .fromTo(
               inP(`.${styles.swoosh}`),
               { clipPath: "inset(-20% 100% -20% 0)" },
-              { clipPath: "inset(-20% 0% -20% 0)", duration: 0.9, ease: EASE_IO, clearProps: "clipPath" },
+              {
+                clipPath: "inset(-20% 0% -20% 0)",
+                duration: 0.9,
+                ease: EASE_IO,
+                clearProps: "clipPath",
+              },
               1.7,
             )
-            .fromTo(inP(`.${styles.tagRule}`), { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: EASE_IO }, 2.0);
+            .fromTo(
+              inP(`.${styles.tagRule}`),
+              { scaleX: 0 },
+              { scaleX: 1, duration: 0.7, ease: EASE_IO },
+              2.0,
+            );
           (inP(`.${styles.tagline} span`) as HTMLElement[]).forEach((s, i) => {
             tl.add(scramble(s, 0.8), 2.05 + i * 0.15);
           });
@@ -149,8 +208,10 @@ export function ContactFormSection() {
     e.preventDefault();
     const next: Partial<Record<keyof Values, string>> = {};
     if (!values.name.trim()) next.name = "Tell us your name.";
-    if (!EMAIL_RE.test(values.email)) next.email = "Enter a valid email address.";
-    if (values.message.trim().length < 10) next.message = "A little more detail, please.";
+    if (!EMAIL_RE.test(values.email))
+      next.email = "Enter a valid email address.";
+    if (values.message.trim().length < 10)
+      next.message = "A little more detail, please.";
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
@@ -165,7 +226,8 @@ export function ContactFormSection() {
   };
 
   const set =
-    (key: keyof Values) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    (key: keyof Values) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setValues((v) => ({ ...v, [key]: e.target.value }));
       if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }));
       if (status !== "idle") setStatus("idle");
@@ -205,65 +267,79 @@ export function ContactFormSection() {
           <p className={`${styles.subline} f-sans cz caps`}>{form.subline}</p>
 
           <form className={styles.form} onSubmit={handleSubmit} noValidate>
-            <label className={`${styles.field} ${styles.half}`}>
-              <Icon name="user" className={styles.fieldIcon} />
-              <input
-                type="text"
-                name="name"
-                autoComplete="name"
-                placeholder={form.fields.name}
-                aria-label={form.fields.name}
-                aria-invalid={Boolean(errors.name)}
-                value={values.name}
-                onChange={set("name")}
-                className={styles.input}
-              />
-              {errors.name && <span className={styles.error}>{errors.name}</span>}
-            </label>
+            <div className={`${styles.slot} ${styles.half}`}>
+              <label className={styles.field}>
+                <Icon name="user" className={styles.fieldIcon} />
+                <input
+                  type="text"
+                  name="name"
+                  autoComplete="name"
+                  placeholder={form.fields.name}
+                  aria-label={form.fields.name}
+                  aria-invalid={Boolean(errors.name)}
+                  value={values.name}
+                  onChange={set("name")}
+                  className={styles.input}
+                />
+              </label>
+              {errors.name && (
+                <span className={styles.error}>{errors.name}</span>
+              )}
+            </div>
 
-            <label className={`${styles.field} ${styles.half}`}>
-              <Icon name="envelope" className={styles.fieldIcon} />
-              <input
-                type="email"
-                name="email"
-                autoComplete="email"
-                placeholder={form.fields.email}
-                aria-label={form.fields.email}
-                aria-invalid={Boolean(errors.email)}
-                value={values.email}
-                onChange={set("email")}
-                className={styles.input}
-              />
-              {errors.email && <span className={styles.error}>{errors.email}</span>}
-            </label>
+            <div className={`${styles.slot} ${styles.half}`}>
+              <label className={styles.field}>
+                <Icon name="envelope" className={styles.fieldIcon} />
+                <input
+                  type="email"
+                  name="email"
+                  autoComplete="email"
+                  placeholder={form.fields.email}
+                  aria-label={form.fields.email}
+                  aria-invalid={Boolean(errors.email)}
+                  value={values.email}
+                  onChange={set("email")}
+                  className={styles.input}
+                />
+              </label>
+              {errors.email && (
+                <span className={styles.error}>{errors.email}</span>
+              )}
+            </div>
 
-            <label className={styles.field}>
-              <Icon name="tag" className={styles.fieldIcon} />
-              <input
-                type="text"
-                name="subject"
-                placeholder={form.fields.subject}
-                aria-label={form.fields.subject}
-                value={values.subject}
-                onChange={set("subject")}
-                className={styles.input}
-              />
-            </label>
+            <div className={styles.slot}>
+              <label className={styles.field}>
+                <Icon name="tag" className={styles.fieldIcon} />
+                <input
+                  type="text"
+                  name="subject"
+                  placeholder={form.fields.subject}
+                  aria-label={form.fields.subject}
+                  value={values.subject}
+                  onChange={set("subject")}
+                  className={styles.input}
+                />
+              </label>
+            </div>
 
-            <label className={`${styles.field} ${styles.tall}`}>
-              <Icon name="pencil" className={styles.fieldIcon} />
-              <textarea
-                name="message"
-                placeholder={form.fields.message}
-                aria-label={form.fields.message}
-                aria-invalid={Boolean(errors.message)}
-                value={values.message}
-                onChange={set("message")}
-                className={`${styles.input} ${styles.textarea}`}
-                rows={3}
-              />
-              {errors.message && <span className={styles.error}>{errors.message}</span>}
-            </label>
+            <div className={styles.slot}>
+              <label className={`${styles.field} ${styles.tall}`}>
+                <Icon name="pencil" className={styles.fieldIcon} />
+                <textarea
+                  name="message"
+                  placeholder={form.fields.message}
+                  aria-label={form.fields.message}
+                  aria-invalid={Boolean(errors.message)}
+                  value={values.message}
+                  onChange={set("message")}
+                  className={`${styles.input} ${styles.textarea}`}
+                  rows={3}
+                />
+              </label>
+              {errors.message && (
+                <span className={styles.error}>{errors.message}</span>
+              )}
+            </div>
 
             <div className={styles.submitWrap}>
               <button
@@ -275,7 +351,11 @@ export function ContactFormSection() {
                 <span className="f-cond cz caps">
                   {status === "sending" ? "Sending…" : form.submit}
                 </span>
-                <svg className={styles.submitArrow} viewBox="0 0 32 20" aria-hidden="true">
+                <svg
+                  className={styles.submitArrow}
+                  viewBox="0 0 32 20"
+                  aria-hidden="true"
+                >
                   <path d="M1 10h29M21 1.5l9 8.5-9 8.5" />
                 </svg>
               </button>
@@ -285,7 +365,10 @@ export function ContactFormSection() {
                 </p>
               )}
               {status === "error" && (
-                <p className={`${styles.note} ${styles.noteError}`} role="alert">
+                <p
+                  className={`${styles.note} ${styles.noteError}`}
+                  role="alert"
+                >
                   {form.failed}
                 </p>
               )}

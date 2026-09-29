@@ -164,13 +164,14 @@ export function AboutHero() {
       {/* ---------------- Copy ---------------- */}
       <div className={styles.copy}>
         <Eyebrow
+          hideUntilRevealed
           label={aboutHero.eyebrow}
           className={styles.eyebrow}
           labelClassName={styles.eyebrowLabel}
           ruleClassName={styles.eyebrowRule}
         />
 
-        <h1 className={styles.title}>
+        <h1 className={styles.title} data-a>
           {aboutHero.titleWhite.map((line) => (
             <span key={line} className="line f-display cz">
               <span className="line-inner t-white">{line}</span>

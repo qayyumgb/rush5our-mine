@@ -114,16 +114,16 @@ export function ContactHero() {
       <div className={styles.atmos} aria-hidden="true" data-a />
 
       <div className={styles.copy}>
-        <p className={`${styles.eyebrow} f-sans cz caps`}>
+        <p className={`${styles.eyebrow} f-sans cz caps`} data-a>
           {contactHero.eyebrow.map((w) => (
             <span key={w} className={styles.eyebrowWord}>
               {w}
             </span>
           ))}
         </p>
-        <span className={styles.rule} aria-hidden="true" />
+        <span className={styles.rule} aria-hidden="true" data-a />
 
-        <h1 id="contact-title" className={styles.title}>
+        <h1 id="contact-title" className={styles.title} data-a>
           {contactHero.titleWhite.map((line) => (
             <span key={line} className="line f-display cz">
               <span className="line-inner t-white">{line}</span>
@@ -149,7 +149,7 @@ export function ContactHero() {
           data-a
         />
 
-        <p className={`${styles.body} f-sans cz`}>
+        <p className={`${styles.body} f-sans cz`} data-a>
           {contactHero.bodyLines.map((line) => (
             <span key={line}>{line}</span>
           ))}
@@ -172,7 +172,7 @@ export function ContactHero() {
           </a>
         </div>
 
-        <p className={`${styles.tagline} f-sans cz caps`}>
+        <p className={`${styles.tagline} f-sans cz caps`} data-a>
           {contactHero.tagline.map((run, i) =>
             run.accent ? (
               <b key={i} className={styles.taglineAccent}>
@@ -183,7 +183,7 @@ export function ContactHero() {
             ),
           )}
         </p>
-        <span className={`${styles.rule} ${styles.rule2}`} aria-hidden="true" />
+        <span className={`${styles.rule} ${styles.rule2}`} aria-hidden="true" data-a />
       </div>
     </section>
   );

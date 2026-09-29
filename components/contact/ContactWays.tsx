@@ -170,7 +170,20 @@ export function ContactWays() {
         <ul className={styles.grid}>
           {contactWays.ways.map((way) => (
             <li key={way.title} className={styles.card} data-lines={way.body.length} data-a>
-              <Icon name={way.icon} className={styles.icon} />
+              {typeof way.icon === "string" ? (
+                <Icon name={way.icon} className={styles.icon} />
+              ) : (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  className={`${styles.icon} ${styles.iconImg}`}
+                  src={way.icon.src}
+                  width={way.icon.width}
+                  height={way.icon.height}
+                  alt=""
+                  aria-hidden="true"
+                  decoding="async"
+                />
+              )}
 
               <h3 className={`${styles.cardTitle} f-display cz caps`}>{way.title}</h3>
 

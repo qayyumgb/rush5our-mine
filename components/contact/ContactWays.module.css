@@ -184,6 +184,14 @@
   stroke-width: 1.5;
 }
 
+/* The QR mark: 92 x 91 in the mockup, held to that on the icon line. */
+.iconImg {
+  height: calc(91 * var(--k));
+  width: auto;
+  margin-top: calc(-2 * var(--k));
+  max-width: none;
+}
+
 /* Icon slot bottom 537 -> title cap top 548. Cap 37, leaning like the
    headline. */
 .cardTitle {

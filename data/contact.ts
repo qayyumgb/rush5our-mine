@@ -55,7 +55,8 @@ export default contactHero;
 /* ------------------------------------------------------------------------ */
 
 export interface ContactWay {
-  icon: IconName;
+  /** A registry icon, or a mark lifted from the mockup as an alpha image. */
+  icon: IconName | { src: string; width: number; height: number };
   title: string;
   /** Body copy, one entry per line as the mockup sets it. */
   body: string[];
@@ -95,7 +96,7 @@ export const contactWays: ContactWaysContent = {
       cta: { label: "Work with us", href: "#form" },
     },
     {
-      icon: "qr",
+      icon: { src: "/assets/images/contact-ways-qr.webp", width: 100, height: 100 },
       title: "Claim your find",
       body: ["Found a sticker?", "Submit your proof and", "claim your reward."],
       script: "Evidence wins.",

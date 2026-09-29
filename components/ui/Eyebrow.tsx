@@ -15,6 +15,9 @@ export interface EyebrowProps {
   className?: string;
   labelClassName?: string;
   ruleClassName?: string;
+  /** Adds `data-a`, keeping it hidden until its timeline sets the start
+   *  state — for heroes, whose timeline is built after first paint. */
+  hideUntilRevealed?: boolean;
 }
 
 export function Eyebrow({
@@ -23,6 +26,7 @@ export function Eyebrow({
   className,
   labelClassName,
   ruleClassName,
+  hideUntilRevealed = false,
 }: EyebrowProps) {
   const centred = rules === "both";
 
@@ -31,6 +35,7 @@ export function Eyebrow({
       className={[styles.eyebrow, centred ? styles.centred : "", className]
         .filter(Boolean)
         .join(" ")}
+      {...(hideUntilRevealed ? { "data-a": "" } : {})}
     >
       {centred && (
         <i

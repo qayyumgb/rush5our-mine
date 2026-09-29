@@ -274,12 +274,46 @@
 }
 
 /* ------------------------------------------------------------------------ */
+/* Phones                                                                    */
+/* The headline fills the phone frame edge to edge in the mockup; on a real  */
+/* phone it reads better with 15px shaved off each line.                     */
+/* ------------------------------------------------------------------------ */
+
+@media (max-width: 640px) {
+  .title :global(.line):nth-child(1) {
+    font-size: calc(188 * var(--k) - 15px);
+  }
+
+  .title :global(.line):nth-child(2) {
+    font-size: calc(175 * var(--k) - 15px);
+  }
+
+  .title :global(.line):nth-child(3) {
+    font-size: calc(170 * var(--k) - 15px);
+  }
+
+  .brush {
+    margin-left: calc(140 * var(--k));
+    width: calc(620 * var(--k));
+    height: calc(46 * var(--k));
+  }
+}
+
+/* ------------------------------------------------------------------------ */
 /* Desktop                                                                   */
 /* The column is already capped at 900px, so only the headline needs to     */
 /* come down from phone-poster scale, as every other page's headlines do.   */
 /* ------------------------------------------------------------------------ */
 
 @media (min-width: 1024px) {
+  /* The mockup's 1774 frame is a phone; with the headline stepped down the
+     content ends ~500px sooner, so the height is the content's plus room
+     for the mark at the foot (214 tall, cut off 30 below its top). */
+  .hero {
+    min-height: 0;
+    padding-bottom: calc(150 * var(--k));
+  }
+
   .title :global(.line):nth-child(1) {
     font-size: calc(1.35 * var(--fs-l1));
   }

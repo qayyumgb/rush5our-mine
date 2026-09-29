@@ -4,7 +4,7 @@
  * FAQ — section 6, "Questions? Answered." (mockup 6.png).
  *
  * A centred heading, a single-open accordion, the "reach out" bar (which
- * opens the contact form) and the site footer.
+ * opens the contact form). The site footer follows it from the root layout.
  *
  * ▸ BACKEND SEAM: `items` arrives as a prop, defaulted to the static data.
  *
@@ -14,7 +14,6 @@
  *   • opening a row animates its real height — measured from the content, so
  *     it works for answers of any length — while the previous row closes in
  *     the same timeline, and the toggle's vertical bar rotates flat
- *   • the footer lifts as it comes into view
  *
  * ACCESSIBILITY: the accordion is a set of buttons with `aria-expanded` and
  * `aria-controls`; panels are `role="region"` labelled by their trigger, and
@@ -29,9 +28,7 @@ import { useMotion } from "@/components/motion/MotionProvider";
 import ContactForm from "@/components/ui/ContactForm";
 import Eyebrow from "@/components/ui/Eyebrow";
 import Icon from "@/components/ui/Icon";
-import SocialIcon from "@/components/ui/SocialIcon";
 import { faqContent, faqItems as defaultItems, type FaqItem } from "@/data/faq";
-import { footerLinks, site, socialLinks } from "@/data/site";
 import styles from "./FaqSection.module.css";
 
 export interface FaqSectionProps {
@@ -140,27 +137,6 @@ export function FaqSection({ items = defaultItems }: FaqSectionProps) {
         },
       );
 
-      /* footer */
-      const footer = gsap.timeline({
-        defaults: { ease: EASE },
-        scrollTrigger: { trigger: q(`.${styles.footer}`)[0], start: "top 94%" },
-      });
-      footer
-        .fromTo(q(`.${styles.footerWord}`), { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 1 }, 0)
-        .fromTo(q(`.${styles.footerTag}`), { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 1 }, 0.12)
-        .fromTo(
-          q(`.${styles.socials} a`),
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.8, stagger: 0.08 },
-          0.2,
-        )
-        .fromTo(q(`.${styles.footerSep}`), { scaleY: 0 }, { scaleY: 1, duration: 0.8, ease: EASE_IO }, 0.2)
-        .fromTo(
-          q(`.${styles.footerLinks} a`),
-          { y: 14, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.7, stagger: 0.06 },
-          0.35,
-        );
     }, root);
 
     return () => ctx.revert();
@@ -272,51 +248,6 @@ export function FaqSection({ items = defaultItems }: FaqSectionProps) {
           </span>
         </button>
       </div>
-
-      {/* ---------------- Footer ---------------- */}
-      <footer className={styles.footer}>
-        <div className={styles.footerInner}>
-          <div>
-            <span className={`${styles.footerWord} f-display cz`}>
-              {site.wordmark.light}
-              <span className="text-red">{site.wordmark.accent}</span>
-            </span>
-            <p className={`${styles.footerTag} f-sans cz caps`}>
-              <span>More than merch.</span>
-              <span>A culture.</span>
-            </p>
-          </div>
-
-          <div className={styles.footerRight}>
-            {/* The divider is scoped to the icon row so the wider link row
-                below can extend past it to the left, as in the mockup. */}
-            <div className={styles.socialsRow}>
-              <span className={styles.footerSep} aria-hidden="true" />
-              <div className={styles.socials}>
-                {socialLinks.map((s) => (
-                  <a
-                    key={s.label}
-                    href={s.href}
-                    aria-label={s.label}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                  >
-                    <SocialIcon name={s.icon} />
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            <nav className={styles.footerLinks} aria-label="Footer">
-              {footerLinks.map((l) => (
-                <a key={l.label} href={l.href} className="f-sans cz caps">
-                  {l.label}
-                </a>
-              ))}
-            </nav>
-          </div>
-        </div>
-      </footer>
 
       <ContactForm open={contactOpen} onClose={() => setContactOpen(false)} />
     </section>
