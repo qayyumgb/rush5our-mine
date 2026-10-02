@@ -331,16 +331,120 @@
   overflow: visible;
 }
 
-.note {
-  margin: calc(14 * var(--k)) 0 0;
-  font-family: var(--f-body);
-  font-size: max(12px, calc(18 * var(--k)));
-  color: #cfcfcf;
-  text-align: center;
+/* The wait: a ring turning where the arrow was. */
+.spinner {
+  flex: none;
+  width: calc(26 * var(--k));
+  height: calc(26 * var(--k));
+  border: max(2px, calc(3 * var(--k))) solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: contact-spin 0.8s linear infinite;
 }
 
+@keyframes contact-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2.4s;
+  }
+}
+
+/* Honeypot — see the component. Kept in the DOM and "visible" to a bot,
+   but off-screen and one pixel square for everyone else. */
+.trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* The outcome, under the button: a framed line in the page's red and
+   black, with a mark, a short heading and the sentence. */
+.note {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(16 * var(--k));
+  margin: calc(18 * var(--k)) 0 0;
+  padding: calc(16 * var(--k)) calc(20 * var(--k));
+  border: 1px solid #5f5f5d;
+  border-radius: calc(8 * var(--k));
+  background: #000;
+  font-family: var(--f-body);
+  font-size: max(12px, calc(18 * var(--k)));
+  line-height: 1.45;
+  color: #d6d6d6;
+  text-align: left;
+  animation: contact-note-in 0.5s var(--ease-out) both;
+}
+
+.note strong {
+  display: block;
+  margin-bottom: calc(3 * var(--k));
+  font-size: max(14px, calc(25 * var(--k)));
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+  color: #fff;
+}
+
+.noteIcon {
+  flex: none;
+  width: calc(34 * var(--k));
+  height: calc(34 * var(--k));
+  min-width: 20px;
+  min-height: 20px;
+  margin-top: calc(2 * var(--k));
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Sent: the brand's red frame and glow, as the panel itself is drawn. */
+.noteSent {
+  border-color: #ee0420;
+  background: linear-gradient(180deg, #17020a 0%, #0a0103 100%);
+  box-shadow:
+    0 0 calc(18 * var(--k)) rgba(var(--red-rgb), 0.35),
+    inset 0 0 calc(18 * var(--k)) rgba(var(--red-rgb), 0.14);
+}
+
+.noteSent .noteIcon {
+  color: #ff2b3a;
+}
+
+/* Failed: the same pale red the field errors use, so it reads as a fault
+   and not as the brand. */
 .noteError {
+  border-color: #ff6b70;
+  color: #ffc9cb;
+}
+
+.noteError strong,
+.noteError .noteIcon {
   color: #ff6b70;
+}
+
+@keyframes contact-note-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note {
+    animation: none;
+  }
 }
 
 /* ------------------------------------------------------------------------ */

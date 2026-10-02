@@ -14,10 +14,10 @@
  *
  * The same red grunge as the rest of the page creeps in at both edges.
  *
- * ▸ BACKEND SEAM — `submitContact` is a stub, the same seam as the FAQ's
- *   overlay form (components/ui/ContactForm.tsx). To go live, replace its
- *   body with a POST to `app/api/contact/route.ts`; the pending, sent and
- *   failed states are already handled here.
+ * ▸ SENDING — the form posts to `app/api/contact/route.ts`, which sends the
+ *   message on through SendGrid. The rules for a valid message live in
+ *   lib/contact/validation.ts and are run here before submitting and again
+ *   on the server. A hidden honeypot field rides along to catch bots.
  *
  * MOTION: the eyebrow decodes; each panel rises as it enters, its
  * headline's characters rise, its subline lifts, then the fields (or list
@@ -34,35 +34,65 @@ import { scramble, splitTitle } from "@/lib/motion/split";
 import { useMotion } from "@/components/motion/MotionProvider";
 import Icon from "@/components/ui/Icon";
 import { contactForm } from "@/data/contact";
+import {
+  EMPTY_CONTACT,
+  HONEYPOT_FIELD,
+  normalizeContact,
+  validateContact,
+  type ContactErrors,
+  type ContactField,
+  type ContactResponse,
+  type ContactValues,
+} from "@/lib/contact/validation";
 import styles from "./ContactFormSection.module.css";
 
-interface Values {
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
+/** A failed submission: a sentence for the visitor, and any field errors. */
+class SubmitError extends Error {
+  constructor(
+    message: string,
+    readonly fields?: ContactErrors,
+  ) {
+    super(message);
+  }
 }
 
-const EMPTY: Values = { name: "", email: "", subject: "", message: "" };
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+/**
+ * Posts the form to the API route. Resolves when the message has been
+ * accepted; throws a `SubmitError` carrying the server's own (already
+ * visitor-safe) message otherwise, or a plain error if the request never
+ * got an answer.
+ */
+async function submitContact(values: ContactValues, honeypot: string): Promise<void> {
+  const res = await fetch("/api/contact", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...values, [HONEYPOT_FIELD]: honeypot }),
+  });
 
-async function submitContact(values: Values): Promise<void> {
-  // BACKEND SEAM — see the header comment.
-  await new Promise((r) => setTimeout(r, 900));
-  void values;
+  let data: ContactResponse | null = null;
+  try {
+    data = (await res.json()) as ContactResponse;
+  } catch {
+    // Not JSON (a proxy's error page, say): handled as a failure below.
+  }
+
+  if (res.ok && data?.ok) return;
+  if (data && !data.ok) throw new SubmitError(data.error, data.fields);
+  throw new Error(`Unexpected response: ${res.status}`);
 }
 
 export function ContactFormSection() {
   const rootRef = useRef<HTMLElement>(null);
   const { ready, reduced } = useMotion();
 
-  const [values, setValues] = useState<Values>(EMPTY);
-  const [errors, setErrors] = useState<Partial<Record<keyof Values, string>>>(
-    {},
-  );
+  const [values, setValues] = useState<ContactValues>(EMPTY_CONTACT);
+  const [honeypot, setHoneypot] = useState("");
+  const [errors, setErrors] = useState<ContactErrors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">(
     "idle",
   );
+  /** The server's sentence for a failure; falls back to the stock line. */
+  const [failure, setFailure] = useState("");
 
   useEffect(() => {
     const root = rootRef.current;
@@ -206,27 +236,32 @@ export function ContactFormSection() {
   /* --- submit ------------------------------------------------------------ */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const next: Partial<Record<keyof Values, string>> = {};
-    if (!values.name.trim()) next.name = "Tell us your name.";
-    if (!EMAIL_RE.test(values.email))
-      next.email = "Enter a valid email address.";
-    if (values.message.trim().length < 10)
-      next.message = "A little more detail, please.";
+    if (status === "sending") return;
+
+    // The same rules the server applies — see lib/contact/validation.ts.
+    const clean = normalizeContact(values);
+    const next = validateContact(clean);
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
     setStatus("sending");
+    setFailure("");
     try {
-      await submitContact(values);
+      await submitContact(clean, honeypot);
       setStatus("sent");
-      setValues(EMPTY);
-    } catch {
+      setValues(EMPTY_CONTACT);
+    } catch (err) {
+      if (err instanceof SubmitError) {
+        // The server disagreed about a field: show it where it belongs.
+        if (err.fields) setErrors(err.fields);
+        setFailure(err.message);
+      }
       setStatus("error");
     }
   };
 
   const set =
-    (key: keyof Values) =>
+    (key: ContactField) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setValues((v) => ({ ...v, [key]: e.target.value }));
       if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }));
@@ -315,11 +350,15 @@ export function ContactFormSection() {
                   name="subject"
                   placeholder={form.fields.subject}
                   aria-label={form.fields.subject}
+                  aria-invalid={Boolean(errors.subject)}
                   value={values.subject}
                   onChange={set("subject")}
                   className={styles.input}
                 />
               </label>
+              {errors.subject && (
+                <span className={styles.error}>{errors.subject}</span>
+              )}
             </div>
 
             <div className={styles.slot}>
@@ -341,27 +380,60 @@ export function ContactFormSection() {
               )}
             </div>
 
+            {/* Honeypot: off-screen, out of the tab order and hidden from
+                assistive tech, so no person fills it — a bot that does is
+                dropped by the API route. Not `display: none`, which some
+                bots skip. */}
+            <div className={styles.trap} aria-hidden="true">
+              <label>
+                Company
+                <input
+                  type="text"
+                  name={HONEYPOT_FIELD}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                />
+              </label>
+            </div>
+
             <div className={styles.submitWrap}>
               <button
                 type="submit"
                 className={styles.submit}
                 disabled={status === "sending"}
+                aria-busy={status === "sending"}
                 aria-live="polite"
               >
                 <span className="f-cond cz caps">
-                  {status === "sending" ? "Sending…" : form.submit}
+                  {status === "sending" ? form.sending : form.submit}
                 </span>
-                <svg
-                  className={styles.submitArrow}
-                  viewBox="0 0 32 20"
-                  aria-hidden="true"
-                >
-                  <path d="M1 10h29M21 1.5l9 8.5-9 8.5" />
-                </svg>
+                {status === "sending" ? (
+                  <span className={styles.spinner} aria-hidden="true" />
+                ) : (
+                  <svg
+                    className={styles.submitArrow}
+                    viewBox="0 0 32 20"
+                    aria-hidden="true"
+                  >
+                    <path d="M1 10h29M21 1.5l9 8.5-9 8.5" />
+                  </svg>
+                )}
               </button>
               {status === "sent" && (
-                <p className={styles.note} role="status">
-                  {form.sent}
+                <p className={`${styles.note} ${styles.noteSent}`} role="status">
+                  <svg
+                    className={styles.noteIcon}
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path d="M4 12.5l5.2 5.2L20 6.8" />
+                  </svg>
+                  <span>
+                    <strong className="f-cond caps">{form.sentTitle}</strong>
+                    {form.sent}
+                  </span>
                 </p>
               )}
               {status === "error" && (
@@ -369,7 +441,18 @@ export function ContactFormSection() {
                   className={`${styles.note} ${styles.noteError}`}
                   role="alert"
                 >
-                  {form.failed}
+                  <svg
+                    className={styles.noteIcon}
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path d="M12 7v6.5M12 17v.5" />
+                    <circle cx="12" cy="12" r="10" />
+                  </svg>
+                  <span>
+                    <strong className="f-cond caps">{form.failedTitle}</strong>
+                    {failure || form.failed}
+                  </span>
                 </p>
               )}
             </div>

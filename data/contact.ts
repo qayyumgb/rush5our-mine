@@ -138,8 +138,14 @@ export interface ContactFormContent {
       message: string;
     };
     submit: string;
-    /** Shown in place of the button once a message has gone. */
+    /** The button's label while a message is on its way. */
+    sending: string;
+    /** Shown under the button once a message has gone. */
+    sentTitle: string;
     sent: string;
+    /** Shown under the button when sending fails; `failed` is the fallback
+        line, used when the server gives no reason of its own. */
+    failedTitle: string;
     failed: string;
   };
   reach: {
@@ -169,7 +175,10 @@ export const contactForm: ContactFormContent = {
       message: "Your Message",
     },
     submit: "Send message",
-    sent: "Message sent. We’ll be in touch.",
+    sending: "Sending…",
+    sentTitle: "Message sent.",
+    sent: "We got it — check your inbox for a confirmation. We’ll be in touch.",
+    failedTitle: "Not sent.",
     failed: "Something went wrong. Try again in a moment.",
   },
   reach: {
