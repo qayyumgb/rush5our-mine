@@ -48,7 +48,7 @@ export const navLinks: NavLink[] = [
   { label: "Merch", href: "/#merch" }, // → "/merch" when built
   { label: "Videos", href: "/#videos" }, // → "/videos" when built
   { label: "Rush Hunts", href: "/rush-hunts" },
-  { label: "Join the movement", href: "/#culture" }, // → "/join" when built
+  { label: "Join the movement", href: "/join" },
   { label: "Contact", href: "/contact" },
 ];
 

@@ -1,0 +1,383 @@
+/* =========================================================================
+   JOIN THE MOVEMENT — section 1, JOIN THE MOVEMENT.
+   (mockups/Join The Movement/1.png, a 1024 x 1536 phone frame)
+
+   Every number is a pixel measured off the mockup x `--k`, this page's
+   unit: 1/1024 of the viewport, capped at the same 900px column the shared
+   `--u` stops at, so the composition scales with the phone and then sits
+   centred on a desktop. Measured reference points:
+
+     eyebrow      cap y106..118 (h13), x282..728 centred, grey ~rgb(150)
+     rule         y142..144 (h3) x450..573 (w124), red
+     headline     "JOIN"          cap y208..425 (h218) x65..523, white
+                  "THE MOVEMENT." cap y446..622 (h177) x79..966, red
+                  both lean ~8deg
+     body         2 lines from x86, caps y663..695 and 711..743 (pitch 48)
+     pillars      dividers 1 red at x359 and x667, y810..1038
+                  icons bottom-aligned on y898: 117x81 / 84x86 / 88x86,
+                  centred on x198 / 512 / 835
+                  titles cap y931..958 (h28), italic, white
+                  copy caps y981..1001 and 1011..1031 (pitch 30), ~rgb(206)
+     red button   x66..957 (w892) y1096..1214 (h119), radius ~14
+                  label cap y1136..1174 (h39) x299..673; arrow x704..745
+     tagline      cap y1258..1271 (h14) x94..928, grey ~rgb(158)
+     rule         y1297..1300 (h4) x430..593 (w164)
+     frame        1536 tall; the ghosted R5 fills the foot
+   ========================================================================= */
+
+.hero {
+  --k: calc(min(100vw, 900px) / 1024);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  min-height: calc(1536 * var(--k));
+  /* The eyebrow's cap top, 103 — or, on a phone, just under the fixed nav. */
+  padding: max(calc(103 * var(--k)), calc(130 * var(--nu))) 0 0;
+  background: var(--black);
+  text-align: center;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Atmosphere                                                                */
+/* ------------------------------------------------------------------------ */
+
+/* The mockup's own artwork at the mockup's own size, on black. Three static
+   images, no blur, no blend — nothing re-rasterises on scroll. Cut as two
+   edge strips and a centre band so that on a phone they tile back into the
+   mockup exactly, and on a desktop the strips hug the viewport's edges while
+   the marks stay centred under the column. The band is its own layer so it
+   can fade at its sides there. */
+.atmos,
+.atmos::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.atmos {
+  background:
+    url("/assets/images/join-hero-edge-l.webp") left top / calc(110 * var(--k)) auto no-repeat,
+    url("/assets/images/join-hero-edge-r.webp") right top / calc(110 * var(--k)) auto no-repeat;
+}
+
+.atmos::before {
+  content: "";
+  background: url("/assets/images/join-hero-centre.webp") center top / calc(804 * var(--k)) auto no-repeat;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Copy column                                                               */
+/* ------------------------------------------------------------------------ */
+
+.copy {
+  position: relative;
+  z-index: 1;
+  width: calc(1024 * var(--k));
+  margin-inline: auto;
+}
+
+/* Three words apart, in the mid grey the mockup uses for its quiet caps. */
+.eyebrow {
+  display: flex;
+  justify-content: center;
+  gap: calc(44 * var(--k));
+  font-size: calc(17.5 * var(--k));
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  color: #969794;
+}
+
+/* Eyebrow cap bottom 118 -> rule 142. */
+.rule {
+  display: block;
+  margin: calc(18 * var(--k)) auto 0;
+  width: calc(124 * var(--k));
+  height: max(1px, calc(3 * var(--k)));
+  background: var(--red);
+  transform-origin: center;
+}
+
+/* Rule bottom 145 -> headline cap top 208. */
+.title {
+  margin-top: calc(67 * var(--k));
+  text-align: left;
+  padding-left: calc(55 * var(--k));
+}
+
+/* The headline leans as the Contact hero's does: every line of the mockup's
+   is set at about 8 degrees in a heavier, wider cut than ours. Each line is
+   skewed to match, stretched to the mockup's measured width (its cap height
+   already matches), and given a hair of stroke for the weight. The mask
+   boxes stay upright, so the characters still rise straight out of them. */
+.title :global(.line) {
+  text-align: left;
+  transform: skewX(-8deg);
+  transform-origin: 0 100%;
+  --sx: 1;
+  white-space: nowrap;
+}
+
+.title :global(.line-inner) {
+  display: inline-block;
+  transform: scaleX(var(--sx));
+  transform-origin: 0 50%;
+}
+
+/* JOIN 65..523 in the mockup at a 218 cap: a wide cut, so ours is stretched. */
+.title :global(.line):nth-child(1) {
+  --sx: 1.08;
+  font-size: calc(246 * var(--k));
+  letter-spacing: 0.005em;
+}
+
+/* THE MOVEMENT. 79..966 at a 177 cap: a condensed cut, where ours at that
+   cap runs to ~1080, so it is narrowed to the mockup's width. */
+.title :global(.line):nth-child(2) {
+  --sx: 0.752;
+  margin-top: calc(17 * var(--k));
+  margin-left: calc(5 * var(--k));
+  font-size: calc(201 * var(--k));
+  letter-spacing: 0.005em;
+}
+
+/* The mockup's white is a lit, scratched surface — bright at the top
+   falling to ~215 at the baseline — and its red darkens the same way.
+   Painted through the type with the shared grunge noise on top, as the
+   Contact hero's is. */
+.title :global(.char) {
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 240px 240px, 100% 100%;
+  background-repeat: repeat, no-repeat;
+  -webkit-text-stroke: max(0.5px, calc(1.6 * var(--k))) rgba(255, 255, 255, 0.55);
+}
+
+.title :global(.char.t-white) {
+  background-image: var(--grunge), linear-gradient(180deg, #fff 0%, #f2f2f2 45%, #cfcfcf 100%);
+}
+
+.title :global(.char.t-red) {
+  background-image: var(--grunge), linear-gradient(180deg, #ff2b34 0%, var(--red) 50%, #b40e17 100%);
+  -webkit-text-stroke: max(0.5px, calc(1.6 * var(--k))) rgba(255, 60, 70, 0.55);
+}
+
+/* Headline cap bottom 622 -> body cap top 663. Two lines at a 48 pitch. */
+.body {
+  --lh: 1.315;
+  margin-top: calc(41 * var(--k));
+  padding-left: calc(86 * var(--k));
+  text-align: left;
+  /* The mockup's face is a narrower geometric sans: set a little smaller
+     than its cap so the lines run to about its width. */
+  font-size: calc(36.5 * var(--k));
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  color: #e4e4e3;
+  white-space: nowrap;
+}
+
+.body span {
+  display: block;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Pillars                                                                   */
+/* ------------------------------------------------------------------------ */
+
+/* Body cap bottom 743 -> dividers 810. Columns centred on x198 / 512 / 835:
+   the mockup's three are not quite equal. */
+.pillars {
+  display: grid;
+  grid-template-columns: calc(319 * var(--k)) calc(308 * var(--k)) calc(336 * var(--k));
+  margin: calc(71 * var(--k)) 0 0 calc(40 * var(--k));
+  padding: 0;
+  list-style: none;
+}
+
+.pillar {
+  position: relative;
+  padding-top: calc(3 * var(--k));
+}
+
+.divider {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: max(1px, calc(1 * var(--k)));
+  height: calc(228 * var(--k));
+  background: #c20210;
+  transform-origin: top;
+}
+
+/* Icons sit on a common baseline at y898, 88 below the dividers' top. */
+.iconSlot {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: calc(85 * var(--k));
+}
+
+.icon {
+  display: block;
+  overflow: visible;
+}
+
+.icon :global(.i-stroke) {
+  stroke: #ee0a1d;
+  stroke-width: 1.35;
+}
+
+/* Each drawn to the mockup's size: the glyph fills a different share of
+   its 24-unit box. */
+.community {
+  width: calc(122 * var(--k));
+  height: calc(122 * var(--k));
+  margin-bottom: calc(-22 * var(--k));
+}
+
+.gift {
+  width: calc(100 * var(--k));
+  height: calc(100 * var(--k));
+  margin-bottom: calc(-10 * var(--k));
+}
+
+.growth {
+  width: calc(115 * var(--k));
+  height: calc(115 * var(--k));
+  margin-bottom: calc(-12 * var(--k));
+}
+
+/* Icon baseline 898 -> title cap 931. Floored so a phone keeps it legible,
+   as every other page's small type is. */
+.pillarTitle {
+  margin-top: calc(35 * var(--k));
+  font-size: max(12px, calc(30 * var(--k)));
+  letter-spacing: 0.005em;
+  color: #f0f0f1;
+  white-space: nowrap;
+  -webkit-text-stroke: 0;
+}
+
+.slant {
+  display: inline-block;
+  transform: skewX(-8deg) scaleX(1.06);
+}
+
+/* The long third title is set tighter in the mockup. */
+.pillar:nth-child(3) .slant {
+  transform: skewX(-8deg) scaleX(0.96);
+}
+
+/* Title cap bottom 958 -> copy cap top 981; pitch 30. */
+.pillarBody {
+  --lh: 1.25;
+  margin-top: calc(24 * var(--k));
+  font-size: max(9px, calc(24 * var(--k)));
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: #d0d0cf;
+  white-space: nowrap;
+}
+
+.pillarBody span {
+  display: block;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Button and foot                                                           */
+/* ------------------------------------------------------------------------ */
+
+/* Dividers bottom 1038 -> button 1096. */
+.btnWrap {
+  margin: calc(66 * var(--k)) 0 0 calc(66 * var(--k));
+  text-align: left;
+}
+
+.btn {
+  width: calc(892 * var(--k));
+  height: calc(119 * var(--k));
+  gap: calc(34 * var(--k));
+  border-radius: calc(14 * var(--k));
+  font-family: var(--f-ui);
+  font-weight: 700;
+  font-size: calc(46 * var(--k));
+  letter-spacing: -0.01em;
+  padding-left: calc(10 * var(--k));
+  /* Sampled: a deep red face (~rgb(143,2,15)) under a hot 2px rim
+     (~rgb(250,37,48)), lit all round by its own glow. */
+  background: linear-gradient(180deg, #a2030f 0%, #8f020f 50%, #a2030f 100%);
+  box-shadow:
+    0 0 46px -2px rgba(var(--red-rgb), 0.9),
+    0 0 14px rgba(var(--red-rgb), 0.55),
+    inset 0 0 0 max(1.5px, calc(2 * var(--k))) rgba(255, 46, 60, 0.95),
+    inset 0 0 22px rgba(255, 30, 40, 0.35);
+}
+
+.btn svg {
+  width: calc(45 * var(--k));
+  height: calc(28 * var(--k));
+}
+
+/* Button bottom 1214 -> tagline cap top 1258. Cap 14, 834 wide. */
+.tagline {
+  margin-top: calc(44 * var(--k));
+  font-size: calc(19 * var(--k));
+  font-weight: 500;
+  letter-spacing: 0.36em;
+  padding-left: 0.36em;
+  color: #9e9fa0;
+  white-space: nowrap;
+}
+
+/* Tagline cap bottom 1271 -> rule 1297. */
+.rule2 {
+  margin-top: calc(24 * var(--k));
+  width: calc(164 * var(--k));
+  height: max(1px, calc(4 * var(--k)));
+}
+
+/* ------------------------------------------------------------------------ */
+/* Phones                                                                    */
+/* The headline fills the phone frame edge to edge in the mockup; on a real  */
+/* phone it reads better with 15px shaved off each line.                     */
+/* ------------------------------------------------------------------------ */
+
+@media (max-width: 640px) {
+  .title :global(.line):nth-child(1) {
+    font-size: calc(246 * var(--k) - 15px);
+  }
+
+  .title :global(.line):nth-child(2) {
+    font-size: calc(201 * var(--k) - 15px);
+  }
+}
+
+/* ------------------------------------------------------------------------ */
+/* Desktop                                                                   */
+/* The column is already capped at 900px, so only the headline needs to     */
+/* come down from phone-poster scale, as every other page's headlines do.   */
+/* ------------------------------------------------------------------------ */
+
+@media (min-width: 1024px) {
+  .hero {
+    min-height: 0;
+    padding-bottom: calc(236 * var(--k));
+  }
+
+  /* The band no longer meets the strips, so its cut sides fade out. */
+  .atmos::before {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 8%, #000 92%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 8%, #000 92%, transparent 100%);
+  }
+
+  .title :global(.line):nth-child(1) {
+    font-size: calc(1.5 * var(--fs-l1));
+  }
+
+  .title :global(.line):nth-child(2) {
+    margin-top: calc(10 * var(--k));
+    font-size: calc(1.3 * var(--fs-l1));
+  }
+}

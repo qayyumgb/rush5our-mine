@@ -1,0 +1,537 @@
+/* =========================================================================
+   JOIN THE MOVEMENT — section 2, CHOOSE HOW YOU JOIN
+   (mockups/Join The Movement/2.png, a 1024 x 1536 phone frame)
+
+   Every number is a pixel measured off the mockup x `--k`, this page's
+   unit (see JoinHero.module.css). The section's own top is the mockup's.
+
+     eyebrow      cap y67..78 (h12) x304..720, grey; rule y109..111 x452..572
+     headline     cap y157..244 (h88), leaning ~8deg
+                  "CHOOSE" x69..397 white; "HOW YOU JOIN" x408..963 red
+     subline      cap y269..282 (h14) x99..924, grey ~rgb(180)
+     free card    x47..978 (w932) y324..831 (h508), 2 red, radius ~14
+                  hairline x375 (w2) y360..670; mark cut x120 y440 (186x132)
+                  title cap y362..399 (h38) x424..801; FREE cut x418 y404
+                  lead cap y476..498 (h23) x425..830
+                  checks 31 at x425, tops 522 / 562 / 601 / 640 (pitch 39.3)
+                  perks cap 21 from x479, tops 529 / 569 / 608 / 647
+                  button x78..946 (w869) y708..801 (h94); label cap 35
+     further      cap y864..908 (h45): "WANT TO" x288..461, "GO FURTHER?"
+                  x473..780 red; rules y888..890 x67..255 and x768..957
+                  subline cap y927..940 (h14) x281..743, grey ~rgb(130)
+     cards        y971..1397 (h426); x47..347, 364..664, 681..981 (w300)
+                  marks ~80 wide, tops ~996, centred
+                  titles two lines, caps y1094..1121 and 1131..1158
+                  copy caps from y1185 (1179 on the four-line card), pitch 29
+                  outline buttons y1310..1375 (h66), x70..325 etc, 1 white
+                  label cap 22
+     tagline      cap y1451..1461 (h11) x184..841, grey ~rgb(105)
+                  rules y1455..1457 x47..162 and x863..978
+     frame        1536 tall
+   ========================================================================= */
+
+.section {
+  --k: calc(min(100vw, 900px) / 1024);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: calc(67 * var(--k)) 0 calc(70 * var(--k));
+  background: var(--black);
+  text-align: center;
+}
+
+/* The mockup's own grunge up both edges, lifted from the file with the type
+   and cards removed, hugging the viewport's edges. Static images. */
+.atmos {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    url("/assets/images/join-ways-edge-l.webp") left top / calc(110 * var(--k)) auto no-repeat,
+    url("/assets/images/join-ways-edge-r.webp") right top / calc(110 * var(--k)) auto no-repeat;
+}
+
+.col {
+  position: relative;
+  z-index: 1;
+  width: calc(1024 * var(--k));
+  margin-inline: auto;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Statement                                                                 */
+/* ------------------------------------------------------------------------ */
+
+.head {
+  position: relative;
+}
+
+.eyebrow {
+  display: flex;
+  justify-content: center;
+  gap: calc(30 * var(--k));
+  font-size: calc(16.5 * var(--k));
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  color: #bdbdbd;
+}
+
+/* Eyebrow cap bottom 78 -> rule 109. */
+.rule {
+  display: block;
+  margin: calc(22 * var(--k)) auto 0;
+  width: calc(121 * var(--k));
+  height: max(1px, calc(3 * var(--k)));
+  background: var(--red);
+  transform-origin: center;
+}
+
+/* Rule bottom 112 -> headline cap top 157. One leaning line in the hero's
+   scratched white and red, stretched to the mockup's width. */
+.title {
+  margin-top: calc(47 * var(--k));
+}
+
+.title :global(.line) {
+  text-align: center;
+  font-size: calc(98.5 * var(--k));
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+  transform: skewX(-8deg);
+}
+
+.title :global(.line-inner) {
+  display: inline-block;
+  transform: scaleX(1.05);
+}
+
+/* The mockup's "CHOOSE" is set a little looser than its red words. */
+.title :global(.char.t-white) {
+  letter-spacing: 0.045em;
+}
+
+.title :global(.char),
+.furtherTitle :global(.char) {
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 240px 240px, 100% 100%;
+  background-repeat: repeat, no-repeat;
+  -webkit-text-stroke: max(0.5px, calc(1.2 * var(--k))) rgba(255, 255, 255, 0.5);
+}
+
+.title :global(.char.t-white),
+.furtherTitle :global(.char.t-white) {
+  background-image: var(--grunge), linear-gradient(180deg, #fff 0%, #f0f0f0 50%, #cfcfcf 100%);
+}
+
+.title :global(.char.t-red),
+.furtherTitle :global(.char.t-red) {
+  background-image: var(--grunge), linear-gradient(180deg, #ff2b34 0%, var(--red) 50%, #b40e17 100%);
+  -webkit-text-stroke: max(0.5px, calc(1.2 * var(--k))) rgba(255, 60, 70, 0.5);
+}
+
+/* Headline cap bottom 244 -> subline cap top 269. */
+.subline {
+  margin-top: calc(25 * var(--k));
+  font-size: calc(19 * var(--k));
+  font-weight: 500;
+  letter-spacing: 0.38em;
+  padding-left: 0.38em;
+  color: #b4b6b5;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Free tier                                                                 */
+/* ------------------------------------------------------------------------ */
+
+/* Subline cap bottom 282 -> card 324. Children are placed from the card's
+   padding box, 2 inside its edge. */
+.free {
+  position: relative;
+  margin: calc(42 * var(--k)) 0 0 calc(47 * var(--k));
+  width: calc(932 * var(--k));
+  height: calc(508 * var(--k));
+  border: max(1.5px, calc(2 * var(--k))) solid #c8020e;
+  border-radius: calc(14 * var(--k));
+  background: #020101;
+  box-shadow: 0 0 calc(10 * var(--k)) rgba(var(--red-rgb), 0.3);
+  text-align: left;
+}
+
+.freeIcon {
+  position: absolute;
+  left: calc(71 * var(--k));
+  top: calc(114 * var(--k));
+  width: calc(186 * var(--k));
+  height: calc(132 * var(--k));
+  max-width: none;
+}
+
+/* Hairline at x375, y360..670. */
+.divider {
+  position: absolute;
+  left: calc(326 * var(--k));
+  top: calc(34 * var(--k));
+  width: max(1px, calc(2 * var(--k)));
+  height: calc(311 * var(--k));
+  background: #bc0210;
+  transform-origin: top;
+}
+
+.freeText {
+  position: absolute;
+  left: calc(375 * var(--k));
+  top: calc(36 * var(--k));
+}
+
+/* Title cap 38, x424..801. */
+.freeTitle {
+  font-size: calc(43.5 * var(--k));
+  letter-spacing: 0.005em;
+  color: #f2f2f2;
+  white-space: nowrap;
+  -webkit-text-stroke: 0;
+}
+
+.slant {
+  display: inline-block;
+  transform: skewX(-8deg) scaleX(1.08);
+  transform-origin: 0 50%;
+}
+
+/* FREE cut x418..568, y404..470. */
+.badge {
+  display: block;
+  margin: calc(3 * var(--k)) 0 0 calc(-7 * var(--k));
+  width: calc(150 * var(--k));
+  height: calc(66 * var(--k));
+  max-width: none;
+}
+
+/* Cut bottom 470 -> lead cap top 476. */
+.lead {
+  margin-top: calc(12 * var(--k));
+  font-size: calc(27 * var(--k));
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* Lead cap bottom 498 -> first check 522. */
+.perks {
+  margin: calc(26 * var(--k)) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.perk {
+  display: flex;
+  align-items: center;
+  height: calc(31 * var(--k));
+  margin-top: calc(9.6 * var(--k));
+  font-size: calc(23.5 * var(--k));
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.perk:first-child {
+  margin-top: 0;
+}
+
+/* The copy sits a hair below the check's centre in the mockup. */
+.perk span {
+  position: relative;
+  top: calc(-2 * var(--k));
+}
+
+/* The cut is 38 square around a 31 circle; the text starts 54 past it. */
+.check {
+  flex: none;
+  width: calc(38 * var(--k));
+  height: calc(38 * var(--k));
+  margin: 0 calc(16 * var(--k)) 0 calc(-3 * var(--k));
+  max-width: none;
+}
+
+/* Button x78..946, y708..801: 31 in, 384 down. */
+.freeBtn {
+  position: absolute;
+  left: calc(29 * var(--k));
+  top: calc(382 * var(--k));
+}
+
+.redMagnet {
+  display: block;
+}
+
+.redBtn {
+  width: calc(869 * var(--k));
+  height: calc(94 * var(--k));
+  gap: calc(17 * var(--k));
+  border-radius: calc(12 * var(--k));
+  font-family: var(--f-ui);
+  font-weight: 700;
+  padding-bottom: calc(4 * var(--k));
+  font-size: calc(40 * var(--k));
+  letter-spacing: -0.01em;
+  /* Sampled: a deep face (~rgb(132,3,9)) under a hot 2px rim (~rgb(238,1,15)). */
+  background: linear-gradient(180deg, #a00210 0%, #84030a 50%, #a00210 100%);
+  box-shadow:
+    0 0 calc(30 * var(--k)) rgba(var(--red-rgb), 0.75),
+    0 0 calc(10 * var(--k)) rgba(var(--red-rgb), 0.5),
+    inset 0 0 0 max(1.5px, calc(2 * var(--k))) rgba(240, 10, 25, 0.95),
+    inset 0 0 calc(18 * var(--k)) rgba(255, 30, 40, 0.3);
+}
+
+.redBtn svg {
+  width: calc(37 * var(--k));
+  height: calc(24 * var(--k));
+}
+
+/* ------------------------------------------------------------------------ */
+/* Go further                                                                */
+/* ------------------------------------------------------------------------ */
+
+/* Card bottom 831 -> cap top 864. */
+.further {
+  margin-top: calc(36 * var(--k));
+}
+
+.furtherRow {
+  position: relative;
+}
+
+/* The mockup sets this title 22 right of the column's centre. */
+.furtherTitle :global(.line) {
+  text-align: center;
+  padding-left: calc(44 * var(--k));
+  font-size: calc(50 * var(--k));
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+  transform: skewX(-8deg);
+}
+
+.furtherTitle :global(.line-inner) {
+  display: inline-block;
+  transform: scaleX(1.14);
+}
+
+/* "GO FURTHER?" is the looser of its two runs. */
+.furtherTitle :global(.char.t-red) {
+  letter-spacing: 0.05em;
+}
+
+/* Rules y888..890: 24 below the cap top. */
+.furtherRule {
+  position: absolute;
+  top: calc(22 * var(--k));
+  width: calc(189 * var(--k));
+  height: max(1px, calc(3 * var(--k)));
+  background: var(--red);
+}
+
+.furtherL {
+  left: calc(67 * var(--k));
+  transform-origin: right;
+}
+
+.furtherR {
+  left: calc(768 * var(--k));
+  transform-origin: left;
+}
+
+/* Cap bottom 908 -> subline cap top 927. */
+.furtherSub {
+  margin-top: calc(19 * var(--k));
+  font-size: calc(19 * var(--k));
+  font-weight: 500;
+  letter-spacing: 0.36em;
+  padding-left: 0.36em;
+  color: #8f9091;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Cards                                                                     */
+/* ------------------------------------------------------------------------ */
+
+/* Subline cap bottom 940 -> cards 971. */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, calc(300 * var(--k)));
+  gap: calc(17 * var(--k));
+  margin: calc(31 * var(--k)) 0 0 calc(47 * var(--k));
+  padding: 0;
+  list-style: none;
+}
+
+/* 426 tall in the mockup; the floor on the type below lets a phone's card
+   grow instead, with the foot reserved for the pinned button. */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: calc(426 * var(--k));
+  padding: calc(18 * var(--k)) calc(22 * var(--k)) calc(117 * var(--k));
+  border: max(1.5px, calc(2 * var(--k))) solid #c8020e;
+  border-radius: calc(14 * var(--k));
+  background: #020101;
+  box-shadow: 0 0 calc(10 * var(--k)) rgba(var(--red-rgb), 0.3);
+}
+
+/* Marks sit in an 85 slot from y 996; the titles' cap top is 1094. */
+.iconSlot {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(85 * var(--k));
+}
+
+/* Each cut's own size, in the page's unit (`--w`/`--h` are set inline). */
+.cardIcon {
+  display: block;
+  width: calc(var(--w) * var(--k));
+  height: calc(var(--h) * var(--k));
+  max-width: none;
+}
+
+/* Floored for phones, as every other page's small type is; the lines sit a
+   touch further apart than the mockup's 37 pitch. */
+.cardTitle {
+  margin-top: calc(11 * var(--k));
+  font-size: max(12px, calc(31 * var(--k)));
+  letter-spacing: 0.005em;
+  line-height: max(16px, calc(38 * var(--k)));
+  color: #f2f2f2;
+  white-space: nowrap;
+  -webkit-text-stroke: 0;
+}
+
+.cardTitle .slant {
+  display: block;
+  transform: skewX(-8deg) scaleX(1.15);
+  transform-origin: 50% 50%;
+}
+
+/* Title cap bottom 1158 -> copy cap top 1185; pitch 29. */
+.cardBody {
+  --lh: 1.32;
+  margin-top: calc(25 * var(--k));
+  font-size: max(9px, calc(22 * var(--k)));
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.cardBody span {
+  display: block;
+}
+
+/* Four lines start higher: 1179. */
+.card[data-lines="4"] .cardBody {
+  margin-top: calc(19 * var(--k));
+}
+
+/* Pinned 22 above the foot: x70..325 of the first card, y1310..1375. */
+.btn {
+  position: absolute;
+  left: calc(21 * var(--k));
+  bottom: calc(20 * var(--k));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(17 * var(--k));
+  width: calc(256 * var(--k));
+  height: calc(66 * var(--k));
+  border: max(1px, calc(1.5 * var(--k))) solid #f2f2f2;
+  border-radius: calc(10 * var(--k));
+  background: #060606;
+  color: #fff;
+  transition:
+    background-color 0.4s,
+    color 0.4s,
+    transform 0.45s var(--ease-out);
+}
+
+.btn:hover {
+  background: var(--white);
+  color: var(--black);
+  transform: translateY(-2px);
+}
+
+.btnLabel {
+  font-size: calc(26 * var(--k));
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.btnArrow {
+  width: calc(25 * var(--k));
+  height: calc(19 * var(--k));
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+  transition: transform 0.45s var(--ease-out);
+}
+
+.btn:hover .btnArrow {
+  transform: translateX(calc(4 * var(--k)));
+}
+
+/* On a phone the floored copy needs the card's full width. */
+@media (max-width: 640px) {
+  .card {
+    padding-inline: calc(8 * var(--k));
+  }
+}
+
+/* ------------------------------------------------------------------------ */
+/* Tagline                                                                   */
+/* ------------------------------------------------------------------------ */
+
+/* Cards bottom 1397 -> cap top 1451. */
+.foot {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: calc(54 * var(--k));
+}
+
+.tagline {
+  font-size: calc(15.3 * var(--k));
+  font-weight: 500;
+  letter-spacing: 0.36em;
+  padding-left: 0.36em;
+  color: #6c6f6e;
+  white-space: nowrap;
+}
+
+.footRule {
+  position: absolute;
+  top: 50%;
+  width: calc(116 * var(--k));
+  height: max(1px, calc(3 * var(--k)));
+  background: #b7020e;
+}
+
+.footL {
+  left: calc(47 * var(--k));
+  transform-origin: right;
+}
+
+.footR {
+  left: calc(863 * var(--k));
+  transform-origin: left;
+}

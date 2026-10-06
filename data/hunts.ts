@@ -449,8 +449,7 @@ export const huntsClosing: HuntsClosingContent = {
     "You’re not just watching RUSH HUNTS.",
   ],
   shout: "You can be part of the next one.",
-  // → "/join" when the Join The Movement page is built.
-  cta: { label: "Join the movement", href: "/#culture" },
+  cta: { label: "Join the movement", href: "/join" },
   mark: "RUSH 5OUR",
   tag: "The hunt is real.",
 };

@@ -42,7 +42,7 @@ export const contactHero: ContactHeroContent = {
     "We see every move.",
     "We appreciate every one of you.",
   ],
-  primaryCta: { label: "Join the movement", href: "/#culture" },
+  primaryCta: { label: "Join the movement", href: "/join" },
   // BACKEND SEAM: points at the form further down this page once it exists.
   secondaryCta: { label: "Submit a find", href: "#form" },
   tagline: [{ text: "Real people. " }, { text: "Real", accent: true }, { text: " opportunities." }],
@@ -292,7 +292,7 @@ export const contactClosing: ContactClosingContent = {
     "You are the reason this movement exists.",
     "Let’s keep building something unforgettable.",
   ],
-  cta: { label: "Join the movement", href: "/#culture" },
+  cta: { label: "Join the movement", href: "/join" },
   pillars: [
     { icon: "globe", label: ["Real world", "movement"] },
     { icon: "community", label: ["Loyal", "community"] },

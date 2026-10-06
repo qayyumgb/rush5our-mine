@@ -37,6 +37,7 @@ export type IconName =
   | "handshake"
   | "cloudUp"
   | "user"
+  | "at"
   | "tag"
   | "pencil"
   | "clockGear"
@@ -322,6 +323,17 @@ export const ICONS: Record<IconName, IconSpec> = {
   },
 
   /** Price tag on a tilt — the subject field. */
+  /** Commercial at — the username field. */
+  at: {
+    viewBox: "0 0 24 24",
+    render: (
+      <>
+        <circle className={S} cx="12" cy="12" r="4.3" />
+        <path className={S} d="M16.3 12v1.7a2.7 2.7 0 0 0 5.4 0V12a9.7 9.7 0 1 0-3.9 7.8" />
+      </>
+    ),
+  },
+
   tag: {
     viewBox: "0 0 24 24",
     render: (
