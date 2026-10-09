@@ -1,0 +1,412 @@
+/* =========================================================================
+   MERCH — section 3, LOCKED FUTURE DROPS
+   (mockups/Merch/3.png, a 941 x 1672 phone frame)
+
+   Every number is a pixel measured off the mockup x `--k`, the page's
+   column unit (see MerchDrop.module.css). Every block is placed off the
+   frame's top.
+
+     eyebrow      cap y84..102 (h19) x383..558, red, tracked
+     headline     "FUTURE" cap y116..232 (h117) x233..732, white
+                  "DROPS"  cap y241..362 (h122) x245..713, red
+                  both lean ~11deg, centred
+     subline      2 lines, caps y381..393 and 407..419 (pitch 26),
+                  x214..728 and x309..632, white, tracked
+     rings        79 across, 2 red, centred on (61, 794) and (879, 794);
+                  white chevron 12 x 23
+     padlock      part of the photograph: brackets x387..553 y833..983,
+                  lock x435..505 y857..953
+     level        cap y1175..1246 (h72) x330..605, white, italic
+     name         cap y1273..1291 (h19) x333..605, light grey, tracked
+     rule         y1334..1338 (h5) x378..563 (w186), red
+     bar          x256..684 (w429) y1377..1470 (h94), 2 red, radius ~10,
+                  red glow; lock 42 x 56 at x356; label cap 42 x434..582
+     dots         27 across, y1561..1588, at x354, 406, 457, 509, 561
+     frame        1672 tall
+   ========================================================================= */
+
+.section {
+  --k: calc(min(100vw, 900px) / 941);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  height: calc(1672 * var(--k));
+  background: var(--black);
+}
+
+/* The mockup's own photograph at its own size, centred. One static image. */
+.atmos {
+  --pulse: 0;
+  position: absolute;
+  left: 50%;
+  top: 0;
+  z-index: 0;
+  width: calc(941 * var(--k));
+  height: calc(1672 * var(--k));
+  margin-left: calc(-470.5 * var(--k));
+  pointer-events: none;
+  background: url("/assets/images/merch-locked-plate.webp") center top / 100% 100% no-repeat;
+}
+
+/* A red bloom over the padlock on each level change; `--pulse` is driven
+   from 1 to 0 by the component. */
+.pulse {
+  position: absolute;
+  left: calc(320 * var(--k));
+  top: calc(760 * var(--k));
+  width: calc(300 * var(--k));
+  height: calc(300 * var(--k));
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 30, 45, 0.55), rgba(255, 30, 45, 0.15) 60%, transparent 100%);
+  opacity: var(--pulse);
+  transform: scale(calc(0.7 + 0.3 * (1 - var(--pulse))));
+  mix-blend-mode: screen;
+}
+
+.frame {
+  position: relative;
+  z-index: 1;
+  width: calc(941 * var(--k));
+  height: 100%;
+  margin-inline: auto;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Statement                                                                 */
+/* ------------------------------------------------------------------------ */
+
+.head {
+  position: absolute;
+  left: 0;
+  top: calc(84 * var(--k));
+  width: 100%;
+  text-align: center;
+}
+
+.eyebrow {
+  font-size: max(9px, calc(26.4 * var(--k)));
+  font-weight: 500;
+  letter-spacing: 0.54em;
+  padding-left: 0.54em;
+  color: #e3000e;
+  white-space: nowrap;
+}
+
+/* Eyebrow cap bottom 102 -> headline cap top 116. */
+.title {
+  margin-top: calc(14 * var(--k));
+}
+
+.title :global(.line) {
+  text-align: center;
+  transform: skewX(-11deg);
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+  overflow: visible;
+  clip-path: inset(-8% -12% -2% -12%);
+}
+
+.title :global(.line-inner) {
+  display: inline-block;
+  transform: scaleX(var(--sx, 1));
+}
+
+/* FUTURE 233..732 at a 117 cap. */
+.title :global(.line):nth-child(1) {
+  --sx: 1.4;
+  padding-left: calc(24 * var(--k));
+  font-size: calc(133 * var(--k));
+}
+
+/* DROPS 245..713 at a 122 cap; cap-to-cap gap 9. */
+.title :global(.line):nth-child(2) {
+  --sx: 1.39;
+  margin-top: calc(5 * var(--k));
+  padding-left: calc(20 * var(--k));
+  font-size: calc(139 * var(--k));
+}
+
+.title :global(.char) {
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 240px 240px, 100% 100%;
+  background-repeat: repeat, no-repeat;
+  -webkit-text-stroke: max(0.5px, calc(1.3 * var(--k))) rgba(255, 255, 255, 0.5);
+}
+
+.title :global(.char.t-white) {
+  background-image: var(--grunge), linear-gradient(180deg, #fff 0%, #f4f4f4 50%, #d6d6d6 100%);
+}
+
+.title :global(.char.t-red) {
+  background-image: var(--grunge), linear-gradient(180deg, #ff2b34 0%, var(--red) 50%, #b40e17 100%);
+  -webkit-text-stroke: max(0.5px, calc(1.3 * var(--k))) rgba(255, 60, 70, 0.5);
+}
+
+/* Headline cap bottom 362 -> subline cap top 381; pitch 26. */
+.subline {
+  --lh: 1.44;
+  margin-top: calc(19 * var(--k));
+  font-size: max(9px, calc(18 * var(--k)));
+  font-weight: 400;
+  letter-spacing: 0.54em;
+  padding-left: 0.54em;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.subline span {
+  display: block;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Rings                                                                     */
+/* ------------------------------------------------------------------------ */
+
+.rings {
+  position: absolute;
+  left: 0;
+  top: calc(755 * var(--k));
+  width: 100%;
+  height: calc(79 * var(--k));
+}
+
+.ring {
+  position: absolute;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: calc(79 * var(--k));
+  height: calc(79 * var(--k));
+  padding: 0;
+  border: max(1.5px, calc(2 * var(--k))) solid #f1000c;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.88);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 0 calc(12 * var(--k)) calc(1 * var(--k)) rgba(var(--red-rgb), 0.4);
+  transition:
+    transform 0.45s var(--ease-out),
+    box-shadow 0.45s var(--ease-out),
+    background-color 0.3s;
+}
+
+.ring:hover {
+  background: rgba(20, 0, 2, 0.95);
+  box-shadow: 0 0 calc(22 * var(--k)) calc(4 * var(--k)) rgba(var(--red-rgb), 0.6);
+}
+
+.ring:active {
+  transform: scale(0.94);
+}
+
+.ring svg {
+  width: calc(12 * var(--k));
+  height: calc(23 * var(--k));
+  min-width: 6px;
+  min-height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+}
+
+.ringL {
+  left: calc(22 * var(--k));
+}
+
+.ringR {
+  left: calc(840 * var(--k));
+}
+
+/* ------------------------------------------------------------------------ */
+/* The crate's face                                                          */
+/* ------------------------------------------------------------------------ */
+
+.panel {
+  position: absolute;
+  left: 0;
+  top: calc(1175 * var(--k));
+  width: 100%;
+  text-align: center;
+}
+
+/* Level: cap 72, italic white. */
+.level {
+  font-size: calc(82 * var(--k));
+  letter-spacing: 0.005em;
+  color: #f0f0f0;
+  white-space: nowrap;
+  -webkit-text-stroke: 0;
+}
+
+.slant {
+  display: inline-block;
+  transform: skewX(-10deg) scaleX(1.16);
+}
+
+/* Level cap bottom 1246 -> name cap top 1273. */
+.name {
+  margin-top: calc(27 * var(--k));
+  font-size: max(9px, calc(26 * var(--k)));
+  font-weight: 400;
+  letter-spacing: 0.42em;
+  padding-left: 0.42em;
+  color: #f0f0f0;
+  white-space: nowrap;
+}
+
+/* Name cap bottom 1291 -> rule 1334. */
+.rule {
+  display: block;
+  margin: calc(43 * var(--k)) auto 0;
+  width: calc(186 * var(--k));
+  height: max(2px, calc(5 * var(--k)));
+  background: #ec0007;
+  transform-origin: center;
+}
+
+/* Rule bottom 1339 -> bar 1377. A 2 red frame on black, lit by its own
+   glow. */
+.bar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(37 * var(--k));
+  width: calc(429 * var(--k));
+  height: calc(94 * var(--k));
+  margin-top: calc(38 * var(--k));
+  border: max(1.5px, calc(2.5 * var(--k))) solid #f00010;
+  overflow: hidden;
+  border-radius: calc(10 * var(--k));
+  background: rgba(0, 0, 0, 0.92);
+  color: #f2000f;
+  box-shadow:
+    0 0 calc(18 * var(--k)) calc(1 * var(--k)) rgba(var(--red-rgb), 0.5),
+    inset 0 0 calc(14 * var(--k)) rgba(var(--red-rgb), 0.18);
+  transition:
+    box-shadow 0.45s var(--ease-out),
+    background-color 0.35s;
+}
+
+.bar:hover {
+  background: rgba(30, 0, 3, 0.95);
+  box-shadow:
+    0 0 calc(28 * var(--k)) calc(3 * var(--k)) rgba(var(--red-rgb), 0.7),
+    inset 0 0 calc(18 * var(--k)) rgba(var(--red-rgb), 0.3);
+}
+
+.lock {
+  flex: none;
+  width: calc(42 * var(--k));
+  height: calc(56 * var(--k));
+}
+
+/* On hover the lock and label lift away and the hint takes the whole bar.
+   The hint is out of flow, so the lock and label centre as the mockup's. */
+.lock,
+.barLabel,
+.barHint {
+  transition:
+    transform 0.5s var(--ease-out),
+    opacity 0.4s;
+  white-space: nowrap;
+}
+
+.barLabel {
+  display: block;
+  font-size: calc(48 * var(--k));
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.barHint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: max(10px, calc(24 * var(--k)));
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  opacity: 0;
+  transform: translateY(60%);
+}
+
+.bar:hover .lock,
+.bar:hover .barLabel,
+.bar:focus-visible .lock,
+.bar:focus-visible .barLabel {
+  opacity: 0;
+  transform: translateY(-60%);
+}
+
+.bar:hover .barHint,
+.bar:focus-visible .barHint {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Dots                                                                      */
+/* ------------------------------------------------------------------------ */
+
+.dots {
+  position: absolute;
+  left: calc(354 * var(--k));
+  top: calc(1561 * var(--k));
+  display: flex;
+  gap: calc(25 * var(--k));
+}
+
+.dot {
+  position: relative;
+  width: calc(27 * var(--k));
+  height: calc(27 * var(--k));
+  min-width: 8px;
+  min-height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #333232;
+  cursor: pointer;
+  transition: background-color 0.4s;
+}
+
+.dot::before {
+  content: "";
+  position: absolute;
+  inset: calc(-10 * var(--k));
+}
+
+.dot:hover {
+  background: #6a6868;
+}
+
+.dotActive,
+.dotActive:hover {
+  background: #fb0110;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lock,
+  .barLabel,
+  .barHint {
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------------------------ */
+/* Desktop                                                                   */
+/* ------------------------------------------------------------------------ */
+
+@media (min-width: 1024px) {
+  .atmos {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 10%, #000 90%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 10%, #000 90%, transparent 100%);
+  }
+}

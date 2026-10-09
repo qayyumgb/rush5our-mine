@@ -45,7 +45,7 @@ export const site = {
 export const navLinks: NavLink[] = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
-  { label: "Merch", href: "/#merch" }, // → "/merch" when built
+  { label: "Merch", href: "/merch" },
   { label: "Videos", href: "/#videos" }, // → "/videos" when built
   { label: "Rush Hunts", href: "/rush-hunts" },
   { label: "Join the movement", href: "/join" },
@@ -70,7 +70,7 @@ export const socialLinks: SocialLink[] = [
 
 /** Footer utility links. */
 export const footerLinks: NavLink[] = [
-  { label: "Shop", href: "/#merch" },
+  { label: "Shop", href: "/merch" },
   { label: "Contact", href: "/contact" },
   { label: "Terms", href: "#" },
   { label: "Privacy", href: "#" },

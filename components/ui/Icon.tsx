@@ -38,6 +38,7 @@ export type IconName =
   | "cloudUp"
   | "user"
   | "at"
+  | "cart"
   | "tag"
   | "pencil"
   | "clockGear"
@@ -330,6 +331,18 @@ export const ICONS: Record<IconName, IconSpec> = {
       <>
         <circle className={S} cx="12" cy="12" r="4.3" />
         <path className={S} d="M16.3 12v1.7a2.7 2.7 0 0 0 5.4 0V12a9.7 9.7 0 1 0-3.9 7.8" />
+      </>
+    ),
+  },
+
+  /** Shopping cart — the merch buttons. */
+  cart: {
+    viewBox: "0 0 26 24",
+    render: (
+      <>
+        <path className={S} d="M1 1.5h3.6l3.1 13.4h12.6l2.9-9.2H6.3" />
+        <circle className={S} cx="9.6" cy="20.5" r="1.9" />
+        <circle className={S} cx="18.9" cy="20.5" r="1.9" />
       </>
     ),
   },

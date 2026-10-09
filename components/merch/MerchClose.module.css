@@ -1,0 +1,278 @@
+/* =========================================================================
+   MERCH — section 5, WEAR THE MOVEMENT. REP THE CULTURE.
+   (mockups/Merch/5.png, a 941 x 1672 phone frame)
+
+   Every number is a pixel measured off the mockup x `--k`, the page's
+   column unit (see MerchDrop.module.css). Every block is placed off the
+   frame's top.
+
+     wordmark     cut x360..579 y28..87 (glyphs x367..571, y34..81)
+     rule         y118..120 (h3) x416..524 (w109), red
+     eyebrow      cap y162..179 (h18) x236..715, grey ~rgb(166), tracked
+     headline     four lines leaning ~8deg, centred
+                  "WEAR THE"  cap y197..380 (h184) x92..861, white
+                  "MOVEMENT." cap y389..571 (h183) x55..895, white
+                  "REP THE"   cap y584..795 (h212) x101..845, red
+                  "CULTURE."  cap y807..1020 (h214) x62..898, red
+     brush        cut x96..895 y1024..1119
+     copy         4 centred lines, cap tops 1135 / 1182 / 1229 / 1276
+                  (pitch 47), white ~rgb(240), tracked
+     button       x86..856 (w771) y1364..1489 (h126), radius ~10, textured
+                  red under a hot rim; label cap 48 x264..613; arrow 42 x
+                  33 at x653
+     taglines     caps y1546..1559 and 1577..1590 (pitch 31), grey ~rgb(80)
+     frame        1672 tall
+   ========================================================================= */
+
+.section {
+  --k: calc(min(100vw, 900px) / 941);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  height: calc(1672 * var(--k));
+  background: var(--black);
+}
+
+.atmos {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  z-index: 0;
+  width: calc(941 * var(--k));
+  height: calc(1672 * var(--k));
+  margin-left: calc(-470.5 * var(--k));
+  pointer-events: none;
+  background: url("/assets/images/merch-close-plate.webp") center top / 100% 100% no-repeat;
+}
+
+.frame {
+  position: relative;
+  z-index: 1;
+  width: calc(941 * var(--k));
+  height: 100%;
+  margin-inline: auto;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Head                                                                      */
+/* ------------------------------------------------------------------------ */
+
+.head {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.mark {
+  position: absolute;
+  left: calc(360 * var(--k));
+  top: calc(28 * var(--k));
+  width: calc(220 * var(--k));
+  height: calc(60 * var(--k));
+  max-width: none;
+}
+
+.rule {
+  position: absolute;
+  left: calc(416 * var(--k));
+  top: calc(118 * var(--k));
+  width: calc(109 * var(--k));
+  height: max(1px, calc(3 * var(--k)));
+  background: #e3030f;
+  transform-origin: center;
+}
+
+.eyebrow {
+  position: absolute;
+  left: 0;
+  top: calc(162 * var(--k));
+  width: 100%;
+  font-size: max(9px, calc(24.5 * var(--k)));
+  font-weight: 400;
+  letter-spacing: 0.63em;
+  padding-left: calc(0.63em + 10 * var(--k));
+  color: #a7a7a6;
+  white-space: nowrap;
+}
+
+/* Eyebrow cap bottom 179 -> headline cap top 197. */
+.title {
+  position: absolute;
+  left: 0;
+  top: calc(197 * var(--k));
+  width: 100%;
+}
+
+/* The mockup's cut is heavier and set tight: the tracking closes up and
+   each line is stretched back to its measured width. */
+.title :global(.line) {
+  text-align: center;
+  transform: skewX(-8deg);
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  overflow: visible;
+  clip-path: inset(-6% -12% -2% -12%);
+}
+
+.title :global(.line-inner) {
+  display: inline-block;
+  transform: scaleX(var(--sx, 1));
+}
+
+/* WEAR THE 92..861 at a 184 cap. */
+.title :global(.line):nth-child(1) {
+  --sx: 1.093;
+  margin-left: calc(-11 * var(--k));
+  font-size: calc(210 * var(--k));
+}
+
+/* MOVEMENT. 55..895 at a 183 cap; cap gap 9. */
+.title :global(.line):nth-child(2) {
+  --sx: 0.994;
+  margin-top: calc(4 * var(--k));
+  margin-left: calc(24 * var(--k));
+  font-size: calc(209 * var(--k));
+}
+
+/* REP THE 101..845 at a 212 cap; cap gap 13. */
+.title :global(.line):nth-child(3) {
+  --sx: 1.134;
+  margin-top: calc(1 * var(--k));
+  margin-left: calc(-4 * var(--k));
+  font-size: calc(242 * var(--k));
+}
+
+/* CULTURE. 62..898 at a 214 cap; cap gap 12. */
+.title :global(.line):nth-child(4) {
+  --sx: 1.139;
+  margin-top: calc(5 * var(--k));
+  margin-left: calc(30 * var(--k));
+  font-size: calc(244 * var(--k));
+}
+
+.title :global(.char) {
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 240px 240px, 100% 100%;
+  background-repeat: repeat, no-repeat;
+  -webkit-text-stroke: max(0.5px, calc(1.5 * var(--k))) rgba(255, 255, 255, 0.5);
+}
+
+/* The mockup's white is a concrete-grey, lit from above and stained. */
+.title :global(.char.t-white) {
+  background-image: var(--grunge), linear-gradient(180deg, #f6f6f6 0%, #e0e0e0 50%, #b8b8b8 100%);
+}
+
+.title :global(.char.t-red) {
+  background-image: var(--grunge), linear-gradient(180deg, #ff2b34 0%, #ec0c18 50%, #c0060f 100%);
+  -webkit-text-stroke: max(0.5px, calc(1.5 * var(--k))) rgba(255, 60, 70, 0.5);
+}
+
+.brush {
+  position: absolute;
+  left: calc(96 * var(--k));
+  top: calc(1024 * var(--k));
+  width: calc(800 * var(--k));
+  height: calc(96 * var(--k));
+  max-width: none;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Copy, button, taglines                                                    */
+/* ------------------------------------------------------------------------ */
+
+.body {
+  --lh: 1.55;
+  position: absolute;
+  left: 0;
+  top: calc(1135 * var(--k));
+  width: 100%;
+  margin: 0;
+  text-align: center;
+  font-size: max(9px, calc(31 * var(--k)));
+  font-weight: 400;
+  letter-spacing: 0.142em;
+  color: #f0f0f0;
+  white-space: nowrap;
+}
+
+.body span {
+  display: block;
+}
+
+.btnWrap {
+  position: absolute;
+  left: calc(86 * var(--k));
+  top: calc(1364 * var(--k));
+}
+
+.btnMagnet {
+  display: block;
+}
+
+/* A textured red face under a hot 2px rim, lit by its own glow: sampled
+   rgb(245,15,26) at the rim, rgb(100..150,2,6) through the face, which is
+   mottled darker toward the right. */
+.btn {
+  width: calc(771 * var(--k));
+  height: calc(126 * var(--k));
+  gap: calc(40 * var(--k));
+  padding: 0 0 calc(4 * var(--k)) calc(12 * var(--k));
+  border-radius: calc(10 * var(--k));
+  font-family: var(--f-ui);
+  font-weight: 700;
+  font-size: calc(57 * var(--k));
+  letter-spacing: -0.065em;
+  background:
+    var(--grunge),
+    radial-gradient(90% 140% at 30% 30%, #a3050c 0%, #82030a 55%, #5e0106 100%);
+  background-size: 240px 240px, 100% 100%;
+  box-shadow:
+    0 0 calc(30 * var(--k)) rgba(var(--red-rgb), 0.75),
+    0 0 calc(10 * var(--k)) rgba(var(--red-rgb), 0.5),
+    inset 0 0 0 max(1.5px, calc(3 * var(--k))) rgba(250, 20, 34, 0.95),
+    inset 0 0 calc(20 * var(--k)) rgba(255, 40, 50, 0.3);
+}
+
+.btn svg {
+  width: calc(42 * var(--k));
+  height: calc(33 * var(--k));
+}
+
+.btn svg path {
+  stroke-width: 2.4;
+}
+
+.tag {
+  --lh: 1.63;
+  position: absolute;
+  left: 0;
+  top: calc(1546 * var(--k));
+  width: 100%;
+  margin: 0;
+  text-align: center;
+  font-size: max(8px, calc(19 * var(--k)));
+  font-weight: 400;
+  letter-spacing: 0.43em;
+  padding-left: 0.43em;
+  color: #4d4d4f;
+  white-space: nowrap;
+}
+
+.tag span {
+  display: block;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Desktop                                                                   */
+/* ------------------------------------------------------------------------ */
+
+@media (min-width: 1024px) {
+  .atmos {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 8%, #000 92%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 8%, #000 92%, transparent 100%);
+  }
+}

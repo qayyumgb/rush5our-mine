@@ -1,0 +1,513 @@
+/* =========================================================================
+   MERCH — section 2, FEATURED DROP: LEVEL 1: ESSENTIALS
+   (mockups/Merch/2.png, a 941 x 1672 phone frame)
+
+   Every number is a pixel measured off the mockup x `--k`, this page's
+   column unit: 1/941 of the viewport, capped at the same 900px column the
+   shared `--u` stops at, so the composition scales with the phone and then
+   sits centred on a desktop. Every block is placed off the frame's top.
+
+     eyebrow      cap y100..116 (h17) x291..638, red, tracked
+     headline     "LEVEL 1:"   cap y136..238 (h103) x225..697, white
+                  "ESSENTIALS" cap y248..359 (h112) x62..900, red
+                  both lean ~10deg, centred
+     subline      cap y375..389 (h15) x134..803, white, tracked
+     rings        74 across, 2 red, centred on (63, 704) and (878, 704);
+                  white chevron 11 x 23
+     thumbnails   y1051..1231 (h181); x59..254, 270..462, 478..670, 686..879
+                  (w ~194, gap 16), radius ~14, 1 grey; the chosen one has a
+                  3 pink-red rim and a red glow
+     name         cap y1256..1272 (h17) x66..313, white, tracked caps
+     price        y1290..1353 (h64) x66..247, red, display face
+     copy         caps from y1367 and 1395 (pitch 28), x66..366, grey
+     hairline     x470..471, y1286..1410, red
+     size         label cap y1290..1302 (h13) x521..563, grey, tracked
+                  boxes 57 tall from y1319: x519..574, 593..647, 666..720,
+                  739..794, 813..878 (gap 19), 1.5 grey, radius ~8; the
+                  chosen one has a 2 pink-red rim and a red glow; cap 17
+     button       x61..879 (w819) y1443..1545 (h103), radius 8; cart 51 x 47
+                  at x302; label cap 41 x401..637
+     dots         26 across, y1591..1617, at x378, 431, 484, 536 (pitch 52.7)
+     frame        1672 tall
+   ========================================================================= */
+
+.section {
+  --k: calc(min(100vw, 900px) / 941);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  height: calc(1672 * var(--k));
+  background: var(--black);
+}
+
+/* The mockup's own photograph at the mockup's own size, centred: the tee
+   on its crate, the smoke, the red lights, with the type and panels filled
+   in. One static image, nothing re-rasterises on scroll. */
+.atmos {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  z-index: 0;
+  width: calc(941 * var(--k));
+  height: calc(1672 * var(--k));
+  margin-left: calc(-470.5 * var(--k));
+  pointer-events: none;
+  background: url("/assets/images/merch-drop-plate.webp") center top / 100% 100% no-repeat;
+}
+
+.frame {
+  position: relative;
+  z-index: 1;
+  width: calc(941 * var(--k));
+  height: 100%;
+  margin-inline: auto;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Statement                                                                 */
+/* ------------------------------------------------------------------------ */
+
+.head {
+  position: absolute;
+  left: 0;
+  top: calc(100 * var(--k));
+  width: 100%;
+  text-align: center;
+}
+
+.eyebrow {
+  font-size: max(9px, calc(23.5 * var(--k)));
+  font-weight: 500;
+  letter-spacing: 0.57em;
+  padding-left: 0.57em;
+  margin-left: calc(-8 * var(--k));
+  color: var(--red);
+  white-space: nowrap;
+}
+
+/* Eyebrow cap bottom 116 -> headline cap top 136. */
+.title {
+  margin-top: calc(20 * var(--k));
+}
+
+/* Each line leans ~10deg and is stretched to the mockup's measured width,
+   in the scratched white and red the hero's headline uses. */
+.title :global(.line) {
+  text-align: center;
+  transform: skewX(-10deg);
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+  overflow: visible;
+  clip-path: inset(-8% -10% -2% -10%);
+}
+
+.title :global(.line-inner) {
+  display: inline-block;
+  transform: scaleX(var(--sx, 1));
+}
+
+/* LEVEL 1: 225..697 at a 103 cap. */
+.title :global(.line):nth-child(1) {
+  --sx: 1.37;
+  margin-left: calc(-14 * var(--k));
+  font-size: calc(117.5 * var(--k));
+}
+
+/* ESSENTIALS 62..900 at a 112 cap; cap-to-cap gap 10. */
+.title :global(.line):nth-child(2) {
+  --sx: 1.54;
+  margin-top: calc(7 * var(--k));
+  margin-left: calc(6 * var(--k));
+  font-size: calc(130 * var(--k));
+}
+
+.title :global(.char) {
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 240px 240px, 100% 100%;
+  background-repeat: repeat, no-repeat;
+  -webkit-text-stroke: max(0.5px, calc(1.3 * var(--k))) rgba(255, 255, 255, 0.5);
+}
+
+.title :global(.char.t-white) {
+  background-image: var(--grunge), linear-gradient(180deg, #fff 0%, #f4f4f4 50%, #d6d6d6 100%);
+}
+
+.title :global(.char.t-red) {
+  background-image: var(--grunge), linear-gradient(180deg, #ff2b34 0%, var(--red) 50%, #b40e17 100%);
+  -webkit-text-stroke: max(0.5px, calc(1.3 * var(--k))) rgba(255, 60, 70, 0.5);
+}
+
+/* Headline cap bottom 359 -> subline cap top 375. */
+.subline {
+  margin-top: calc(16 * var(--k));
+  font-size: max(9px, calc(20.5 * var(--k)));
+  font-weight: 400;
+  letter-spacing: 0.45em;
+  padding-left: 0.45em;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Stage                                                                     */
+/* ------------------------------------------------------------------------ */
+
+/* The views other than the first are laid over the photograph's tee (which
+   sits at about x110..830, y405..1040), feathered into the scene at their
+   edges. Each is a portrait picture, cropped to its upper part so the print
+   sits where the tee's chest is. */
+.stage {
+  position: absolute;
+  left: 0;
+  top: calc(380 * var(--k));
+  width: calc(941 * var(--k));
+  height: calc(680 * var(--k));
+  pointer-events: none;
+}
+
+.view {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: scale(1.04);
+  transition:
+    opacity 0.7s var(--ease-out),
+    transform 0.9s var(--ease-out);
+  -webkit-mask-image: radial-gradient(ellipse closest-side at 50% 50%, #000 70%, transparent 100%);
+  mask-image: radial-gradient(ellipse closest-side at 50% 50%, #000 70%, transparent 100%);
+}
+
+.view[data-active] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.view img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+  max-width: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.rings {
+  position: absolute;
+  left: 0;
+  top: calc(667 * var(--k));
+  width: 100%;
+  height: calc(74 * var(--k));
+}
+
+/* 74 across, a 2 red ring in a soft red glow, the chevron white. */
+.ring {
+  position: absolute;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: calc(74 * var(--k));
+  height: calc(74 * var(--k));
+  padding: 0;
+  border: max(1.5px, calc(2 * var(--k))) solid #f2021a;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 0 calc(14 * var(--k)) calc(2 * var(--k)) rgba(var(--red-rgb), 0.45);
+  transition:
+    transform 0.45s var(--ease-out),
+    box-shadow 0.45s var(--ease-out),
+    background-color 0.3s;
+}
+
+.ring:hover {
+  background: rgba(20, 0, 2, 0.95);
+  box-shadow: 0 0 calc(22 * var(--k)) calc(4 * var(--k)) rgba(var(--red-rgb), 0.65);
+}
+
+.ring:active {
+  transform: scale(0.94);
+}
+
+.ring svg {
+  width: calc(11 * var(--k));
+  height: calc(23 * var(--k));
+  min-width: 6px;
+  min-height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+}
+
+.ringL {
+  left: calc(23 * var(--k));
+}
+
+.ringR {
+  left: calc(843 * var(--k));
+}
+
+/* ------------------------------------------------------------------------ */
+/* Views                                                                     */
+/* ------------------------------------------------------------------------ */
+
+.thumbs {
+  position: absolute;
+  left: calc(59 * var(--k));
+  top: calc(1051 * var(--k));
+  display: grid;
+  grid-template-columns: repeat(4, calc(194 * var(--k)));
+  gap: calc(16 * var(--k));
+}
+
+.thumb {
+  position: relative;
+  height: calc(181 * var(--k));
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #4a4747;
+  border-radius: calc(14 * var(--k));
+  background: #1e1e1e;
+  cursor: pointer;
+  transition:
+    border-color 0.35s,
+    box-shadow 0.45s var(--ease-out),
+    transform 0.45s var(--ease-out);
+}
+
+.thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  max-width: none;
+}
+
+.thumb:hover {
+  border-color: #6a6667;
+  transform: translateY(-2px);
+}
+
+/* A 3 pink-red rim in a red glow, as the mockup frames the chosen view. */
+.thumbActive,
+.thumbActive:hover {
+  border-color: #ff3b4c;
+  box-shadow:
+    inset 0 0 0 max(1px, calc(2 * var(--k))) rgba(255, 150, 160, 0.9),
+    0 0 calc(16 * var(--k)) calc(2 * var(--k)) rgba(var(--red-rgb), 0.55);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Details                                                                   */
+/* ------------------------------------------------------------------------ */
+
+.name,
+.price,
+.desc,
+.sizeLabel {
+  position: absolute;
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* Name: cap 17, x66..313. */
+.name {
+  left: calc(66 * var(--k));
+  top: calc(1256 * var(--k));
+  font-size: max(11px, calc(23.5 * var(--k)));
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: #fff;
+}
+
+/* Price: 64 tall at x66, the display face in red. */
+.price {
+  left: calc(66 * var(--k));
+  top: calc(1290 * var(--k));
+  font-size: max(20px, calc(71 * var(--k)));
+  letter-spacing: -0.02em;
+  color: #f3000c;
+  -webkit-text-stroke: 0;
+}
+
+/* Copy: cap 17 from y1367, pitch 28, grey. */
+.desc {
+  --lh: 1.16;
+  left: calc(66 * var(--k));
+  top: calc(1367 * var(--k));
+  font-size: max(10px, calc(24.3 * var(--k)));
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  color: #8a8a8b;
+}
+
+.desc span {
+  display: block;
+}
+
+.divider {
+  position: absolute;
+  left: calc(470 * var(--k));
+  top: calc(1286 * var(--k));
+  width: max(1px, calc(2 * var(--k)));
+  height: calc(125 * var(--k));
+  background: #b5020d;
+  transform-origin: top;
+}
+
+.sizeLabel {
+  left: calc(521 * var(--k));
+  top: calc(1290 * var(--k));
+  font-size: max(9px, calc(18 * var(--k)));
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  color: #c4c8c5;
+}
+
+.sizes {
+  position: absolute;
+  left: calc(519 * var(--k));
+  top: calc(1319 * var(--k));
+  display: flex;
+  gap: calc(19 * var(--k));
+}
+
+/* 57 tall; the last is wider for its three letters. */
+.size {
+  display: grid;
+  place-items: center;
+  min-width: calc(56 * var(--k));
+  height: calc(57 * var(--k));
+  padding: 0 calc(10 * var(--k)) calc(3 * var(--k));
+  border: max(1px, calc(1.5 * var(--k))) solid #3a3a3a;
+  border-radius: calc(8 * var(--k));
+  background: #050505;
+  color: #fff;
+  font-size: max(11px, calc(20.5 * var(--k)));
+  font-weight: 500;
+  letter-spacing: 0;
+  cursor: pointer;
+  transition:
+    border-color 0.35s,
+    box-shadow 0.45s var(--ease-out);
+}
+
+.size:last-child {
+  min-width: calc(66 * var(--k));
+}
+
+.size:hover {
+  border-color: #666;
+}
+
+.sizeActive,
+.sizeActive:hover {
+  border-color: #ff5a68;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 150, 160, 0.7),
+    0 0 calc(12 * var(--k)) calc(1 * var(--k)) rgba(var(--red-rgb), 0.5);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Button and dots                                                           */
+/* ------------------------------------------------------------------------ */
+
+.btnWrap {
+  position: absolute;
+  left: calc(61 * var(--k));
+  top: calc(1443 * var(--k));
+}
+
+.btnMagnet {
+  display: block;
+}
+
+/* The hero's button: a flat red face under a hot pink rim, lit by its own
+   glow. No arrow; the cart leads the label. */
+.btn {
+  width: calc(819 * var(--k));
+  height: calc(103 * var(--k));
+  gap: calc(52 * var(--k));
+  border-radius: calc(8 * var(--k));
+  font-family: var(--f-ui);
+  font-weight: 700;
+  font-size: calc(46 * var(--k));
+  letter-spacing: -0.04em;
+  padding-right: calc(10 * var(--k));
+  background: linear-gradient(180deg, #e4060f 0%, #d1080e 50%, #e2060f 100%);
+  box-shadow:
+    0 0 calc(34 * var(--k)) rgba(var(--red-rgb), 0.75),
+    0 0 calc(12 * var(--k)) rgba(var(--red-rgb), 0.5),
+    inset 0 0 0 max(1.5px, calc(2.5 * var(--k))) rgba(255, 140, 140, 0.95),
+    inset 0 0 calc(16 * var(--k)) rgba(255, 60, 70, 0.3);
+}
+
+.cart {
+  width: calc(56 * var(--k)) !important;
+  height: calc(52 * var(--k)) !important;
+  overflow: visible;
+  flex: none;
+}
+
+.cart :global(.i-stroke) {
+  stroke-width: 2;
+}
+
+.dots {
+  position: absolute;
+  left: calc(378 * var(--k));
+  top: calc(1591 * var(--k));
+  display: flex;
+  gap: calc(25.7 * var(--k));
+}
+
+.dot {
+  position: relative;
+  width: calc(27 * var(--k));
+  height: calc(27 * var(--k));
+  min-width: 8px;
+  min-height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #333232;
+  cursor: pointer;
+  transition:
+    background-color 0.4s,
+    transform 0.4s var(--ease-out);
+}
+
+/* A larger hit area than the dot. */
+.dot::before {
+  content: "";
+  position: absolute;
+  inset: calc(-10 * var(--k));
+}
+
+.dot:hover {
+  background: #6a6868;
+}
+
+.dotActive,
+.dotActive:hover {
+  background: #fc0313;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Desktop                                                                   */
+/* The column is narrower than the window, so the photograph fades out at  */
+/* its sides rather than ending on a hard edge.                              */
+/* ------------------------------------------------------------------------ */
+
+@media (min-width: 1024px) {
+  .atmos {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 10%, #000 90%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 10%, #000 90%, transparent 100%);
+  }
+}

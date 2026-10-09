@@ -126,7 +126,7 @@ export const joinWays: JoinWaysContent = {
       icon: { src: "/assets/images/join-ways-cart.webp", width: 96, height: 88 },
       title: ["Rep the", "movement"],
       body: ["Wear the merch.", "Support what we’re", "building."],
-      cta: { label: "Shop merch", href: "/#merch" },
+      cta: { label: "Shop merch", href: "/merch" },
     },
     {
       icon: { src: "/assets/images/join-ways-scope.webp", width: 92, height: 90 },

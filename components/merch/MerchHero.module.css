@@ -1,0 +1,365 @@
+/* =========================================================================
+   MERCH — section 1, BUILD THE MOVEMENT.
+   (mockups/Merch/1.png, a 941 x 1671 phone frame)
+
+   Every number is a pixel measured off the mockup x `--au`, here 1/941 of
+   the viewport: the full-bleed unit the Rush Hunts hero uses, re-based to
+   this mockup's width.
+
+     headline     two lines leaning ~10deg, level
+                  "BUILD THE" cap 114..261 (h148) x59..807, white
+                  "MOVEMENT." cap 270..440 (h171) x50..886, red
+     brush        red sweep, cut x145..805 y422..464
+     body         2 tracked lines, caps 470..491 and 513..533 (pitch 43),
+                  x85..854 and x179..761, centred, white
+     red button   x153..788 (w636) y570..671 (h102), radius ~8; a hot pink
+                  rim over a flat red face; cart 50 x 46 at x238; label cap
+                  40 x348..609; arrow 42 x 37 at x666
+     notes        hand-painted, part of the photograph
+     tagline      cap 1602..1613 (h12) x330..613, grey, tracked
+     frame        1671 tall
+   ========================================================================= */
+
+.hero {
+  --au: calc(100vw / 941);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  /* Never shorter than the viewport, never shorter than the mockup ratio. */
+  height: max(calc(1671 * var(--au)), 100vh);
+  height: max(calc(1671 * var(--au)), 100svh);
+  background: var(--black);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Background                                                                */
+/* ------------------------------------------------------------------------ */
+
+.bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.photo {
+  position: absolute;
+  inset: 0;
+  /* Scales from the tees, not the box centre. */
+  transform-origin: 50% 60%;
+}
+
+.img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 0%;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* The photograph carries the mockup's grading already; only the foot fades
+   to the page black so the next section meets it without a seam. */
+.shade {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 0%, transparent 95%, rgba(4, 4, 4, 0.8) 100%);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Copy                                                                      */
+/* ------------------------------------------------------------------------ */
+
+.copy {
+  position: relative;
+  z-index: 3;
+  padding: calc(114 * var(--au)) 0 0 calc(49 * var(--au));
+}
+
+/* Each line leans ~10deg about its own bottom-left corner, so the two left
+   edges stay in a column as they do in the mockup. */
+.title {
+  width: max-content;
+}
+
+.title :global(.line) {
+  transform: skewX(-10deg);
+  transform-origin: 0 100%;
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+  /* The mask only has to hide the characters below the line before they
+     rise; to the right it is left open, since the line is stretched past
+     its own box. */
+  overflow: visible;
+  clip-path: inset(-8% -40% -2% -4%);
+}
+
+.title :global(.line-inner) {
+  display: inline-block;
+  transform: scaleX(var(--sx, 1));
+  transform-origin: 0 50%;
+}
+
+/* BUILD THE 59..807 at a 148 cap: the mockup's cut is wider than ours. */
+.title :global(.line):nth-child(1) {
+  --sx: 1.2;
+  font-size: calc(169 * var(--au));
+}
+
+/* MOVEMENT. 50..886 at a 171 cap; cap-to-cap gap 9. */
+.title :global(.line):nth-child(2) {
+  --sx: 1.012;
+  margin-top: calc(9 * var(--au));
+  margin-left: calc(-14 * var(--au));
+  font-size: calc(189 * var(--au));
+}
+
+/* The mockup's type is a lit, scratched surface: the treatment the Contact
+   and Rush Hunts heroes' headlines use. */
+.title :global(.char) {
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 240px 240px, 100% 100%;
+  background-repeat: repeat, no-repeat;
+  -webkit-text-stroke: max(0.5px, calc(1.3 * var(--au))) rgba(255, 255, 255, 0.5);
+}
+
+.title :global(.char.t-white) {
+  background-image: var(--grunge), linear-gradient(180deg, #fff 0%, #f4f4f4 50%, #d6d6d6 100%);
+}
+
+.title :global(.char.t-red) {
+  background-image: var(--grunge), linear-gradient(180deg, #ff2b34 0%, var(--red) 50%, #b40e17 100%);
+  -webkit-text-stroke: max(0.5px, calc(1.3 * var(--au))) rgba(255, 60, 70, 0.5);
+}
+
+/* Brush cut: x145..805, y422..464. Placed off the frame, so the headline's
+   lean cannot move it. */
+.brush {
+  position: absolute;
+  left: calc(145 * var(--au));
+  top: calc(422 * var(--au));
+  width: calc(660 * var(--au));
+  height: calc(42 * var(--au));
+  max-width: none;
+}
+
+/* Body caps at 470 / 513, each line centred on the frame. */
+.body {
+  --lh: 1.6;
+  position: absolute;
+  left: 0;
+  top: calc(470 * var(--au));
+  width: calc(941 * var(--au));
+  text-align: center;
+  /* Inter sets wider than the mockup's face: 25.5 matches its 769 line. */
+  font-size: calc(25.5 * var(--au));
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  /* The mockup's word gaps are tighter than its letter gaps. */
+  word-spacing: -0.2em;
+  padding-left: 0.3em;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.body span {
+  display: block;
+}
+
+.btnWrap {
+  position: absolute;
+  left: calc(153 * var(--au));
+  top: calc(570 * var(--au));
+}
+
+/* A flat red face under a hot pink 2px rim, lit by its own glow; sampled
+   rgb(255,138,139) at the rim, rgb(228,6,15) just inside, rgb(209,8,14)
+   through the middle. The cart leads, the arrow follows. */
+.btn {
+  width: calc(636 * var(--au));
+  height: calc(102 * var(--au));
+  gap: calc(58 * var(--au));
+  border-radius: calc(8 * var(--au));
+  font-family: var(--f-ui);
+  font-weight: 700;
+  font-size: calc(41 * var(--au));
+  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, #e4060f 0%, #d1080e 50%, #e2060f 100%);
+  box-shadow:
+    0 0 calc(34 * var(--au)) rgba(var(--red-rgb), 0.75),
+    0 0 calc(12 * var(--au)) rgba(var(--red-rgb), 0.5),
+    inset 0 0 0 max(1.5px, calc(2.5 * var(--au))) rgba(255, 140, 140, 0.95),
+    inset 0 0 calc(16 * var(--au)) rgba(255, 60, 70, 0.3);
+}
+
+.btn svg {
+  width: calc(46 * var(--au));
+  height: calc(29 * var(--au));
+}
+
+/* The mockup's arrow is as heavy as the label's stems. */
+.btn svg path {
+  stroke-width: 2.6;
+}
+
+.cart {
+  width: calc(58 * var(--au)) !important;
+  height: calc(54 * var(--au)) !important;
+  overflow: visible;
+  flex: none;
+}
+
+.cart :global(.i-stroke) {
+  stroke-width: 2;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Tagline                                                                   */
+/* ------------------------------------------------------------------------ */
+
+.tagline {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  width: 100%;
+  top: calc(1602 * var(--au));
+  text-align: center;
+  font-size: calc(16.5 * var(--au));
+  font-weight: 400;
+  letter-spacing: 0.37em;
+  padding-left: 0.37em;
+  color: #c6c6c6;
+  white-space: nowrap;
+}
+
+/* ========================================================================= */
+/* PHONES                                                                    */
+/* A phone is taller than the mockup's frame, so the hero is the viewport's  */
+/* height and the photograph sits at its foot at the mockup's own ratio,     */
+/* leaving black above it where the headline is — nothing of the picture     */
+/* (the painted notes at its edges) is cropped away.                         */
+/* ========================================================================= */
+
+@media (max-width: 639px) {
+  .img {
+    top: auto;
+    bottom: 0;
+    height: auto;
+  }
+
+  .tagline {
+    top: auto;
+    bottom: calc(58 * var(--au));
+  }
+}
+
+/* ========================================================================= */
+/* TABLET PORTRAIT                                                           */
+/* Same rule as the Rush Hunts hero: keep the phone composition, but stop   */
+/* it outgrowing the screen height, and centre it.                          */
+/* ========================================================================= */
+
+@media (min-width: 640px) and (orientation: portrait) {
+  .hero {
+    --au: calc(min(100vw, 100vh * 0.563) / 941);
+    --au: calc(min(100vw, 100svh * 0.563) / 941);
+    height: 100vh;
+    height: 100svh;
+  }
+
+  .copy,
+  .body {
+    width: calc(941 * var(--au));
+    margin-inline: auto;
+  }
+
+  .body {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .tagline {
+    top: auto;
+    bottom: calc(57 * var(--au));
+  }
+}
+
+/* ========================================================================= */
+/* DESKTOP / LANDSCAPE                                                       */
+/* The same recomposition the Rush Hunts hero uses: a 1440 x 860 canvas,    */
+/* the photograph held to the right with its left edge feathered into        */
+/* darkness, copy on the left at 0.74 scale, tagline centred at the foot.    */
+/* `.copy` overrides `--au` for its own subtree so every measured size       */
+/* inside it scales down together.                                           */
+/* ========================================================================= */
+
+@media (min-width: 1024px), (orientation: landscape) and (min-width: 640px) {
+  .hero {
+    --ad: min(calc(100vw / 1440), calc(100vh / 860));
+    --ad: min(calc(100vw / 1440), calc(100svh / 860));
+    --au: var(--ad);
+    --x0: calc((100vw - 1440 * var(--ad)) / 2);
+
+    height: 100vh;
+    height: 100svh;
+    min-height: 380px;
+  }
+
+  /* The photograph is a phone crop; on a wide screen it takes the right
+     58%, cropped to the band that holds both tees whole. */
+  .photo {
+    left: 42%;
+    -webkit-mask-image: linear-gradient(90deg, transparent 8%, #000 42%);
+    mask-image: linear-gradient(90deg, transparent 8%, #000 42%);
+  }
+
+  .img {
+    object-position: 50% 58%;
+  }
+
+  .shade {
+    background: linear-gradient(
+      180deg,
+      rgba(4, 4, 4, 0.4) 0%,
+      transparent 16%,
+      transparent 70%,
+      rgba(4, 4, 4, 0.75) 92%,
+      var(--black) 100%
+    );
+  }
+
+  /* The copy keeps its phone-frame coordinates (everything inside is placed
+     off y 114), shrunk to 0.74 and moved as one block. */
+  .copy {
+    --au: calc(var(--ad) * 0.74);
+    position: absolute;
+    left: calc(var(--x0) + 120 * var(--ad) - 59 * var(--au));
+    top: calc(50% - 300 * var(--au));
+    width: calc(941 * var(--au));
+    height: calc(600 * var(--au));
+    padding: 0 0 0 calc(59 * var(--au));
+  }
+
+  .brush {
+    top: calc(308 * var(--au));
+  }
+
+  .body {
+    top: calc(356 * var(--au));
+  }
+
+  .btnWrap {
+    top: calc(456 * var(--au));
+  }
+
+  .tagline {
+    top: auto;
+    bottom: calc(34 * var(--ad));
+    --au: calc(var(--ad) * 0.74);
+  }
+}

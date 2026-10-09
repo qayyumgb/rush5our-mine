@@ -40,6 +40,7 @@ export interface RedButtonProps {
   arrow?: keyof typeof ARROWS | "none";
   /** Magnetic strength, 0 disables. Mockup-tuned per section. */
   magnetStrength?: number;
+  /** Rendered before the label — a leading icon, as the merch buttons carry. */
   children?: ReactNode;
 }
 
@@ -76,6 +77,7 @@ export function RedButton({
   wrapperClassName,
   arrow = "long",
   magnetStrength = 0.25,
+  children,
 }: RedButtonProps) {
   const wrapRef = useRef<HTMLSpanElement>(null);
   const { ready, reduced } = useMotion();
@@ -90,6 +92,7 @@ export function RedButton({
 
   const inner = (
     <>
+      {children}
       <RollingLabel label={label} />
       {arrowSpec && (
         <svg className={styles.arrow} viewBox={arrowSpec.viewBox} aria-hidden="true">
