@@ -46,7 +46,7 @@ export const huntsHero: HuntsHeroContent = {
     "the instructions, and unlock your chance to win.",
   ],
   primaryCta: { label: "Claim your find", href: "/contact#form" },
-  secondaryCta: { label: "Watch Rush Hunts", href: "/#videos" },
+  secondaryCta: { label: "Watch Rush Hunts", href: "/videos" },
   // BACKEND SEAM: points at the next section of this page once it exists.
   cue: { label: "Find it. Scan it. Claim it.", href: "#how" },
   media: {

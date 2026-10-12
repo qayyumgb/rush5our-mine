@@ -1,0 +1,333 @@
+/* =========================================================================
+   VIDEO FEED — the full-screen vertical viewer (no mockup; brand-styled).
+
+   A black screen under a red glow; one 9:16 stage at a time, as tall as
+   the screen (phones) or as tall as the window with dark wings (desktop);
+   the chrome floats over it.
+   ========================================================================= */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  background: #030303;
+  color: #fff;
+}
+
+/* The red atmosphere behind the stage. */
+.overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60% 50% at 50% 100%, rgba(var(--red-rgb), 0.28), transparent 70%),
+    radial-gradient(50% 40% at 50% 0%, rgba(var(--red-rgb), 0.14), transparent 70%);
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------------ */
+/* The column                                                                */
+/* ------------------------------------------------------------------------ */
+
+.column {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  /* A standing layer: the whole column moves on every swipe, and nothing
+     in it is clipped text (see the note in VideoFeed.tsx). */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.column::-webkit-scrollbar {
+  display: none;
+}
+
+.slide {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* 9:16, as tall as the screen allows. */
+.stage {
+  position: relative;
+  height: 100%;
+  width: min(100%, calc(100vh * 9 / 16));
+  width: min(100%, calc(100dvh * 9 / 16));
+  overflow: hidden;
+  background: #000;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 0 90px rgba(var(--red-rgb), 0.35);
+  cursor: pointer;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.poster,
+.video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #000;
+}
+
+/* Real media is never cropped (see VideoPlayer.module.css). */
+.video {
+  object-fit: contain;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* A horizontal clip: the whole picture, centred, over a blurred blow-up of
+   its own poster so the letterbox reads as atmosphere, not black bars. */
+.stageWide .poster {
+  object-fit: contain;
+}
+
+.fill {
+  position: absolute;
+  inset: -12%;
+  width: 124%;
+  height: 124%;
+  object-fit: cover;
+  filter: blur(28px) brightness(0.38) saturate(1.2);
+}
+
+.stageWide::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(70% 60% at 50% 50%, rgba(0, 0, 0, 0) 40%, rgba(var(--red-rgb), 0.14) 100%);
+  pointer-events: none;
+}
+
+.soon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 10px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.pausedMark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  pointer-events: none;
+}
+
+.pausedMark svg {
+  width: 30px;
+  height: 36px;
+  margin-left: 6px;
+}
+
+.progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.progress i {
+  display: block;
+  height: 100%;
+  background: var(--red);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Chrome                                                                    */
+/* ------------------------------------------------------------------------ */
+
+.top,
+.foot {
+  position: absolute;
+  left: 50%;
+  z-index: 2;
+  width: min(100%, calc(100vh * 9 / 16));
+  width: min(100%, calc(100dvh * 9 / 16));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.top {
+  top: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: max(14px, env(safe-area-inset-top)) 16px 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+  padding-bottom: 40px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  pointer-events: auto;
+}
+
+.brand > * {
+  transform-origin: 0 50%;
+  transform: scale(0.8);
+}
+
+.seriesName {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.counter {
+  flex: none;
+  margin: 4px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.85);
+  white-space: nowrap;
+}
+
+.close,
+.ctl {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
+}
+
+.close svg,
+.ctl svg {
+  width: 20px;
+  height: 20px;
+}
+
+.ctl:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+@media (hover: hover) {
+  .close:hover,
+  .ctl:not(:disabled):hover {
+    border-color: var(--red);
+    background: rgba(var(--red-rgb), 0.25);
+    transform: scale(1.06);
+  }
+}
+
+.foot {
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 60px 16px max(16px, env(safe-area-inset-bottom));
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0));
+}
+
+.captionBox {
+  min-width: 0;
+  pointer-events: auto;
+}
+
+.videoTitle {
+  margin: 0;
+  font-size: 22px;
+  letter-spacing: 0.02em;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.caption {
+  margin: 6px 0 14px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.82);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.viewBtn {
+  height: 40px;
+  padding: 0 18px;
+  gap: 10px;
+  border-radius: 8px;
+  font-family: var(--f-ui);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+
+.viewBtn svg {
+  width: 16px;
+  height: 11px;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: none;
+}
+
+/* Touch screens swipe the column; the arrows are for mouse users. */
+@media (pointer: coarse) {
+  .ctlNav {
+    display: none;
+  }
+}
+
+/* Reduced motion: the column still snaps, just without easing. */
+@media (prefers-reduced-motion: reduce) {
+  .column {
+    scroll-behavior: auto;
+  }
+}

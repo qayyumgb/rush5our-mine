@@ -1,0 +1,257 @@
+/* =========================================================================
+   VIDEOS — section 5, YOU'RE PART OF IT.
+   (mockups/Videos/5.png, a 941 x 1672 phone frame)
+
+   Every number is a pixel measured off the mockup x `--k`, the page's
+   column unit (see VideosHero.module.css). The head, the copy and the
+   button follow each other in flow; at the frame's width their heights
+   add up to the mockup's positions.
+
+     wordmark     cut x335..605 y112..188 (glyphs x343..597, y121..179)
+     eyebrow      cap y292..323 (h32) x88..867, white, tracked
+     headline     two lines leaning ~8deg, centred
+                  "YOU'RE"      cap y358..641 (h284) x89..869, white
+                  "PART OF IT." cap y647..876 (h230) x38..906, red
+     brush        cut x90..860 y878..940
+     copy         cap tops 991 / 1039 (pitch 48), then 1110 / 1165
+                  (pitch 55); caps 27-30; centred, white, tracked, two
+                  red words
+     button       x61..880 (w820) y1273..1434 (h162), radius ~18, flat
+                  red under a hot rim; people mark 85 x 58 at x124; label
+                  cap 51 x260..706; arrow 57 wide at x752
+     frame        1672 tall; red grunge up both edges
+   ========================================================================= */
+
+.section {
+  --k: calc(min(100vw, 900px) / 941);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  /* Button foot 1434 -> frame foot 1672. */
+  padding-bottom: calc(238 * var(--k));
+  background: var(--black);
+}
+
+.atmos {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  z-index: 0;
+  width: calc(941 * var(--k));
+  height: 100%;
+  margin-left: calc(-470.5 * var(--k));
+  pointer-events: none;
+  background: url("/assets/images/videos-part-plate.webp") center top / 100% 100% no-repeat;
+}
+
+.frame {
+  position: relative;
+  z-index: 1;
+  width: calc(941 * var(--k));
+  margin-inline: auto;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Head                                                                      */
+/* ------------------------------------------------------------------------ */
+
+.head {
+  position: relative;
+  height: calc(991 * var(--k));
+}
+
+.mark {
+  position: absolute;
+  left: calc(335 * var(--k));
+  top: calc(112 * var(--k));
+  width: calc(270 * var(--k));
+  height: calc(76 * var(--k));
+  max-width: none;
+}
+
+.eyebrow {
+  position: absolute;
+  left: 0;
+  top: calc(295 * var(--k));
+  width: 100%;
+  margin: 0;
+  text-align: center;
+  font-family: var(--f-ui);
+  font-size: max(9px, calc(38 * var(--k)));
+  font-weight: 400;
+  letter-spacing: 0.456em;
+  padding-left: 0.456em;
+  color: #f4f4f4;
+  white-space: nowrap;
+}
+
+.title {
+  position: absolute;
+  left: 0;
+  top: calc(363 * var(--k));
+  width: 100%;
+  margin: 0;
+}
+
+/* The mockup's cut is heavier and set tight: the tracking closes up and
+   each line is stretched to its measured width. */
+.title :global(.line) {
+  text-align: center;
+  transform: skewX(-8deg);
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  overflow: visible;
+  clip-path: inset(-6% -12% -2% -12%);
+}
+
+.title :global(.line-inner) {
+  display: inline-block;
+  transform: scaleX(var(--sx, 1));
+}
+
+/* YOU'RE 89..869 at a 284 cap. */
+.title :global(.line):nth-child(1) {
+  --sx: 1.055;
+  margin-left: calc(-21 * var(--k));
+  font-size: calc(323 * var(--k));
+}
+
+/* PART OF IT. 38..906 at a 230 cap; cap gap 6. */
+.title :global(.line):nth-child(2) {
+  --sx: 0.92;
+  margin-top: calc(-2 * var(--k));
+  margin-left: 0;
+  font-size: calc(261 * var(--k));
+}
+
+.title :global(.char) {
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 240px 240px, 100% 100%;
+  background-repeat: repeat, no-repeat;
+  -webkit-text-stroke: max(0.5px, calc(1.5 * var(--k))) rgba(255, 255, 255, 0.5);
+}
+
+/* The mockup's white is a concrete-grey, lit from above and stained. */
+.title :global(.char.t-white) {
+  background-image: var(--grunge), linear-gradient(180deg, #f6f6f6 0%, #e4e4e4 50%, #c2c2c2 100%);
+}
+
+.title :global(.char.t-red) {
+  background-image: var(--grunge), linear-gradient(180deg, #ff2b34 0%, #ec0c18 50%, #b8060f 100%);
+  -webkit-text-stroke: max(0.5px, calc(1.5 * var(--k))) rgba(255, 60, 70, 0.5);
+}
+
+.brush {
+  position: absolute;
+  left: calc(90 * var(--k));
+  top: calc(878 * var(--k));
+  width: calc(770 * var(--k));
+  height: calc(62 * var(--k));
+  max-width: none;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Copy and button                                                           */
+/* ------------------------------------------------------------------------ */
+
+.copy {
+  position: relative;
+  text-align: center;
+}
+
+/* The mockup sets the copy in a condensed cut: the UI face, tracked. */
+.para {
+  --lh: 1.45;
+  margin: 0;
+  font-family: var(--f-ui);
+  font-size: max(9px, calc(33 * var(--k)));
+  font-weight: 400;
+  letter-spacing: 0.25em;
+  padding-left: 0.25em;
+  color: #f4f4f4;
+  white-space: nowrap;
+}
+
+/* Paragraph 1 cap bottom 1065 -> paragraph 2 cap top 1110; its pitch 55. */
+.para + .para {
+  --lh: 1.49;
+  margin-top: calc(45 * var(--k));
+  font-size: max(9px, calc(37 * var(--k)));
+}
+
+.copyLine {
+  display: block;
+}
+
+.red {
+  color: var(--red);
+}
+
+/* Copy cap bottom 1194 -> button 1273. */
+.btnWrap {
+  margin: calc(79 * var(--k)) 0 0 calc(61 * var(--k));
+}
+
+.btnMagnet {
+  display: block;
+}
+
+/* Sampled: flat rgb(220,2,11) under a hot rgb(251,6,21) rim, in a red
+   glow. The people mark leads the label. */
+.btn {
+  width: calc(820 * var(--k));
+  height: calc(162 * var(--k));
+  gap: calc(49 * var(--k));
+  padding: 0 0 calc(2 * var(--k)) 0;
+  border-radius: calc(18 * var(--k));
+  font-family: var(--f-ui);
+  font-weight: 700;
+  font-size: max(12px, calc(61 * var(--k)));
+  letter-spacing: -0.05em;
+  background: linear-gradient(180deg, #e1030d 0%, #d6020b 100%);
+  box-shadow:
+    0 0 calc(34 * var(--k)) calc(2 * var(--k)) rgba(255, 10, 20, 0.45),
+    inset 0 0 0 max(1.5px, calc(3 * var(--k))) rgb(251, 6, 21),
+    inset 0 0 calc(18 * var(--k)) rgba(255, 60, 70, 0.3);
+}
+
+.people {
+  flex: none;
+  width: calc(100 * var(--k));
+  height: calc(70 * var(--k));
+  max-width: none;
+}
+
+.btn > svg:last-child {
+  width: calc(62 * var(--k));
+  height: calc(38 * var(--k));
+}
+
+/* ------------------------------------------------------------------------ */
+/* Phone — held at their floors, the tracked lines close up.                */
+/* ------------------------------------------------------------------------ */
+
+@media (max-width: 639px) {
+  .eyebrow {
+    letter-spacing: 0.3em;
+    padding-left: 0.3em;
+  }
+
+  .para {
+    letter-spacing: 0.18em;
+    padding-left: 0.18em;
+  }
+}
+
+/* ------------------------------------------------------------------------ */
+/* Desktop                                                                   */
+/* ------------------------------------------------------------------------ */
+
+@media (min-width: 1024px) {
+  .atmos {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 8%, #000 92%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 8%, #000 92%, transparent 100%);
+  }
+}

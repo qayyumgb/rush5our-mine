@@ -1,0 +1,217 @@
+/* =========================================================================
+   VIDEOS — section 1, WATCH THE MOVEMENT.
+   (mockups/Videos/1.png, a 941 x 1672 phone frame)
+
+   Every number is a pixel measured off the mockup x `--k`, this page's
+   column unit: 1/941 of the viewport, capped at the same 900px column the
+   shared `--u` stops at, so the composition scales with the phone and then
+   sits centred on a desktop. Every block is placed off the frame's top.
+
+     eyebrow      cap y214..239 (h26) x133..809, white, tracked
+     headline     three lines leaning ~8deg, centred
+                  "WATCH"     cap y281..538 (h258) x68..867, white
+                  "THE"       cap y560..801 (h242) x251..683, white
+                  "MOVEMENT." cap y820..1038 (h219) x34..919, red
+     sublines     caps y1099..1123 and 1148..1171 (pitch 49), x149..793,
+                  light grey, tracked
+     button       x128..812 (w685) y1275..1417 (h143), radius ~12, a flat
+                  red under a hot pink rim, in a wide red glow; play
+                  triangle 49 x 58 at x203; label cap 46 x315..735
+     frame        1672 tall; red smoke across the foot
+   ========================================================================= */
+
+.hero {
+  --k: calc(min(100vw, 900px) / 941);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  /* Never shorter than the viewport, never shorter than the mockup ratio. */
+  min-height: max(calc(1672 * var(--k)), 100vh);
+  min-height: max(calc(1672 * var(--k)), 100svh);
+  background: var(--black);
+}
+
+/* The mockup's own atmosphere at its own size, centred, filling the hero
+   to its foot so the smoke always sits at the bottom edge. */
+.atmos {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  z-index: 0;
+  width: calc(941 * var(--k));
+  height: calc(1672 * var(--k));
+  margin-left: calc(-470.5 * var(--k));
+  pointer-events: none;
+  background: url("/assets/images/videos-hero-plate.webp") center top / 100% 100% no-repeat;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Copy                                                                      */
+/* ------------------------------------------------------------------------ */
+
+.copy {
+  position: relative;
+  z-index: 1;
+  width: calc(941 * var(--k));
+  margin-inline: auto;
+  padding-top: calc(214 * var(--k));
+  text-align: center;
+}
+
+.eyebrow {
+  font-size: max(9px, calc(32 * var(--k)));
+  font-weight: 400;
+  letter-spacing: 0.24em;
+  padding-left: 0.24em;
+  color: #eceded;
+  white-space: nowrap;
+}
+
+/* Eyebrow cap bottom 239 -> headline cap top 281. */
+.title {
+  margin-top: calc(48 * var(--k));
+}
+
+/* The mockup's cut is heavier and set tight: the tracking closes up and
+   each line is stretched to its measured width. */
+.title :global(.line) {
+  text-align: center;
+  transform: skewX(-8deg);
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  overflow: visible;
+  clip-path: inset(-6% -12% -2% -12%);
+}
+
+.title :global(.line-inner) {
+  display: inline-block;
+  transform: scaleX(var(--sx, 1));
+}
+
+/* WATCH 68..867 at a 258 cap. */
+.title :global(.line):nth-child(1) {
+  --sx: 1.137;
+  margin-left: calc(-32 * var(--k));
+  font-size: calc(294 * var(--k));
+}
+
+/* THE 251..683 at a 242 cap; cap gap 22. */
+.title :global(.line):nth-child(2) {
+  --sx: 1.3;
+  margin-top: calc(10 * var(--k));
+  margin-left: calc(-34 * var(--k));
+  font-size: calc(276 * var(--k));
+}
+
+/* MOVEMENT. 34..919 at a 219 cap; cap gap 19. */
+.title :global(.line):nth-child(3) {
+  --sx: 0.87;
+  margin-top: calc(12 * var(--k));
+  margin-left: calc(-26 * var(--k));
+  font-size: calc(250 * var(--k));
+}
+
+.title :global(.char) {
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 240px 240px, 100% 100%;
+  background-repeat: repeat, no-repeat;
+  -webkit-text-stroke: max(0.5px, calc(1.5 * var(--k))) rgba(255, 255, 255, 0.5);
+}
+
+/* The mockup's white is a concrete-grey, lit from above and stained. */
+.title :global(.char.t-white) {
+  background-image: var(--grunge), linear-gradient(180deg, #f6f6f6 0%, #e4e4e4 50%, #c2c2c2 100%);
+}
+
+.title :global(.char.t-red) {
+  background-image: var(--grunge), linear-gradient(180deg, #ff2b34 0%, #ec0c18 50%, #b8060f 100%);
+  -webkit-text-stroke: max(0.5px, calc(1.5 * var(--k))) rgba(255, 60, 70, 0.5);
+}
+
+/* Headline cap bottom 1038 -> subline cap top 1099; pitch 49. */
+.sub {
+  --lh: 1.63;
+  margin-top: calc(58 * var(--k));
+  font-size: max(9px, calc(31.5 * var(--k)));
+  font-weight: 500;
+  letter-spacing: 0.085em;
+  padding-left: 0.085em;
+  color: #c9c9c9;
+  white-space: nowrap;
+}
+
+.sub span {
+  display: block;
+}
+
+/* Subline cap bottom 1171 -> button 1275. */
+.btnWrap {
+  margin: calc(103 * var(--k)) 0 0 calc(128 * var(--k));
+  text-align: left;
+}
+
+.btnMagnet {
+  display: block;
+}
+
+/* Sampled: a flat rgb(221,3,19) face under a hot pink 2px rim
+   (rgb(254,109,108)), lit all round by a wide glow. The play triangle leads
+   the label. */
+.btn {
+  width: calc(685 * var(--k));
+  height: calc(143 * var(--k));
+  gap: calc(62 * var(--k));
+  padding: 0 calc(4 * var(--k)) calc(2 * var(--k)) 0;
+  border-radius: calc(12 * var(--k));
+  font-family: var(--f-ui);
+  font-weight: 700;
+  /* Label cap 46 over the measured 420 width. */
+  font-size: calc(57 * var(--k));
+  letter-spacing: -0.055em;
+  background: linear-gradient(180deg, #e60516 0%, #dc0313 50%, #d20212 100%);
+  box-shadow:
+    0 0 calc(60 * var(--k)) calc(6 * var(--k)) rgba(255, 20, 40, 0.55),
+    0 0 calc(18 * var(--k)) rgba(var(--red-rgb), 0.6),
+    inset 0 0 0 max(1.5px, calc(2.5 * var(--k))) rgba(255, 130, 135, 0.95),
+    inset 0 0 calc(18 * var(--k)) rgba(255, 70, 80, 0.3);
+}
+
+.play {
+  flex: none;
+  width: calc(49 * var(--k));
+  height: calc(58 * var(--k));
+  margin-top: calc(2 * var(--k));
+  color: #fff;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Desktop                                                                   */
+/* The column is narrower than the window, so the atmosphere fades out at   */
+/* its sides rather than ending on a hard edge. The hero is the viewport's   */
+/* height there, the copy centred in it.                                     */
+/* ------------------------------------------------------------------------ */
+
+@media (min-width: 1024px) {
+  .hero {
+    display: flex;
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+
+  .atmos {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 8%, #000 92%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 8%, #000 92%, transparent 100%);
+  }
+
+  /* A desktop window is wider than it is tall: the phone-poster headline
+     steps down so the whole statement fits in one view, as the Contact
+     hero's does. */
+  .copy {
+    --k: calc(min(100vw, 900px) / 941 * 0.62);
+    padding-top: calc(120 * var(--k));
+    padding-bottom: calc(80 * var(--k));
+  }
+}

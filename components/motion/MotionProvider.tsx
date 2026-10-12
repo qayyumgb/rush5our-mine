@@ -45,6 +45,9 @@ interface MotionContextValue {
   lockScroll: () => void;
   /** Resume page scrolling. */
   unlockScroll: () => void;
+  /** Bring an element to the top of the view with the page's smooth scroll
+      (plain scrolling under reduced motion). */
+  scrollTo: (target: Element, offset?: number) => void;
 }
 
 const MotionContext = createContext<MotionContextValue>({
@@ -52,6 +55,7 @@ const MotionContext = createContext<MotionContextValue>({
   ready: false,
   lockScroll: () => {},
   unlockScroll: () => {},
+  scrollTo: () => {},
 });
 
 /** Read the shared motion environment from any client component. */
@@ -88,6 +92,16 @@ export function MotionProvider({ children }: { children: ReactNode }) {
     lenisRef.current?.start();
     document.documentElement.style.overflow = "";
   }, []);
+
+  const scrollTo = useCallback(
+    (target: Element, offset = 0) => {
+      const y = target.getBoundingClientRect().top + window.scrollY - offset;
+      const lenis = lenisRef.current;
+      if (lenis) lenis.scrollTo(y, { duration: 1.2 });
+      else window.scrollTo({ top: y, behavior: reduced ? "auto" : "smooth" });
+    },
+    [reduced],
+  );
 
   /* --- smooth scroll ---------------------------------------------------- */
   // Skipped entirely under reduced motion: hijacking the scroll wheel is
@@ -226,8 +240,8 @@ export function MotionProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<MotionContextValue>(
-    () => ({ reduced, ready, lockScroll, unlockScroll }),
-    [reduced, ready, lockScroll, unlockScroll],
+    () => ({ reduced, ready, lockScroll, unlockScroll, scrollTo }),
+    [reduced, ready, lockScroll, unlockScroll, scrollTo],
   );
 
   return <MotionContext.Provider value={value}>{children}</MotionContext.Provider>;
