@@ -645,14 +645,9 @@
     letter-spacing: 0;
   }
 
-  /* The poster keeps its shape, centred in the taller card, so the chip
-     still sits on its corner. */
-  .thumb {
-    top: 50%;
-    height: auto;
-    aspect-ratio: 389 / 146;
-    transform: translateY(-50%);
-  }
+  /* The poster still fills the card's full height at the left, as the
+     mockup draws it — the taller card only crops a little more off its
+     sides (object-fit: cover). */
 }
 
 /* ------------------------------------------------------------------------ */

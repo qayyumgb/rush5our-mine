@@ -1,90 +1,19 @@
 /**
- * VIDEO CONTENT — section 3, "Featured videos" (mockup 3.png).
+ * VIDEOS — every video on the site, and the homepage section's copy.
  *
- * ▸ BACKEND SEAM — this is the most likely first API integration.
- *   `featuredVideos` and `gridVideos` are plain arrays shaped like a typical
- *   video API response. To go live:
+ * One list feeds both places: the Videos page (components/videos/*) shows
+ * every series below, and the homepage's Featured Videos section
+ * (components/home/VideosSection.tsx) shows the videos marked
+ * `featured: true`, via `homeFeatured` at the end of this file. To change
+ * what the homepage features, move the flag — nothing else.
  *
- *     1. Add a loader, e.g. `lib/api/videos.ts` exporting
- *        `getVideos(): Promise<VideoItem[]>`.
- *     2. Fetch it in a server component and pass the result into
- *        <VideosSection videos={...} featured={...} />.
- *
- *   The section already takes both lists as optional props and falls back to
- *   the constants below, so the swap is a one-line change at the call site.
- *
- * ▸ ADDING A VIDEO LINK
- *   Paste the plain share URL into `videoUrl` — the one a platform's "Copy
- *   link" button gives you. TikTok, YouTube (including Shorts), Vimeo and
- *   direct .mp4 files are all understood; see lib/video.ts. Tracking
- *   parameters (`?is_from_webapp=…`, `?si=…`) are ignored, so pasting the
- *   whole thing is fine, but the canonical form is kept here for tidiness.
- *
- *   Do NOT paste TikTok's <blockquote> embed snippet. It loads TikTok's
- *   embed.js, which replaces it with TikTok's own card — unstyleable, and it
- *   cannot sit inside our lightbox. The share link gives the same video.
- *
- *   Vertical videos (TikTok, Shorts) are detected automatically and open in
- *   a portrait player.
- *
- *   Leaving `videoUrl` empty is safe: the player shows the thumbnail with a
- *   "coming soon" note.
- *
- * ▸ PLACEHOLDER METRICS — READ BEFORE LAUNCH
- *   `views` and `duration` on every entry below are the figures drawn in the
- *   mockup, not real numbers. They are kept on purpose so the client demo
- *   matches the approved comp, and they are meant to be replaced in one pass
- *   once the real data is available.
- *
- *   EXCEPTION: "Picking up girls" now shows its real YouTube figures —
- *   1,332 views, looked up on 2026-09-22, and a 6:08 duration that happens
- *   to match what the mockup already had. The view count is a STATIC
- *   SNAPSHOT and will drift as the video gains views; only the API makes it
- *   self-updating.
- *
- *   This matters most where a video is already real: "$5 or mystery gift"
- *   plays the genuine TikTok but still shows mockup figures beside it.
- *
- *   Real view counts are NOT available from the oEmbed endpoints that supply
- *   our thumbnails — neither TikTok's nor YouTube's returns any engagement
- *   field. They need a proper API:
- *
- *     • YouTube — an API key is enough (public stats need no OAuth), and one
- *       call also returns duration and thumbnails. By far the easier path.
- *     • TikTok  — OAuth as @rush5our plus app review.
- *
- *   Keep the metric and the player on the same platform per video: the same
- *   clip can have very different counts on each.
- *
- *   See the "Video metrics" section of the README for both setups.
+ * ▸ BACKEND SEAM — the series are plain arrays shaped like a typical video
+ *   API response; a loader can replace them without touching a component.
  */
 
-export interface VideoItem {
-  id: string;
-  title: string;
-  /** One-line strapline under the title. */
-  subtitle: string;
-  /** Thumbnail path or remote URL. */
-  thumbnail: string;
-  /** `object-position` for the thumbnail — the mockup crops each differently. */
-  thumbnailPosition?: string;
-  /** Human-readable runtime, e.g. "6:08". */
-  duration: string;
-  /** Formatted view count, e.g. "125K". */
-  views?: string;
-  /** Category key, matched against the filter tabs. */
-  category: string;
-  /** VIDEO LINK: paste the real URL here (or supply it from the API). */
-  videoUrl: string;
-  /** Badge shown on the featured carousel, e.g. "Latest". */
-  badge?: string;
-}
-
-export interface VideoFilter {
-  /** "all" shows everything; otherwise matched against `VideoItem.category`. */
-  key: string;
-  label: string;
-}
+/* ------------------------------------------------------------------------ */
+/* Homepage — section 3, "Featured videos" (mockup 3.png): the copy         */
+/* ------------------------------------------------------------------------ */
 
 export interface VideosContent {
   eyebrow: string;
@@ -92,9 +21,8 @@ export interface VideosContent {
   titleRed: string;
   subtitle: string;
   accent: { lines: string[] };
+  /** The section's one CTA, to the full Videos page. */
   viewAll: { label: string; href: string };
-  filters: VideoFilter[];
-  watchAll: { label: string; href: string };
 }
 
 export const videosContent: VideosContent = {
@@ -103,103 +31,8 @@ export const videosContent: VideosContent = {
   titleRed: "Videos",
   subtitle: "Real people. Real moments. No scripts.",
   accent: { lines: ["Press", "play.", "See what", "we do."] },
-  // CHANNEL LINK: point at the YouTube / TikTok channel.
-  viewAll: { label: "View all videos", href: "#" },
-  filters: [
-    { key: "all", label: "All" },
-    { key: "girls", label: "Picking up girls" },
-    { key: "hunts", label: "Rush hunts" },
-    { key: "five", label: "$5 series" },
-    { key: "interviews", label: "Public interviews" },
-  ],
-  watchAll: { label: "Watch all videos", href: "#" },
+  viewAll: { label: "View all videos", href: "/videos" },
 };
-
-/** The hero carousel at the top of the section. */
-export const featuredVideos: VideoItem[] = [
-  {
-    id: "picking-up-girls",
-    title: "Picking up girls",
-    subtitle: "Real convos. Real reactions.",
-    thumbnail: "/assets/images/thumb-picking-up-girls.jpg",
-    thumbnailPosition: "50% 0%",
-    duration: "6:08",
-    category: "girls",
-    videoUrl: "https://youtu.be/dAV-rudZcS4",
-    badge: "Latest",
-  },
-  {
-    id: "five-or-mystery",
-    title: "$5 or mystery gift",
-    subtitle: "Random people. Big wins.",
-    thumbnail: "/assets/images/thumb-5-or-mystery.jpg",
-    thumbnailPosition: "50% 30%",
-    duration: "8:21",
-    category: "five",
-    videoUrl: "https://www.tiktok.com/@rush5our/video/7680567561460731166",
-    badge: "Trending",
-  },
-  {
-    id: "rush-hunts",
-    title: "Rush hunts",
-    subtitle: "Find it. Scan it. Win it.",
-    thumbnail: "/assets/images/thumb-rush-hunts.webp",
-    thumbnailPosition: "50% 45%",
-    duration: "10:17",
-    category: "hunts",
-    videoUrl: "",
-    badge: "Rush hunts",
-  },
-  {
-    // PLACEHOLDER: no fourth thumbnail supplied yet — reuses the hero photo.
-    id: "built-different",
-    title: "Built different",
-    subtitle: "How the movement started.",
-    thumbnail: "/assets/images/hero-wide.webp",
-    thumbnailPosition: "50% 25%",
-    duration: "3:45",
-    category: "interviews",
-    videoUrl: "",
-    badge: "Our story",
-  },
-];
-
-/** The filterable 3-up grid below the tabs. */
-export const gridVideos: VideoItem[] = [
-  {
-    id: "grid-picking-up-girls",
-    title: "Picking up girls",
-    subtitle: "Real convos. Real reactions.",
-    thumbnail: "/assets/images/thumb-picking-up-girls.jpg",
-    thumbnailPosition: "100% 50%",
-    duration: "6:08",
-    views: "1,332",
-    category: "girls",
-    videoUrl: "https://youtu.be/dAV-rudZcS4",
-  },
-  {
-    id: "grid-five-or-mystery",
-    title: "$5 or mystery gift",
-    subtitle: "Random people. Big wins.",
-    thumbnail: "/assets/images/thumb-5-or-mystery.jpg",
-    thumbnailPosition: "50% 12%",
-    duration: "8:21",
-    views: "98K",
-    category: "five",
-    videoUrl: "https://www.tiktok.com/@rush5our/video/7680567561460731166",
-  },
-  {
-    id: "grid-rush-hunts",
-    title: "Rush hunts",
-    subtitle: "Find it. Scan it. Win it.",
-    thumbnail: "/assets/images/thumb-rush-hunts.webp",
-    thumbnailPosition: "50% 8%",
-    duration: "10:17",
-    views: "210K",
-    category: "hunts",
-    videoUrl: "",
-  },
-];
 
 /* =========================================================================
    VIDEOS PAGE — every series and every video the /videos page lists
@@ -240,6 +73,9 @@ export interface FeedVideo {
   /** Vertical (9:16) clips fill the stage; horizontal ones sit centred on a
       blurred fill of their poster, the whole picture visible. */
   orientation: "vertical" | "horizontal";
+  /** Shown on the homepage's Featured Videos section (see `homeFeatured`).
+      Curate four to six: at most one horizontal, which leads. */
+  featured?: boolean;
   /** The video file's URL (Cloudflare R2). Empty = not uploaded: the
       viewer shows the poster with a "coming soon" note. */
   src: string;
@@ -283,7 +119,7 @@ export const shortSeries: ShortSeries[] = [
     thumbnailAlt: "A man opening a red gift box — $5 or ?",
     platformUrl: "#", // PLACEHOLDER
     videos: [
-      { id: "five-or-mystery-gift-01", title: "Episode 01", caption: "", orientation: "vertical", src: `${R2_BASE}/five-or-mystery-gift/01.mp4`, poster: `${R2_BASE}/five-or-mystery-gift/01.jpg` },
+      { id: "five-or-mystery-gift-01", featured: true, title: "Episode 01", caption: "", orientation: "vertical", src: `${R2_BASE}/five-or-mystery-gift/01.mp4`, poster: `${R2_BASE}/five-or-mystery-gift/01.jpg` },
       { id: "five-or-mystery-gift-02", title: "Episode 02", caption: "", orientation: "vertical", src: `${R2_BASE}/five-or-mystery-gift/02.mp4`, poster: `${R2_BASE}/five-or-mystery-gift/02.jpg` },
       { id: "five-or-mystery-gift-03", title: "Episode 03", caption: "", orientation: "vertical", src: `${R2_BASE}/five-or-mystery-gift/03.mp4`, poster: `${R2_BASE}/five-or-mystery-gift/03.jpg` },
       { id: "five-or-mystery-gift-04", title: "Episode 04", caption: "", orientation: "vertical", src: `${R2_BASE}/five-or-mystery-gift/04.mp4`, poster: `${R2_BASE}/five-or-mystery-gift/04.jpg` },
@@ -309,7 +145,7 @@ export const shortSeries: ShortSeries[] = [
     thumbnailAlt: "A woman laughing at her phone with dollar bills falling — Bet $5",
     platformUrl: "#", // PLACEHOLDER
     videos: [
-      { id: "bet-five-01", title: "Episode 01", caption: "", orientation: "vertical", src: `${R2_BASE}/bet-five/01.mp4`, poster: `${R2_BASE}/bet-five/01.jpg` },
+      { id: "bet-five-01", featured: true, title: "Episode 01", caption: "", orientation: "vertical", src: `${R2_BASE}/bet-five/01.mp4`, poster: `${R2_BASE}/bet-five/01.jpg` },
       { id: "bet-five-02", title: "Episode 02", caption: "", orientation: "vertical", src: `${R2_BASE}/bet-five/02.mp4`, poster: `${R2_BASE}/bet-five/02.jpg` },
       { id: "bet-five-03", title: "Episode 03", caption: "", orientation: "vertical", src: `${R2_BASE}/bet-five/03.mp4`, poster: `${R2_BASE}/bet-five/03.jpg` },
       { id: "bet-five-04", title: "Episode 04", caption: "", orientation: "vertical", src: `${R2_BASE}/bet-five/04.mp4`, poster: `${R2_BASE}/bet-five/04.jpg` },
@@ -335,7 +171,7 @@ export const shortSeries: ShortSeries[] = [
     thumbnailAlt: "A RUSH5OUR QR code poster outside Valencia College — Rush Hunts",
     platformUrl: "#", // PLACEHOLDER
     videos: [
-      { id: "rush-hunts-01-boone", title: "Boone", caption: "", orientation: "vertical", src: `${R2_BASE}/rush-hunts/01-boone.mp4`, poster: `${R2_BASE}/rush-hunts/01-boone.jpg` },
+      { id: "rush-hunts-01-boone", featured: true, title: "Boone", caption: "", orientation: "vertical", src: `${R2_BASE}/rush-hunts/01-boone.mp4`, poster: `${R2_BASE}/rush-hunts/01-boone.jpg` },
       { id: "rush-hunts-02-edgewater", title: "Edgewater", caption: "", orientation: "vertical", src: `${R2_BASE}/rush-hunts/02-edgewater.mp4`, poster: `${R2_BASE}/rush-hunts/02-edgewater.jpg` },
       { id: "rush-hunts-03-jones", title: "Jones", caption: "", orientation: "vertical", src: `${R2_BASE}/rush-hunts/03-jones.mp4`, poster: `${R2_BASE}/rush-hunts/03-jones.jpg` },
       { id: "rush-hunts-04-colonial", title: "Colonial", caption: "", orientation: "vertical", src: `${R2_BASE}/rush-hunts/04-colonial.mp4`, poster: `${R2_BASE}/rush-hunts/04-colonial.jpg` },
@@ -361,7 +197,7 @@ export const shortSeries: ShortSeries[] = [
     thumbnailAlt: "A man and a woman talking across a café table — You got game?",
     platformUrl: "#", // PLACEHOLDER
     videos: [
-      { id: "you-got-game-01", title: "Episode 01", caption: "", orientation: "vertical", src: `${R2_BASE}/you-got-game/01.mp4`, poster: `${R2_BASE}/you-got-game/01.jpg` },
+      { id: "you-got-game-01", featured: true, title: "Episode 01", caption: "", orientation: "vertical", src: `${R2_BASE}/you-got-game/01.mp4`, poster: `${R2_BASE}/you-got-game/01.jpg` },
       { id: "you-got-game-02", title: "Episode 02", caption: "", orientation: "vertical", src: `${R2_BASE}/you-got-game/02.mp4`, poster: `${R2_BASE}/you-got-game/02.jpg` },
       { id: "you-got-game-03", title: "Episode 03", caption: "", orientation: "vertical", src: `${R2_BASE}/you-got-game/03.mp4`, poster: `${R2_BASE}/you-got-game/03.jpg` },
       { id: "you-got-game-04", title: "Episode 04", caption: "", orientation: "vertical", src: `${R2_BASE}/you-got-game/04.mp4`, poster: `${R2_BASE}/you-got-game/04.jpg` },
@@ -387,7 +223,7 @@ export const shortSeries: ShortSeries[] = [
     thumbnailAlt: "Two men reacting to Drake — Maid of Honour",
     platformUrl: "#", // PLACEHOLDER
     videos: [
-      { id: "rush-reacts-01-hoe-phase", title: "Hoe Phase", caption: "", orientation: "vertical", src: `${R2_BASE}/rush-reacts/01-hoe-phase.mp4`, poster: `${R2_BASE}/rush-reacts/01-hoe-phase.jpg` },
+      { id: "rush-reacts-01-hoe-phase", featured: true, title: "Hoe Phase", caption: "", orientation: "vertical", src: `${R2_BASE}/rush-reacts/01-hoe-phase.mp4`, poster: `${R2_BASE}/rush-reacts/01-hoe-phase.jpg` },
       { id: "rush-reacts-02-road-trips", title: "Road Trips", caption: "", orientation: "vertical", src: `${R2_BASE}/rush-reacts/02-road-trips.mp4`, poster: `${R2_BASE}/rush-reacts/02-road-trips.jpg` },
       { id: "rush-reacts-03-outside-tweaking", title: "Outside Tweaking", caption: "", orientation: "vertical", src: `${R2_BASE}/rush-reacts/03-outside-tweaking.mp4`, poster: `${R2_BASE}/rush-reacts/03-outside-tweaking.jpg` },
       { id: "rush-reacts-04-outside-tweaking", title: "Outside Tweaking", caption: "", orientation: "vertical", src: `${R2_BASE}/rush-reacts/04-outside-tweaking.mp4`, poster: `${R2_BASE}/rush-reacts/04-outside-tweaking.jpg` },
@@ -450,6 +286,7 @@ export const pickingUpGirls: LongSeries = {
   videos: [
     {
       id: "picking-up-girls-02-using-chatgpt",
+      featured: true,
       number: "02",
       title: "Picking Up Girls Using ChatGPT",
       caption: "",
@@ -590,3 +427,36 @@ export const pickingUpGirls: LongSeries = {
     },
   ],
 };
+
+/* ------------------------------------------------------------------------ */
+/* Homepage — the featured set                                               */
+/* ------------------------------------------------------------------------ */
+
+/** A featured video with what the homepage needs to play it in place. */
+export interface HomeFeatured {
+  video: FeedVideo;
+  /** The series it belongs to, as the feed viewer takes it. */
+  series: { id: string; name: string; videos: FeedVideo[]; platformUrl: string };
+  /** Its position in that series, so the viewer opens on it. */
+  index: number;
+}
+
+const seriesName = (lines: TitleRun[][] | TitleRun[]) =>
+  (lines as (TitleRun[] | TitleRun)[])
+    .map((line) => (Array.isArray(line) ? line.map((r) => r.text).join("") : line.text))
+    .join(Array.isArray(lines[0]) ? " " : "");
+
+/** Every `featured: true` video, in the order the homepage shows them:
+    horizontal (long-form) first, then the short series in their order. */
+export const homeFeatured: HomeFeatured[] = [
+  ...pickingUpGirls.videos.flatMap((video, index) =>
+    video.featured
+      ? [{ video, index, series: { id: pickingUpGirls.id, name: seriesName(pickingUpGirls.title), videos: pickingUpGirls.videos, platformUrl: pickingUpGirls.platformUrl } }]
+      : [],
+  ),
+  ...shortSeries.flatMap((s) =>
+    s.videos.flatMap((video, index) =>
+      video.featured ? [{ video, index, series: { id: s.id, name: seriesName(s.title), videos: s.videos, platformUrl: s.platformUrl } }] : [],
+    ),
+  ),
+];

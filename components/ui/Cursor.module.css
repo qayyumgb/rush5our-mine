@@ -5,7 +5,10 @@
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 95;
+  /* Above every layer the site opens — the video lightbox (90), the swipe
+     feed (95), the preloader (100) — since the native cursor is hidden
+     while this one is live; under any of them, there would be no pointer. */
+  z-index: 110;
   pointer-events: none;
   transition: opacity 0.3s;
 }

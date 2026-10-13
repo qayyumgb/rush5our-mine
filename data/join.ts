@@ -165,6 +165,13 @@ export interface JoinSignupContent {
   createTail: string;
   lead: string;
   fields: { name: string; email: string; username: string; password: string };
+  /**
+   * Show the Username and Password fields. Off until the account system
+   * exists (Phase 3, RUSH5OUR-Implementation-Plan.md 3.1): today the form
+   * is an email sign-up (app/api/subscribe), and a password typed into it
+   * would go nowhere. Turn on with the accounts.
+   */
+  accountFields: boolean;
   updatesLabel: string;
   /** "I agree to the Terms & Privacy Policy." in runs; links carry hrefs. */
   agree: { text: string; href?: string }[];
@@ -191,6 +198,7 @@ export const joinSignup: JoinSignupContent = {
   createTail: "account",
   lead: "It’s free. Join the movement and stay connected to what’s next.",
   fields: { name: "Full Name", email: "Email Address", username: "Username", password: "Password" },
+  accountFields: false,
   updatesLabel: "Send me updates about hunts, drops & opportunities.",
   // BACKEND SEAM: the Terms and Privacy pages do not exist yet (the footer's
   // links point at "#" too); give these real hrefs when they do.

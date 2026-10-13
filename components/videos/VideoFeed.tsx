@@ -207,9 +207,11 @@ export function VideoFeed({ series, start = 0, onClose }: VideoFeedProps) {
           <Logo />
           <p className={`${styles.seriesName} f-display caps`}>{series.name}</p>
         </div>
-        <p className={`${styles.counter} f-ui`} aria-live="polite">
-          {index + 1} / {count}
-        </p>
+        {count > 1 && (
+          <p className={`${styles.counter} f-ui`} aria-live="polite">
+            {index + 1} / {count}
+          </p>
+        )}
         <button ref={closeRef} type="button" className={styles.close} onClick={close} aria-label={videosFeed.close}>
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M4 4l16 16M20 4L4 20" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
@@ -291,11 +293,13 @@ export function VideoFeed({ series, start = 0, onClose }: VideoFeedProps) {
           <RedButton label={series.platformLabel ?? videosFeed.viewSeries} href={series.platformUrl} className={styles.viewBtn} arrow="short" magnetStrength={0} />
         </div>
         <div className={styles.controls}>
+          {count > 1 && (
           <button type="button" className={`${styles.ctl} ${styles.ctlNav}`} onClick={() => goTo(index - 1)} disabled={index === 0} aria-label={videosFeed.previous}>
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M5 15l7-7 7 7" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
+          )}
           <button type="button" className={styles.ctl} onClick={() => setMuted((m) => !m)} aria-label={muted ? videosFeed.unmute : videosFeed.mute} aria-pressed={!muted}>
             {muted ? (
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -307,11 +311,13 @@ export function VideoFeed({ series, start = 0, onClose }: VideoFeedProps) {
               </svg>
             )}
           </button>
+          {count > 1 && (
           <button type="button" className={`${styles.ctl} ${styles.ctlNav}`} onClick={() => goTo(index + 1)} disabled={index === count - 1} aria-label={videosFeed.next}>
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M5 9l7 7 7-7" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
+          )}
         </div>
       </div>
     </div>,

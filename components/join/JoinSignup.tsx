@@ -11,11 +11,20 @@
  * "ONCE YOU'RE IN…" between rules, four perks divided by red hairlines, and
  * "FREE TO JOIN. BUILT TO GROW." between rules.
  *
- * ▸ BACKEND SEAM — `submitSignup` is a stub: Phase 1 ships the form's UI
- *   and the account system is Phase 3 (see RUSH5OUR-Implementation-Plan.md,
- *   3.1). To go live, replace its body with a POST to an `app/api/signup`
- *   route handler; the pending, sent and failed states are already handled
- *   here, as the Contact form's are.
+ * SIGN-UP — the form posts to app/api/subscribe (SendGrid, the Contact
+ *   form's setup): name, email, the updates opt-in and the Terms tick. The
+ *   rules are shared with the server (lib/subscribe/validation.ts) — run
+ *   here first as a courtesy, again there as the ones that count — and the
+ *   states are idle → sending → sent | error: the button locks while
+ *   sending, a sent note shows and the form clears, and an error keeps
+ *   what was typed and shows the server's own reason, field by field where
+ *   it has one.
+ *
+ * ▸ BACKEND SEAM — the account system is Phase 3 (RUSH5OUR-Implementation-
+ *   Plan.md, 3.1). Until then `joinSignup.accountFields` is off and the
+ *   Username / Password fields are not shown; they are never sent to the
+ *   subscribe route either way. With accounts, turn the flag on and point
+ *   `submitSignup` at the sign-up route.
  *
  * MOTION:
  *   • the eyebrow decodes, the rule draws, the headline's characters rise,
@@ -36,6 +45,14 @@ import { scramble, splitTitle } from "@/lib/motion/split";
 import { useMotion } from "@/components/motion/MotionProvider";
 import Icon from "@/components/ui/Icon";
 import { joinSignup } from "@/data/join";
+import {
+  HONEYPOT_FIELD,
+  normalizeSubscribe,
+  validateSubscribe,
+  type SubscribeErrors,
+  type SubscribeResponse,
+  type SubscribeValues,
+} from "@/lib/subscribe/validation";
 import styles from "./JoinSignup.module.css";
 
 interface Values {
@@ -59,32 +76,64 @@ const PERK_ICON: Record<string, string> = {
 };
 
 const EMPTY: Values = { name: "", email: "", username: "", password: "", updates: false, agree: false };
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const USERNAME_RE = /^[a-z0-9._]{3,24}$/i;
 
-function validate(v: Values): Errors {
-  const e: Errors = {};
-  if (!v.name.trim()) e.name = "Tell us your name.";
-  if (!EMAIL_RE.test(v.email.trim())) e.email = "Enter a valid email address.";
-  if (!USERNAME_RE.test(v.username.trim())) e.username = "3–24 letters, numbers, dots or underscores.";
-  if (v.password.length < 8) e.password = "At least 8 characters.";
-  if (!v.agree) e.agree = "You’ll need to agree to the Terms to join.";
+/** The sign-up's rules — the server's own — plus the account fields' while
+    those are shown. */
+function validate(v: Values, accountFields: boolean): Errors {
+  const e: Errors = validateSubscribe(normalizeSubscribe(v));
+  if (accountFields) {
+    if (!USERNAME_RE.test(v.username.trim())) e.username = "3–24 letters, numbers, dots or underscores.";
+    if (v.password.length < 8) e.password = "At least 8 characters.";
+  }
   return e;
 }
 
-async function submitSignup(values: Values): Promise<void> {
-  // BACKEND SEAM — see the header comment.
-  await new Promise((r) => setTimeout(r, 900));
-  void values;
+class SubmitError extends Error {
+  constructor(
+    message: string,
+    readonly fields?: SubscribeErrors,
+  ) {
+    super(message);
+  }
+}
+
+/**
+ * Posts the sign-up to the API route — only its four fields, never the
+ * account ones. Resolves when it was accepted; throws a `SubmitError`
+ * carrying the server's own (visitor-safe) message otherwise, or a plain
+ * error if the request never got an answer.
+ */
+async function submitSignup(values: SubscribeValues, honeypot: string): Promise<void> {
+  const res = await fetch("/api/subscribe", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...values, [HONEYPOT_FIELD]: honeypot }),
+  });
+
+  let data: SubscribeResponse | null = null;
+  try {
+    data = (await res.json()) as SubscribeResponse;
+  } catch {
+    // Not JSON (a proxy's error page, say): handled as a failure below.
+  }
+
+  if (res.ok && data?.ok) return;
+  if (data && !data.ok) throw new SubmitError(data.error, data.fields);
+  throw new Error(`Unexpected response: ${res.status}`);
 }
 
 export function JoinSignup() {
   const rootRef = useRef<HTMLElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const { ready, reduced } = useMotion();
 
   const [values, setValues] = useState<Values>(EMPTY);
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  /** The server's reason for the last failure, when it gave one. */
+  const [failure, setFailure] = useState("");
+  const [honeypot, setHoneypot] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
@@ -178,19 +227,35 @@ export function JoinSignup() {
   }, [ready, reduced]);
 
   /* --- submit ------------------------------------------------------------ */
+  /** Moves focus to the first field that needs attention, once it renders. */
+  const focusFirstInvalid = () =>
+    requestAnimationFrame(() => formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus());
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (status === "sending") return;
-    const next = validate(values);
+    const next = validate(values, joinSignup.accountFields);
     setErrors(next);
-    if (Object.keys(next).length > 0) return;
+    if (Object.keys(next).length > 0) {
+      focusFirstInvalid();
+      return;
+    }
 
     setStatus("sending");
+    setFailure("");
     try {
-      await submitSignup(values);
+      await submitSignup(normalizeSubscribe(values), honeypot);
       setStatus("sent");
       setValues(EMPTY);
-    } catch {
+    } catch (err) {
+      if (err instanceof SubmitError) {
+        // The server disagreed about a field: show it where it belongs.
+        if (err.fields) {
+          setErrors(err.fields);
+          focusFirstInvalid();
+        }
+        setFailure(err.message);
+      }
       setStatus("error");
     }
   };
@@ -209,6 +274,8 @@ export function JoinSignup() {
 
   const c = joinSignup;
 
+  const errorId = (key: Field) => `signup-${key}-error`;
+
   const textField = (
     key: "name" | "email" | "username" | "password",
     icon: "user" | "envelope" | "at" | "lock",
@@ -224,7 +291,10 @@ export function JoinSignup() {
           autoComplete={autoComplete}
           placeholder={c.fields[key]}
           aria-label={c.fields[key]}
+          aria-required="true"
           aria-invalid={Boolean(errors[key])}
+          aria-describedby={errors[key] ? errorId(key) : undefined}
+          {...(key === "email" ? { inputMode: "email" as const, autoCapitalize: "none", spellCheck: false } : {})}
           value={values[key]}
           onChange={setText(key)}
           className={styles.input}
@@ -242,7 +312,11 @@ export function JoinSignup() {
           </button>
         )}
       </label>
-      {errors[key] && <span className={styles.error}>{errors[key]}</span>}
+      {errors[key] && (
+        <span id={errorId(key)} className={styles.error}>
+          {errors[key]}
+        </span>
+      )}
     </div>
   );
 
@@ -282,11 +356,12 @@ export function JoinSignup() {
         </div>
 
         {/* ---------------- Form ---------------- */}
-        <form className={styles.panel} onSubmit={handleSubmit} noValidate data-a>
+        <form ref={formRef} className={styles.panel} onSubmit={handleSubmit} noValidate aria-label={c.submit} data-a>
           {textField("name", "user", "text", "name")}
           {textField("email", "envelope", "email", "email")}
-          {textField("username", "at", "text", "username")}
-          {textField("password", "lock", "password", "new-password")}
+          {/* Account fields — off until Phase 3; see `joinSignup.accountFields`. */}
+          {c.accountFields && textField("username", "at", "text", "username")}
+          {c.accountFields && textField("password", "lock", "password", "new-password")}
 
           <label className={`${styles.checkRow} f-sans`} data-a>
             <input type="checkbox" className={styles.checkInput} checked={values.updates} onChange={setFlag("updates")} />
@@ -301,7 +376,9 @@ export function JoinSignup() {
                 className={styles.checkInput}
                 checked={values.agree}
                 onChange={setFlag("agree")}
+                aria-required="true"
                 aria-invalid={Boolean(errors.agree)}
+                aria-describedby={errors.agree ? errorId("agree") : undefined}
               />
               <span className={styles.checkBox} aria-hidden="true" />
               <span className={`${styles.checkLabel} cz`}>
@@ -316,7 +393,29 @@ export function JoinSignup() {
                 )}
               </span>
             </label>
-            {errors.agree && <span className={styles.error}>{errors.agree}</span>}
+            {errors.agree && (
+              <span id={errorId("agree")} className={styles.error}>
+                {errors.agree}
+              </span>
+            )}
+          </div>
+
+          {/* Honeypot: off-screen, out of the tab order and hidden from
+              assistive tech, so no person fills it — a bot that does is
+              dropped by the API route. Not `display: none`, which some
+              bots skip. */}
+          <div className={styles.trap} aria-hidden="true">
+            <label>
+              Company
+              <input
+                type="text"
+                name={HONEYPOT_FIELD}
+                tabIndex={-1}
+                autoComplete="off"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+              />
+            </label>
           </div>
 
           <div className={styles.submitWrap}>
@@ -355,7 +454,7 @@ export function JoinSignup() {
                 </svg>
                 <span>
                   <strong className="f-cond caps">{c.failedTitle}</strong>
-                  {c.failed}
+                  {failure || c.failed}
                 </span>
               </p>
             )}

@@ -439,9 +439,14 @@
     margin-top: 10px;
   }
 
-  /* The poster shows whole in the taller card rather than losing its sides. */
+  /* The poster shows whole, at its own shape, at the top of the taller
+     card — its lettering ("$5 OR ?", "BET $5") is never cropped. */
+  .thumb {
+    border-radius: calc(9 * var(--k)) 0 0 0;
+  }
+
   .thumb img {
-    object-fit: contain;
+     object-fit: contain;
   }
 }
 

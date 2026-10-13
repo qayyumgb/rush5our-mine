@@ -1,13 +1,16 @@
 /**
- * CONTACT FORM — basic rate limiting.
+ * MAIL ROUTES — basic rate limiting, shared by the contact form and the
+ * Join sign-up.
  *
- * A fixed window per client: at most `LIMIT` submissions every `WINDOW_MS`
- * from one IP address. The counts live in this module's memory.
+ * A fixed window per key: at most `LIMIT` submissions every `WINDOW_MS`.
+ * Each route prefixes the client's address with its own name
+ * (`contact:1.2.3.4`, `subscribe:1.2.3.4`), so the two forms keep separate
+ * counts. The counts live in this module's memory.
  *
  * WHAT THIS IS AND ISN'T: on Vercel each serverless instance has its own
  * memory, and instances come and go, so this slows a burst from one address
  * rather than enforcing a hard quota. Together with the honeypot it is
- * enough to keep casual spam out. If the form is ever targeted, move the
+ * enough to keep casual spam out. If a form is ever targeted, move the
  * counter to a shared store (Upstash Redis, Vercel KV) — `checkRateLimit`
  * is the only function that would change.
  */

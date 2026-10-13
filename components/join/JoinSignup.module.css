@@ -327,6 +327,18 @@
   transform: rotate(-35deg);
 }
 
+/* Honeypot — see the component. Kept in the DOM and "visible" to a bot,
+   but off-screen and one pixel square for everyone else. */
+.trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .error {
   display: block;
   margin: calc(6 * var(--k)) 0 0 calc(6 * var(--k));

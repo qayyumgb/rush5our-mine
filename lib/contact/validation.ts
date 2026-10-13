@@ -38,7 +38,9 @@ export const CONTACT_LIMITS = {
   messageMin: 10,
 } as const;
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+/** A practical address check: something@something.tld, no spaces. Shared
+    with the Join sign-up (lib/subscribe/validation.ts). */
+export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 /**
  * Trims every field, and flattens line breaks out of the single-line ones
