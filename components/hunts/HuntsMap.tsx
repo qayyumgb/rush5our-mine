@@ -1,51 +1,136 @@
 "use client";
 
 /**
- * RUSH HUNTS — section 4, "Hunt map" (mockups/Rush Hunts/4.png, a
- * 950 x 1655 phone frame).
+ * RUSH HUNTS — section 4, "Hunt map" (mockups/Rush Hunts/4.png; the live
+ * map is Phase 2, 2A in RUSH5OUR-Implementation-Plan.md).
  *
- * A left-set statement — red tracked eyebrow with a rule, a very wide
- * two-colour headline, a tracked subline and three lines of copy — then a
- * legend of three pills over a dark map of the city. The map carries glowing
- * pins, two crowned special drops, the city's name, a brush-script note,
- * zoom buttons and a "use my location" button. A red-framed card of nearby
- * hunts overlaps its foot, and a tracked line between two rules closes it.
+ * The mockup's left-set statement — red tracked eyebrow with a rule, the
+ * very wide two-colour headline, a tracked subline and three lines of copy —
+ * then the hunt explorer:
  *
- * The map, the edge grunge, the script, the crown and the target mark are
- * lifted from the mockup file (see data/hunts.ts). The map is a picture, not
- * a live map: the zoom buttons scale that picture, and the pins sit on it by
- * pixel.
+ *   • a filter row, All / Active / Upcoming / Past, each status chip
+ *     carrying the mark its hunts wear on the map (the row is the legend),
+ *     and "Near me", which asks for the visitor's location and sorts the
+ *     list by distance
+ *   • the live map (HuntMapCanvas.tsx, Mapbox) beside the list of hunts on
+ *     a wide screen, above it on a phone. Picking a hunt in either one
+ *     selects it in both: the map flies to it and opens its card, the list
+ *     opens its row
+ *   • the mockup's tracked closing line between two rules
+ *
+ * DATA: every hunt comes from `hunts` in data/hunts.ts — nothing here or in
+ * the map knows a hunt of its own. The copy is `huntsMap` beside it.
+ *
+ * STATUS: worked out from each hunt's start and end (lib/hunts.ts). The
+ * first render uses the page's render time, so it matches the server's
+ * HTML; then the visitor's clock takes over, and a timer set for the next
+ * start or end flips that hunt — badge, marker, filter counts — on the spot.
+ *
+ * TOKEN: the map needs NEXT_PUBLIC_MAPBOX_TOKEN (a public Mapbox token,
+ * read at build time). Without one — or if the map fails to start — the
+ * mockup's map artwork stands in, with a short note, and the list still
+ * shows every hunt and its details.
  *
  * MOTION:
  *   • the eyebrow decodes as its rule draws, the headline's characters rise,
  *     the subline and copy lift
- *   • the legend pills lift in turn, the map fades up, its pins drop in one
- *     after another and then breathe; the script writes on
- *   • the card rises, its rows slide in, the button lifts
+ *   • the filter chips lift in turn, the map and the list rise, the rows
+ *     follow
+ *   • the closing rules draw
  *
  * No standing `will-change` or `translateZ(0)` — see AboutHero.tsx.
  */
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import dynamic from "next/dynamic";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { gsap } from "@/lib/motion/gsap";
-import { EASE, EASE_IO, charsIn, pauseWhenOffscreen } from "@/lib/motion/helpers";
+import { EASE, EASE_IO, charsIn } from "@/lib/motion/helpers";
 import { scramble, splitTitle } from "@/lib/motion/split";
 import { useMotion } from "@/components/motion/MotionProvider";
-import RedButton from "@/components/ui/RedButton";
-import { huntsMap, type HuntPinKind } from "@/data/hunts";
+import { hunts as allHunts, huntsMap, type Hunt, type HuntFilter, type HuntStatus } from "@/data/hunts";
+import {
+  byStatusThenDate,
+  describeWhen,
+  formatMiles,
+  huntTimes,
+  milesBetween,
+  nextStatusChange,
+  withStatus,
+  type LatLng,
+  type LiveHunt,
+} from "@/lib/hunts";
 import styles from "./HuntsMap.module.css";
 
-/** Zoom steps for the map picture. */
-const ZOOMS = [1, 1.25, 1.5, 1.8];
+/** The live map: only fetched when there's a token to draw it with. */
+const HuntMapCanvas = dynamic(() => import("./HuntMapCanvas"), {
+  ssr: false,
+  loading: () => <span className={styles.mapLoading} aria-hidden="true" />,
+});
 
-const CROWN = "/assets/images/hunts-map-crown.webp";
+/** Read at build time; set it in .env.local and on the host. */
+const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? "";
 
-function LegendMark({ kind }: { kind: HuntPinKind }) {
-  if (kind === "special") {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img className={styles.legendCrown} src={CROWN} width={54} height={48} alt="" aria-hidden="true" />;
-  }
-  return <span className={`${styles.legendDot} ${kind === "recent" ? styles.legendDotRecent : ""}`} aria-hidden="true" />;
+type Geo =
+  | { state: "idle" }
+  | { state: "locating" }
+  | { state: "located"; at: LatLng }
+  | { state: "denied" }
+  | { state: "unavailable" };
+
+const MARK_CLASS: Record<HuntStatus, string> = {
+  active: styles.markActive,
+  upcoming: styles.markUpcoming,
+  ended: styles.markEnded,
+};
+
+const BADGE_CLASS: Record<HuntStatus, string> = {
+  active: styles.badgeActive,
+  upcoming: styles.badgeUpcoming,
+  ended: styles.badgeEnded,
+};
+
+/** Long waits are re-checked hourly: a timer can't be set further out than
+    ~24 days, and a sleeping laptop's timers run late. */
+const MAX_WAIT = 60 * 60 * 1000;
+
+/**
+ * The hunts with their status, kept current: re-read at the next start or
+ * end, and whenever the tab comes back into view. A new array only when a
+ * status actually changes, so the map doesn't refit for nothing.
+ */
+function useLiveHunts(hunts: Hunt[], renderedAt: number): LiveHunt[] {
+  const [state, setState] = useState(() => ({ source: hunts, live: withStatus(hunts, renderedAt) }));
+  if (state.source !== hunts) setState({ source: hunts, live: withStatus(hunts, renderedAt) });
+
+  useEffect(() => {
+    let timer = 0;
+    const tick = () => {
+      const now = Date.now();
+      const next = withStatus(hunts, now);
+      setState((prev) =>
+        prev.source === hunts &&
+        prev.live.length === next.length &&
+        prev.live.every((h, i) => h.id === next[i].id && h.status === next[i].status)
+          ? prev
+          : { source: hunts, live: next },
+      );
+      window.clearTimeout(timer);
+      const at = nextStatusChange(hunts, now);
+      // A beat past the moment, so the change has happened when we look.
+      if (at !== null) timer = window.setTimeout(tick, Math.min(at - now + 500, MAX_WAIT));
+    };
+    const onVisible = () => {
+      if (document.visibilityState === "visible") tick();
+    };
+    timer = window.setTimeout(tick, 0);
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [hunts]);
+
+  return state.source === hunts ? state.live : withStatus(hunts, renderedAt);
 }
 
 function Arrow({ className }: { className?: string }) {
@@ -56,11 +141,111 @@ function Arrow({ className }: { className?: string }) {
   );
 }
 
-export function HuntsMap() {
+export function HuntsMap({ hunts: source = allHunts, renderedAt }: { hunts?: Hunt[]; renderedAt: number }) {
   const rootRef = useRef<HTMLElement>(null);
-  const { ready, reduced } = useMotion();
-  const [zoom, setZoom] = useState(0);
+  const mapColRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+  const { ready, reduced, scrollTo } = useMotion();
 
+  const [filter, setFilter] = useState<HuntFilter>("all");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [geo, setGeo] = useState<Geo>({ state: "idle" });
+  const [mapFailed, setMapFailed] = useState(false);
+
+  const c = huntsMap;
+  const hunts = useLiveHunts(source, renderedAt);
+  const live = MAPBOX_TOKEN !== "" && !mapFailed;
+  const here = geo.state === "located" ? geo.at : null;
+
+  /* --- what the list and the map show --------------------------------- */
+  const counts = useMemo(() => {
+    const n: Record<HuntFilter, number> = { all: hunts.length, active: 0, upcoming: 0, ended: 0 };
+    for (const h of hunts) n[h.status] += 1;
+    return n;
+  }, [hunts]);
+
+  const visible = useMemo(() => {
+    const shown = hunts.filter((h) => filter === "all" || h.status === filter);
+    if (here) return [...shown].sort((a, b) => milesBetween(here, a) - milesBetween(here, b));
+    return [...shown].sort(byStatusThenDate);
+  }, [hunts, filter, here]);
+
+  /** A selection that the filter has hidden is no selection. */
+  const selected = selectedId && visible.some((h) => h.id === selectedId) ? selectedId : null;
+
+  useEffect(() => {
+    if (!MAPBOX_TOKEN && process.env.NODE_ENV !== "production") {
+      console.warn("[hunt map] NEXT_PUBLIC_MAPBOX_TOKEN is not set — showing the map artwork instead of the live map.");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === "production") return;
+    for (const h of source) {
+      if (!huntTimes(h)) {
+        console.warn(
+          `[hunt map] "${h.id}" is hidden: startsAt/endsAt must be date-times with a UTC offset, e.g. "2026-11-07T20:00-05:00", and end after they start.`,
+        );
+      }
+    }
+  }, [source]);
+
+  /* --- selection, from either side ------------------------------------ */
+  /** From the list: select, and bring the map into view if it's off-screen
+      (a phone, where the list sits under the map). */
+  const selectFromList = (id: string) => {
+    const next = selected === id ? null : id;
+    setSelectedId(next);
+    const col = mapColRef.current;
+    if (next && live && col) {
+      const r = col.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > window.innerHeight) scrollTo(col, 96);
+    }
+  };
+
+  /** From the map: select, and scroll the list — only the list, never the
+      page — to the row, where the list is its own scroll box. */
+  const selectFromMap = useCallback(
+    (id: string | null) => {
+      setSelectedId(id);
+      const list = listRef.current;
+      if (!id || !list || list.scrollHeight <= list.clientHeight + 1) return;
+      const row = list.querySelector<HTMLElement>(`[data-id="${CSS.escape(id)}"]`);
+      if (row) list.scrollTo({ top: row.offsetTop - 8, behavior: reduced ? "auto" : "smooth" });
+    },
+    [reduced],
+  );
+
+  const onMapFail = useCallback(() => setMapFailed(true), []);
+
+  /* --- near me ---------------------------------------------------------- */
+  const locate = () => {
+    if (!("geolocation" in navigator)) {
+      setGeo({ state: "unavailable" });
+      return;
+    }
+    setGeo({ state: "locating" });
+    navigator.geolocation.getCurrentPosition(
+      (pos) => setGeo({ state: "located", at: { lat: pos.coords.latitude, lng: pos.coords.longitude } }),
+      (err) => setGeo({ state: err.code === err.PERMISSION_DENIED ? "denied" : "unavailable" }),
+      { enableHighAccuracy: false, timeout: 10_000, maximumAge: 300_000 },
+    );
+  };
+
+  const geoNote =
+    geo.state === "locating"
+      ? c.near.locating
+      : geo.state === "located"
+        ? visible[0]
+          ? c.near.located.replace("{n}", formatMiles(milesBetween(geo.at, visible[0])))
+          : ""
+        : geo.state === "denied"
+          ? c.near.denied
+          : geo.state === "unavailable"
+            ? c.near.unavailable
+            : "";
+
+  /* --- motion ----------------------------------------------------------- */
   useEffect(() => {
     const root = rootRef.current;
     if (!root || !ready) return;
@@ -71,8 +256,6 @@ export function HuntsMap() {
       gsap.set(q("[data-a]"), { visibility: "visible" });
       return;
     }
-
-    let stopWatching = () => {};
 
     const ctx = gsap.context(() => {
       gsap.set(q("[data-a]"), { visibility: "visible" });
@@ -94,68 +277,16 @@ export function HuntsMap() {
         0.8,
       );
 
-      /* --- map ---------------------------------------------------------- */
-      const map = gsap.timeline({
-        defaults: { ease: EASE },
-        scrollTrigger: { trigger: q(`.${styles.stage}`)[0], start: "top 78%" },
-      });
-      map
-        .fromTo(q(`.${styles.pill}`), { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, stagger: 0.1 }, 0)
-        .fromTo(q(`.${styles.viewport}`), { opacity: 0 }, { opacity: 1, duration: 1.4, ease: "power1.out" }, 0.1)
-        .fromTo(q(`.${styles.city}`), { opacity: 0 }, { opacity: 1, duration: 1 }, 0.6)
-        .fromTo(
-          q(`.${styles.pin}`),
-          { y: -26, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.7, stagger: 0.09, ease: "back.out(2)" },
-          0.5,
-        )
-        .fromTo(
-          q(`.${styles.script}`),
-          { clipPath: "inset(0 100% 0 0)" },
-          { clipPath: "inset(0 0% 0 0)", duration: 1.2, ease: EASE_IO, clearProps: "clipPath" },
-          0.7,
-        )
-        .fromTo(
-          q(`.${styles.zoom}, .${styles.locate}`),
-          { opacity: 0, y: 12 },
-          { opacity: 1, y: 0, duration: 0.8, stagger: 0.1 },
-          1,
-        );
-
-      // The pins breathe: a ring swells out of each and fades.
-      const pulse = gsap.fromTo(
-        q(`.${styles.ring}`),
-        { scale: 0.6, opacity: 0.7 },
-        { scale: 2.1, opacity: 0, duration: 2.2, ease: "power1.out", repeat: -1, stagger: { each: 0.35, repeat: -1 } },
-      );
-      stopWatching = pauseWhenOffscreen(root, [pulse]);
-
-      /* --- nearby ------------------------------------------------------- */
+      /* --- explorer ----------------------------------------------------- */
       gsap
         .timeline({
           defaults: { ease: EASE },
-          scrollTrigger: { trigger: q(`.${styles.card}`)[0], start: "top 86%" },
+          scrollTrigger: { trigger: q(`.${styles.explorer}`)[0], start: "top 82%" },
         })
-        .fromTo(q(`.${styles.card}`), { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 1.1 }, 0)
-        .fromTo(
-          q(`.${styles.target}`),
-          { scale: 0.5, opacity: 0, rotate: -90 },
-          { scale: 1, opacity: 1, rotate: 0, duration: 1, ease: "back.out(1.6)" },
-          0.2,
-        )
-        .fromTo(
-          q(`.${styles.cardTitle}, .${styles.viewAll}`),
-          { y: 14, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.8, stagger: 0.1 },
-          0.3,
-        )
-        .fromTo(
-          q(`.${styles.row}`),
-          { x: -24, opacity: 0 },
-          { x: 0, opacity: 1, duration: 0.8, stagger: 0.1 },
-          0.45,
-        )
-        .fromTo(q(`.${styles.ctaWrap}`), { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9 }, 0.75);
+        .fromTo(q(`.${styles.chip}`), { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, stagger: 0.07, clearProps: "transform" }, 0)
+        .fromTo(q(`.${styles.mapCol}`), { y: 36, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2, clearProps: "transform" }, 0.15)
+        .fromTo(q(`.${styles.listCol}`), { y: 36, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2, clearProps: "transform" }, 0.3)
+        .fromTo(q(`.${styles.item}`), { x: -18, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8, stagger: 0.07, clearProps: "transform" }, 0.55);
 
       /* --- foot --------------------------------------------------------- */
       gsap
@@ -164,13 +295,10 @@ export function HuntsMap() {
         .fromTo(q(`.${styles.footLabel}`), { opacity: 0 }, { opacity: 1, duration: 1 }, 0.2);
     }, root);
 
-    return () => {
-      stopWatching();
-      ctx.revert();
-    };
+    return () => ctx.revert();
   }, [ready, reduced]);
 
-  const c = huntsMap;
+  const filterName = c.filters.find((f) => f.key === filter)?.label.toLowerCase() ?? "";
 
   return (
     <section ref={rootRef} id="hunt-map" className={styles.section} aria-labelledby="hunts-map-title">
@@ -206,142 +334,136 @@ export function HuntsMap() {
           </p>
         </div>
 
-        {/* ---------------- Map ---------------- */}
-        <div className={styles.stage}>
-          <div className={styles.viewport} data-a>
-            <div className={styles.mapInner} style={{ "--z": ZOOMS[zoom] } as CSSProperties}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                className={styles.mapImg}
-                src={c.map.src}
-                width={c.map.width}
-                height={c.map.height}
-                alt={c.map.alt}
-                decoding="async"
-              />
+        {/* ---------------- Explorer ---------------- */}
+        <div className={styles.explorer}>
+          <div className={styles.controls}>
+            {/* One flowing row: on a phone "Near me" sits beside the last filter
+                rather than on a line of its own. */}
+            <div className={styles.filters} role="group" aria-label="Filter and sort hunts">
+              {c.filters.map((f) => (
+                <button
+                  key={f.key}
+                  type="button"
+                  className={`${styles.chip} f-sans caps`}
+                  aria-pressed={filter === f.key}
+                  onClick={() => setFilter(f.key)}
+                  data-a
+                >
+                  {f.key !== "all" && <span className={`${styles.mark} ${MARK_CLASS[f.key]}`} aria-hidden="true" />}
+                  <span>{f.label}</span>
+                  <span className={styles.chipCount}>{counts[f.key]}</span>
+                </button>
+              ))}
 
-              <span className={`${styles.city} f-cond caps`}>{c.map.city}</span>
-
-              <ul className={styles.pins}>
-                {c.map.pins.map((pin) => (
-                  <li
-                    key={`${pin.x}-${pin.y}`}
-                    className={`${styles.pin} ${styles[pin.kind]}`}
-                    style={{ "--x": pin.x, "--y": pin.y } as CSSProperties}
-                  >
-                    <span className="sr-only">{pin.label}</span>
-                    <span className={styles.ring} aria-hidden="true" />
-                    {pin.kind === "special" ? (
-                      <span className={styles.crownBox} aria-hidden="true">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={CROWN} width={54} height={48} alt="" />
-                      </span>
-                    ) : (
-                      <span className={styles.dot} aria-hidden="true" />
-                    )}
-                  </li>
-                ))}
-              </ul>
+              <button
+                type="button"
+                className={`${styles.chip} ${styles.near} f-sans caps`}
+                onClick={locate}
+                disabled={geo.state === "locating"}
+                aria-pressed={geo.state === "located"}
+                data-a
+              >
+                <svg className={styles.nearIcon} viewBox="0 0 26 26" aria-hidden="true">
+                  <path d="M25.5 0.5 0.8 10.6l10.4 3.2 3.4 11.4z" />
+                </svg>
+                <span>{c.near.label}</span>
+              </button>
             </div>
           </div>
 
-          <ul className={styles.legend}>
-            {c.legend.map((item) => (
-              <li key={item.kind} className={`${styles.pill} f-sans caps`} data-a>
-                <LegendMark kind={item.kind} />
-                <span className={styles.pillLabel}>{item.label}</span>
-              </li>
-            ))}
-          </ul>
+          <p className={`${styles.geoNote} f-sans`} role="status" aria-live="polite">
+            {geoNote}
+          </p>
 
-          {/* The brush-script note and its stroke, lifted from the mockup as
-              an alpha image: hand-painted, not a font. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            className={styles.script}
-            src="/assets/images/hunts-map-script.webp"
-            width={170}
-            height={228}
-            alt={c.script}
-            decoding="async"
-            data-a
-          />
+          <div className={styles.layout}>
+            {/* ---- Map ---- */}
+            <div ref={mapColRef} className={styles.mapCol} role="region" aria-label="Hunt map" data-a>
+              {live ? (
+                <HuntMapCanvas
+                  token={MAPBOX_TOKEN}
+                  hunts={visible}
+                  selectedId={selected}
+                  onSelect={selectFromMap}
+                  user={here}
+                  onFail={onMapFail}
+                />
+              ) : (
+                <div className={styles.fallback}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    className={styles.fallbackImg}
+                    src={c.fallback.src}
+                    width={c.fallback.width}
+                    height={c.fallback.height}
+                    alt={c.fallback.alt}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <div className={styles.fallbackNote}>
+                    <strong className="f-display caps">{c.fallback.title}</strong>
+                    <span className="f-sans">{c.fallback.body}</span>
+                  </div>
+                </div>
+              )}
+            </div>
 
-          <div className={styles.zoom} role="group" aria-label="Map zoom" data-a>
-            <button
-              type="button"
-              className={styles.zoomBtn}
-              aria-label="Zoom in"
-              disabled={zoom === ZOOMS.length - 1}
-              onClick={() => setZoom((z) => Math.min(ZOOMS.length - 1, z + 1))}
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 0v24M0 12h24" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              className={styles.zoomBtn}
-              aria-label="Zoom out"
-              disabled={zoom === 0}
-              onClick={() => setZoom((z) => Math.max(0, z - 1))}
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M0 12h24" />
-              </svg>
-            </button>
-          </div>
+            {/* ---- List ---- */}
+            <div className={styles.listCol} data-a>
+              <div className={styles.listHead}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className={styles.target} src="/assets/images/hunts-map-target.webp" width={80} height={80} alt="" aria-hidden="true" />
+                <h3 className={`${styles.listTitle} f-display cz caps`}>
+                  <span className={styles.slant}>
+                    {c.list.titleWhite} <span className={styles.red}>{c.list.titleRed}</span>
+                  </span>
+                </h3>
+              </div>
 
-          <a className={`${styles.locate} f-sans`} href={c.locate.href} data-a>
-            <svg className={styles.locateIcon} viewBox="0 0 26 26" aria-hidden="true">
-              <path d="M25.5 0.5 0.8 10.6l10.4 3.2 3.4 11.4z" />
-            </svg>
-            <span>{c.locate.label}</span>
-          </a>
-
-          {/* ---------------- Nearby hunts ---------------- */}
-          <div className={styles.card} data-a>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              className={styles.target}
-              src="/assets/images/hunts-map-target.webp"
-              width={80}
-              height={80}
-              alt=""
-              aria-hidden="true"
-            />
-            <h3 className={`${styles.cardTitle} f-display cz caps`}>
-              <span className={styles.slant}>
-                {c.nearby.titleWhite} <span className={styles.red}>{c.nearby.titleRed}</span>
-              </span>
-            </h3>
-            <a className={`${styles.viewAll} f-cond caps`} href={c.nearby.viewAll.href}>
-              <span>{c.nearby.viewAll.label}</span>
-              <Arrow className={styles.viewAllArrow} />
-            </a>
-
-            <ul className={styles.rows}>
-              {c.nearby.hunts.map((hunt) => (
-                <li key={hunt.name} className={styles.row}>
-                  <a className={`${styles.rowLink} f-sans`} href={hunt.href}>
-                    <span className={styles.rowDot} aria-hidden="true" />
-                    <span className={styles.rowName}>{hunt.name}</span>
-                    <span className={styles.rowDist}>{hunt.distance}</span>
-                    <Arrow className={styles.rowArrow} />
-                  </a>
-                </li>
-              ))}
-            </ul>
-
-            <div className={styles.ctaWrap}>
-              <RedButton
-                label={c.nearby.cta.label}
-                href={c.nearby.cta.href}
-                className={styles.cta}
-                wrapperClassName={styles.ctaMagnet}
-                arrow="long"
-                magnetStrength={0.12}
-              />
+              {visible.length === 0 ? (
+                <div className={`${styles.empty} f-sans`}>
+                  <p>{hunts.length === 0 ? c.empty.none : c.empty.filtered.replace("{status}", filterName)}</p>
+                  {hunts.length > 0 && (
+                    <button type="button" className={`${styles.showAll} f-sans caps`} onClick={() => setFilter("all")}>
+                      {c.empty.showAll}
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <ul ref={listRef} className={styles.list} aria-label="Hunts" data-lenis-prevent>
+                  {visible.map((h) => {
+                    const open = h.id === selected;
+                    return (
+                      <li key={h.id} id={`hunt-${h.id}`} data-id={h.id} className={`${styles.item} ${open ? styles.itemOpen : ""}`}>
+                        <button
+                          type="button"
+                          className={styles.itemBtn}
+                          aria-expanded={open}
+                          aria-controls={`hunt-${h.id}-detail`}
+                          onClick={() => selectFromList(h.id)}
+                        >
+                          <span className={`${styles.mark} ${MARK_CLASS[h.status]}`} aria-hidden="true" />
+                          <span className={`${styles.itemTitle} f-cond caps`}>{h.title}</span>
+                          <span className={`${styles.itemSide} f-sans`}>
+                            {here ? formatMiles(milesBetween(here, h)) : <Arrow className={styles.itemArrow} />}
+                          </span>
+                          <span className={`${styles.itemMeta} f-sans`}>
+                            <span className={`${styles.badge} ${BADGE_CLASS[h.status]} caps`}>{c.status[h.status]}</span>
+                            {h.city} · {describeWhen(h)}
+                          </span>
+                        </button>
+                        <div id={`hunt-${h.id}-detail`} className={`${styles.itemDetail} f-sans`} hidden={!open}>
+                          <p>{h.description}</p>
+                          {h.reward && (
+                            <p className={styles.itemReward}>
+                              <span className="caps">{c.labels.reward}</span> <strong>{h.reward}</strong>
+                            </p>
+                          )}
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
             </div>
           </div>
 

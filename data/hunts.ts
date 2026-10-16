@@ -186,25 +186,115 @@ export const huntsRewards: HuntsRewardsContent = {
 };
 
 /* ------------------------------------------------------------------------ */
+/* THE HUNTS — every hunt the site knows about                               */
+/*                                                                          */
+/* The one source for hunt data: the Hunt Map (section 4) reads this list   */
+/* and nothing else. Add or edit a hunt here; no component changes.         */
+/*                                                                          */
+/* STATUS IS AUTOMATIC: give each hunt a start and an end, and the site     */
+/* shows it as Upcoming before the start, Active until the end, and Ended   */
+/* after — switching on its own at those moments, even on a page that's     */
+/* already open. To end a hunt early (the sticker was found), set its       */
+/* `endsAt` to when it was found.                                          */
+/* ------------------------------------------------------------------------ */
+
+export type HuntStatus = "active" | "upcoming" | "ended";
+
+export interface Hunt {
+  /** Stable key; also the list item's anchor (`/rush-hunts#hunt-<id>`). */
+  id: string;
+  title: string;
+  /** One or two short sentences, shown in the map card and the list. */
+  description: string;
+  /** Where the hunt is, in decimal degrees (WGS84). */
+  lat: number;
+  lng: number;
+  /**
+   * When the hunt goes live and when it ends, in the hunt's own local time
+   * WITH its UTC offset: "2026-11-07T20:00-05:00" is 8 PM in Tampa. Florida
+   * and Georgia are -04:00 in summer (EDT, Mar–early Nov) and -05:00 in
+   * winter (EST). The offset is required; a hunt without one is skipped.
+   */
+  startsAt: string;
+  endsAt: string;
+  /** Shown under the title, e.g. "Orlando, FL". */
+  city: string;
+  /** What finding it wins, e.g. "$100 cash". */
+  reward?: string;
+  /** A photo for the map card, from /public. */
+  image?: string;
+}
+
+/**
+ * PLACEHOLDER HUNTS — five invented hunts across four cities, so the map,
+ * its clustering (the two Orlando hunts sit a few blocks apart) and every
+ * status have something to show. Replace them with the real hunts as they
+ * are planned; see the implementation plan, section 2C.
+ */
+export const hunts: Hunt[] = [
+  {
+    id: "downtown-drop",
+    title: "Downtown Drop",
+    description: "Three stickers between Church Street and Lake Eola. First scan claims the cash.",
+    lat: 28.5421,
+    lng: -81.379,
+    startsAt: "2026-10-14T18:00-04:00",
+    endsAt: "2026-10-19T23:00-04:00",
+    city: "Orlando, FL",
+    reward: "$100 cash",
+    image: "/assets/images/hunts-finds-1.webp",
+  },
+  {
+    id: "lake-eola-loop",
+    title: "Lake Eola Loop",
+    description: "One sticker somewhere on the loop. Follow the clues we post on the day.",
+    lat: 28.5434,
+    lng: -81.3727,
+    startsAt: "2026-10-16T12:00-04:00",
+    endsAt: "2026-10-20T21:00-04:00",
+    city: "Orlando, FL",
+    reward: "Limited merch drop",
+  },
+  {
+    id: "ybor-night-hunt",
+    title: "Ybor Night Hunt",
+    description: "After dark on 7th Avenue. Bring a flashlight and a fast phone.",
+    lat: 27.96,
+    lng: -82.439,
+    startsAt: "2026-11-07T20:00-05:00",
+    endsAt: "2026-11-08T02:00-05:00",
+    city: "Tampa, FL",
+    reward: "VIP event pass",
+  },
+  {
+    id: "wynwood-walls",
+    title: "Wynwood Walls",
+    description: "Hidden in plain sight among the murals. The first city-wide hunt in Miami.",
+    lat: 25.801,
+    lng: -80.199,
+    startsAt: "2026-11-21T10:00-05:00",
+    endsAt: "2026-11-22T18:00-05:00",
+    city: "Miami, FL",
+    reward: "$250 cash",
+  },
+  {
+    id: "beltline-run",
+    title: "BeltLine Run",
+    description: "Found 41 minutes after the first clue dropped. Atlanta moves fast.",
+    lat: 33.769,
+    lng: -84.364,
+    startsAt: "2026-09-27T09:00-04:00",
+    endsAt: "2026-09-27T09:41-04:00",
+    city: "Atlanta, GA",
+    reward: "$50 + merch",
+  },
+];
+
+/* ------------------------------------------------------------------------ */
 /* Section 4 — HUNT MAP (mockups/Rush Hunts/4.png)                           */
 /* ------------------------------------------------------------------------ */
 
-export type HuntPinKind = "active" | "recent" | "special";
-
-export interface HuntPin {
-  kind: HuntPinKind;
-  /** Position on the map artwork, in its own 950 x 620 pixels. */
-  x: number;
-  y: number;
-  /** Read out for the pin. */
-  label: string;
-}
-
-export interface NearbyHunt {
-  name: string;
-  distance: string;
-  href: string;
-}
+export type HuntFilter = "all" | HuntStatus;
 
 export interface HuntsMapContent {
   eyebrow: string;
@@ -213,32 +303,42 @@ export interface HuntsMapContent {
   subline: string;
   /** Body copy, one entry per line; `strong` lines are set in full white. */
   body: { text: string; strong?: boolean }[];
-  legend: { kind: HuntPinKind; label: string }[];
+  /** The filter row. Each status chip doubles as the map's legend. */
+  filters: { key: HuntFilter; label: string }[];
+  /** How a status is named on a badge. */
+  status: Record<HuntStatus, string>;
+  /** The time beside each hunt, by status; "{date}" is replaced with its
+      start (upcoming) or end (active, ended). */
+  when: Record<HuntStatus, string>;
+  list: { titleWhite: string; titleRed: string };
+  /** Labels in the map card and the list. */
+  labels: { reward: string; showOnMap: string; you: string };
+  near: {
+    label: string;
+    locating: string;
+    /** "{n}" is replaced with the closest hunt's distance. */
+    located: string;
+    denied: string;
+    unavailable: string;
+  };
+  empty: {
+    /** No hunts at all. */
+    none: string;
+    /** The filter matches nothing; "{status}" is replaced. */
+    filtered: string;
+    showAll: string;
+  };
   /**
-   * BACKEND SEAM: the map is artwork lifted from the mockup, not a live map.
-   * Pins are placed on that picture by pixel. When a real map (Mapbox,
-   * Google Maps) replaces it, swap `pins` for coordinates and render them
-   * with that map's markers.
+   * Without a Mapbox token (NEXT_PUBLIC_MAPBOX_TOKEN), or if the map fails
+   * to load, this artwork stands in for the map and the list still works.
    */
-  map: {
+  fallback: {
     src: string;
     width: number;
     height: number;
     alt: string;
-    city: string;
-    pins: HuntPin[];
-  };
-  /** Read out for the script artwork over the map. */
-  script: string;
-  /** BACKEND SEAM: points at the full map once that page exists. */
-  locate: { label: string; href: string };
-  nearby: {
-    titleWhite: string;
-    titleRed: string;
-    viewAll: { label: string; href: string };
-    /** BACKEND SEAM: the list takes any number of hunts. */
-    hunts: NearbyHunt[];
-    cta: { label: string; href: string };
+    title: string;
+    body: string;
   };
   foot: string;
 }
@@ -253,42 +353,35 @@ export const huntsMap: HuntsMapContent = {
     { text: "New drops happen weekly." },
     { text: "Find a location. Make a move.", strong: true },
   ],
-  legend: [
-    { kind: "active", label: "Active hunt" },
-    { kind: "recent", label: "Recent find" },
-    { kind: "special", label: "Special drop" },
+  filters: [
+    { key: "all", label: "All" },
+    { key: "active", label: "Active" },
+    { key: "upcoming", label: "Upcoming" },
+    { key: "ended", label: "Past" },
   ],
-  map: {
+  status: { active: "Active", upcoming: "Upcoming", ended: "Ended" },
+  when: { upcoming: "Starts {date}", active: "Ends {date}", ended: "Ended {date}" },
+  list: { titleWhite: "All", titleRed: "hunts" },
+  labels: { reward: "Reward", showOnMap: "Show on map", you: "You are here" },
+  near: {
+    label: "Near me",
+    locating: "Finding you…",
+    located: "Sorted by distance — the closest hunt is {n} away.",
+    denied: "Location is off for this site. Turn it on to sort hunts by distance.",
+    unavailable: "We couldn’t find your location. Try again in a moment.",
+  },
+  empty: {
+    none: "No hunts on the map yet. The first drop is coming — follow @rush5our to hear first.",
+    filtered: "No {status} hunts right now.",
+    showAll: "Show all hunts",
+  },
+  fallback: {
     src: "/assets/images/hunts-map-city.webp",
     width: 950,
     height: 620,
-    alt: "Map of Orlando, Florida, marked with Rush Hunt locations",
-    city: "Orlando, FL",
-    pins: [
-      { kind: "recent", x: 468, y: 188, label: "Recent find" },
-      { kind: "special", x: 695, y: 194, label: "Special drop" },
-      { kind: "active", x: 310, y: 236, label: "Active hunt" },
-      { kind: "active", x: 566.5, y: 251.5, label: "Active hunt" },
-      { kind: "active", x: 694.5, y: 268.5, label: "Active hunt" },
-      { kind: "recent", x: 626, y: 388, label: "Recent find" },
-      { kind: "active", x: 747.5, y: 410, label: "Active hunt" },
-      { kind: "active", x: 313, y: 441.5, label: "Active hunt" },
-      { kind: "active", x: 475, y: 468.5, label: "Active hunt" },
-      { kind: "special", x: 308, y: 518, label: "Special drop" },
-    ],
-  },
-  script: "Same city. Bigger hunts.",
-  locate: { label: "Use My Location", href: "#hunt-map" },
-  nearby: {
-    titleWhite: "Nearby",
-    titleRed: "hunts",
-    viewAll: { label: "View all", href: "#hunt-map" },
-    hunts: [
-      { name: "Downtown Orlando", distance: "0.8 mi", href: "#hunt-map" },
-      { name: "Lake Eola", distance: "1.4 mi", href: "#hunt-map" },
-      { name: "Millenia", distance: "2.1 mi", href: "#hunt-map" },
-    ],
-    cta: { label: "View full map", href: "#hunt-map" },
+    alt: "Map of Orlando, Florida",
+    title: "Live map coming soon",
+    body: "Every hunt is in the list — pick one to see its details.",
   },
   foot: "Explore. Find. Claim. Repeat.",
 };

@@ -19,6 +19,12 @@ import HuntsClosing from "@/components/hunts/HuntsClosing";
 import { huntsHero } from "@/data/hunts";
 import { site } from "@/data/site";
 
+/**
+ * Regenerated at most every five minutes, so the Hunt Map's server-rendered
+ * statuses stay close to the clock; in the browser the map keeps them exact.
+ */
+export const revalidate = 300;
+
 export const metadata: Metadata = {
   title: "Rush Hunts",
   description: huntsHero.bodyLines.join(" "),
@@ -44,7 +50,12 @@ export default function RushHuntsPage() {
         <HuntsRewards />
 
         {/* 4 — HUNT MAP */}
-        <HuntsMap />
+        {/* The render time, so the map's first paint in the browser agrees
+            with the server's; it moves to the visitor's clock straight after.
+            A server component renders once per regeneration and the value
+            travels to the browser as data, so this read is stable. */}
+        {/* eslint-disable-next-line react-hooks/purity */}
+        <HuntsMap renderedAt={Date.now()} />
 
         {/* 5 — FOUND IN THE WILD */}
         <HuntsFinds />
