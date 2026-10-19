@@ -42,6 +42,8 @@ export interface RedButtonProps {
   magnetStrength?: number;
   /** Rendered before the label — a leading icon, as the merch buttons carry. */
   children?: ReactNode;
+  /** Buttons only: greys the button out and ignores clicks (sold out). */
+  disabled?: boolean;
 }
 
 /** Splits a label into the two stacked rolls the hover effect needs. */
@@ -78,6 +80,7 @@ export function RedButton({
   arrow = "long",
   magnetStrength = 0.25,
   children,
+  disabled,
 }: RedButtonProps) {
   const wrapRef = useRef<HTMLSpanElement>(null);
   const { ready, reduced } = useMotion();
@@ -111,7 +114,7 @@ export function RedButton({
           {inner}
         </a>
       ) : (
-        <button type="button" className={buttonClass} aria-label={label} onClick={onClick}>
+        <button type="button" className={buttonClass} aria-label={label} onClick={onClick} disabled={disabled}>
           {inner}
         </button>
       )}

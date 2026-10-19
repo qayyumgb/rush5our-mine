@@ -5,6 +5,8 @@ import { MotionProvider } from "@/components/motion/MotionProvider";
 import Footer from "@/components/ui/Footer";
 import { VideoPlayerProvider } from "@/components/ui/VideoPlayer";
 import Cursor from "@/components/ui/Cursor";
+import CartProvider from "@/components/cart/CartProvider";
+import { readShopifyConfig } from "@/lib/shopify/client";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -81,9 +83,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <MotionProvider>
           <VideoPlayerProvider>
-            {children}
-            {/* One footer for every page, after its sections. */}
-            <Footer />
+            {/* The Shopify cart, on every page. Only whether the store is set
+                up crosses to the browser — never its domain or token. */}
+            <CartProvider enabled={readShopifyConfig() !== null}>
+              {children}
+              {/* One footer for every page, after its sections. */}
+              <Footer />
+            </CartProvider>
             <Cursor />
           </VideoPlayerProvider>
         </MotionProvider>

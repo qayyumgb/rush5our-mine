@@ -1,0 +1,117 @@
+/* PRODUCT OPTIONS — the size boxes of mockups/Merch/2.png, for any option.
+   Sized by variables so a section can set them in its own units:
+     --opt-h       box height            --opt-gap     gap between boxes
+     --opt-min     box min width         --opt-font    value size
+     --opt-pad     box side padding      --opt-radius  corner
+     --opt-label   legend size           --opt-label-gap  legend to boxes
+     --opt-group-gap  between groups */
+
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--opt-group-gap, 18px);
+}
+
+.group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  display: block;
+  margin-bottom: var(--opt-label-gap, 10px);
+  padding: 0;
+  font-size: var(--opt-label, 13px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.2em;
+  color: #c4c8c5;
+}
+
+.values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--opt-gap, 10px);
+}
+
+.value {
+  position: relative;
+  display: block;
+  cursor: pointer;
+}
+
+/* A bigger target than the box, for a thumb on a small phone. */
+.value::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--opt-hit, 0px) * -1) calc(var(--opt-gap, 10px) / -2);
+}
+
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.box {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: var(--opt-min, 48px);
+  height: var(--opt-h, 46px);
+  padding: 0 var(--opt-pad, 14px);
+  border: var(--opt-border, 1.5px) solid #3a3a3a;
+  border-radius: var(--opt-radius, 8px);
+  background: #050505;
+  color: #fff;
+  font-size: var(--opt-font, 15px);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  transition:
+    border-color 0.35s,
+    box-shadow 0.45s var(--ease-out),
+    color 0.3s;
+}
+
+.value:hover .box {
+  border-color: #666;
+}
+
+/* The chosen value: a pink-red rim in a red glow, as the mockup's "S". */
+.input:checked + .box {
+  border-color: #ff5a68;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 150, 160, 0.7),
+    0 0 12px 1px rgba(var(--red-rgb), 0.5);
+}
+
+.input:focus-visible + .box {
+  outline: 2px solid var(--white);
+  outline-offset: 3px;
+}
+
+/* Sold out with the other options as they are: struck through. */
+.value[data-state="soldout"] .box {
+  color: #6c6c6c;
+  background:
+    linear-gradient(
+        to top right,
+        transparent calc(50% - 0.75px),
+        rgba(255, 255, 255, 0.28) calc(50% - 0.75px),
+        rgba(255, 255, 255, 0.28) calc(50% + 0.75px),
+        transparent calc(50% + 0.75px)
+      )
+      #050505;
+}
+
+/* A combination the store doesn't make. */
+.value[data-state="missing"] .box {
+  color: #4c4c4c;
+  border-style: dashed;
+}

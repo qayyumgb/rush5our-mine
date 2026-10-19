@@ -1,0 +1,538 @@
+/* =========================================================================
+   PRODUCT PAGE — /merch/[handle] (no mockup)
+
+   The store's own page, in the site's language: near-black, one red, the
+   display face for the name and price, Oswald for labels, Inter for copy.
+   Phone first — photos, then details — and side by side from 900px, the
+   details sticking beside the photos. The 16px gutter on a phone.
+   ========================================================================= */
+
+.product {
+  position: relative;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding: calc(120 * var(--nu) + 28px) 16px 88px;
+  animation: rise 0.9s var(--ease-out) both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--muted);
+  transition: color 0.25s;
+}
+
+.back:hover {
+  color: var(--red);
+}
+
+.back svg {
+  width: 18px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.layout {
+  display: grid;
+  gap: 28px;
+  margin-top: 12px;
+}
+
+@media (min-width: 900px) {
+  .product {
+    padding-inline: 32px;
+  }
+
+  .layout {
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+    gap: 56px;
+    align-items: start;
+  }
+
+  .info {
+    position: sticky;
+    top: calc(120 * var(--nu) + 24px);
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Gallery                                                                 */
+/* ---------------------------------------------------------------------- */
+
+.gallery {
+  min-width: 0;
+}
+
+.stageWrap {
+  position: relative;
+}
+
+/* One photo at a time, a native swipe on touch screens. */
+.track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  border: 1px solid #2c2a2a;
+  border-radius: 14px;
+  background:
+    radial-gradient(70% 55% at 50% 45%, rgba(var(--red-rgb), 0.1), transparent 75%),
+    var(--card);
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+.track:focus-visible {
+  outline: 2px solid var(--white);
+  outline-offset: 3px;
+}
+
+.slide {
+  flex: 0 0 100%;
+  aspect-ratio: var(--ar, 0.8);
+  scroll-snap-align: center;
+}
+
+.slide img,
+.media {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.media {
+  aspect-ratio: 4 / 5;
+  border: 1px solid #2c2a2a;
+  border-radius: 14px;
+  background: var(--card);
+}
+
+/* The merch drop's ring, smaller. Hidden on touch screens: swipe there. */
+.arrow {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-top: -24px;
+  border: 2px solid #f2021a;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  box-shadow: 0 0 14px 2px rgba(var(--red-rgb), 0.4);
+  transition:
+    box-shadow 0.4s var(--ease-out),
+    transform 0.3s var(--ease-out);
+}
+
+.arrow:hover {
+  box-shadow: 0 0 22px 4px rgba(var(--red-rgb), 0.6);
+}
+
+.arrow:active {
+  transform: scale(0.94);
+}
+
+.arrow svg {
+  width: 8px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.arrowL {
+  left: 14px;
+}
+
+.arrowR {
+  right: 14px;
+}
+
+@media (pointer: coarse) {
+  .arrow {
+    display: none;
+  }
+}
+
+.counter {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: rgba(4, 4, 4, 0.75);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.thumbs {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 3px;
+}
+
+.thumbs::-webkit-scrollbar {
+  display: none;
+}
+
+.thumb {
+  flex: none;
+  width: 72px;
+  height: 90px;
+  overflow: hidden;
+  border: 1px solid #3a3838;
+  border-radius: 9px;
+  background: var(--card);
+  transition:
+    border-color 0.3s,
+    box-shadow 0.4s var(--ease-out);
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumb:hover {
+  border-color: #6a6667;
+}
+
+.thumbActive,
+.thumbActive:hover {
+  border-color: #ff3b4c;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 150, 160, 0.9),
+    0 0 12px 1px rgba(var(--red-rgb), 0.5);
+}
+
+@media (min-width: 900px) {
+  .thumb {
+    width: 84px;
+    height: 105px;
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Details                                                                 */
+/* ---------------------------------------------------------------------- */
+
+.info {
+  min-width: 0;
+}
+
+.eyebrow {
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.4em;
+  color: var(--red);
+}
+
+.title {
+  font-size: clamp(40px, 9vw, 72px);
+  line-height: 0.95;
+  letter-spacing: 0.005em;
+  color: #fff;
+  transform: skewX(-8deg);
+  transform-origin: left bottom;
+  overflow-wrap: anywhere;
+}
+
+.priceRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+  margin-top: 16px;
+}
+
+.price {
+  font-size: clamp(32px, 6vw, 44px);
+  line-height: 1;
+  color: #f3000c;
+}
+
+.compare {
+  font-size: 18px;
+  color: var(--dim);
+}
+
+.badge {
+  align-self: center;
+  padding: 6px 10px 5px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  color: #fff;
+}
+
+.options {
+  --opt-h: 48px;
+  --opt-min: 52px;
+  --opt-font: 15px;
+  --opt-gap: 10px;
+  --opt-label: 13px;
+  --opt-label-gap: 12px;
+  --opt-group-gap: 22px;
+  margin-top: 28px;
+}
+
+.qtyRow {
+  margin-top: 24px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  color: #c4c8c5;
+}
+
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  height: 48px;
+  border: 1.5px solid #3a3a3a;
+  border-radius: 8px;
+  background: #050505;
+}
+
+.stepper button {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 100%;
+  color: #fff;
+  transition: color 0.2s;
+}
+
+.stepper button:hover:not(:disabled) {
+  color: var(--red);
+}
+
+.stepper button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.stepper svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.stepper output {
+  min-width: 36px;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  color: #fff;
+}
+
+/* The merch drop's glowing button, at a page's size. */
+.buy {
+  margin-top: 28px;
+}
+
+.btnMagnet {
+  display: block;
+}
+
+.btn {
+  width: 100%;
+  height: 64px;
+  gap: 18px;
+  border-radius: 8px;
+  font-family: var(--f-ui);
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, #e4060f 0%, #d1080e 50%, #e2060f 100%);
+  box-shadow:
+    0 0 28px rgba(var(--red-rgb), 0.6),
+    0 0 10px rgba(var(--red-rgb), 0.4),
+    inset 0 0 0 2px rgba(255, 140, 140, 0.95),
+    inset 0 0 14px rgba(255, 60, 70, 0.3);
+}
+
+.btn:disabled,
+.btn:disabled:hover {
+  background: linear-gradient(180deg, #3a1012 0%, #2a0b0d 100%);
+  box-shadow: inset 0 0 0 1.5px rgba(255, 120, 120, 0.28);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.btnBusy {
+  cursor: progress;
+  pointer-events: none;
+}
+
+.cart {
+  width: 28px !important;
+  height: 26px !important;
+  overflow: visible;
+  flex: none;
+}
+
+.cart :global(.i-stroke) {
+  stroke-width: 2;
+}
+
+.error {
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--red-hot);
+}
+
+.error:empty {
+  display: none;
+}
+
+.note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--dim);
+}
+
+.note svg {
+  flex: none;
+  width: 13px;
+  height: 15px;
+  margin-top: 2px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+}
+
+.desc {
+  margin-top: 36px;
+  padding-top: 26px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.descTitle {
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  color: #c4c8c5;
+}
+
+.desc p + p {
+  margin-top: 12px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* States: not found, couldn't load, loading                               */
+/* ---------------------------------------------------------------------- */
+
+.state {
+  max-width: 640px;
+  margin-inline: auto;
+  padding: calc(120 * var(--nu) + 90px) 16px 120px;
+  text-align: center;
+}
+
+.stateTitle {
+  font-size: clamp(38px, 8vw, 64px);
+  line-height: 0.98;
+  color: #fff;
+  transform: skewX(-8deg);
+}
+
+.stateBody {
+  margin-top: 18px;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.stateCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  margin-top: 28px;
+  padding: 0 30px;
+  border: 1px solid var(--red);
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #fff;
+  transition:
+    background-color 0.3s,
+    box-shadow 0.3s;
+}
+
+.stateCta:hover {
+  background: rgba(var(--red-rgb), 0.16);
+  box-shadow: 0 0 24px rgba(var(--red-rgb), 0.35);
+}
+
+.skeleton {
+  border-radius: 14px;
+  background: linear-gradient(100deg, #0d0d0e 30%, #17171a 50%, #0d0d0e 70%) 0 0 / 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+.skeletonMedia {
+  aspect-ratio: 4 / 5;
+}
+
+.skeletonLine {
+  height: 22px;
+  margin-top: 18px;
+  border-radius: 6px;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}

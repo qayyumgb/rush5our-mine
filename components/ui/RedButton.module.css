@@ -52,6 +52,20 @@
   transform: translateY(0) scale(0.985);
 }
 
+/* Sold out, or busy: the red drains to a dark face and the hover stops. */
+.btn:disabled,
+.btn:disabled:hover {
+  transform: none;
+  cursor: not-allowed;
+  background: linear-gradient(180deg, #3a1012, #2a0b0d);
+  box-shadow: inset 0 0 0 1px rgba(255, 120, 120, 0.25);
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.btn:disabled::before {
+  display: none;
+}
+
 /* ARROW — stroked so it inherits the label colour. */
 .arrow {
   flex: none;

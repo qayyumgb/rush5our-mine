@@ -3,7 +3,7 @@
  * on through SendGrid.
  *
  * In order, a request is:
- *   1. checked for origin, size and shape   (lib/mail/sendgrid.ts)
+ *   1. checked for origin, size and shape   (lib/http.ts)
  *   2. rate limited per IP                  (lib/mail/rateLimit.ts)
  *   3. dropped silently if the honeypot is filled
  *   4. validated                            (lib/subscribe/validation.ts —
@@ -27,7 +27,8 @@
 
 import sgMail from "@sendgrid/mail";
 import { checkRateLimit, clientKey } from "@/lib/mail/rateLimit";
-import { isForeignOrigin, logSendGridError, readJsonObject, readMailConfig } from "@/lib/mail/sendgrid";
+import { isForeignOrigin, readJsonObject } from "@/lib/http";
+import { logSendGridError, readMailConfig } from "@/lib/mail/sendgrid";
 import { signupNotificationEmail, welcomeEmail } from "@/lib/subscribe/emails";
 import {
   HONEYPOT_FIELD,

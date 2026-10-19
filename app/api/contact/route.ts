@@ -22,7 +22,8 @@
 import sgMail from "@sendgrid/mail";
 import { autoReplyEmail, notificationEmail } from "@/lib/contact/emails";
 import { checkRateLimit, clientKey } from "@/lib/mail/rateLimit";
-import { isForeignOrigin, logSendGridError, readJsonObject, readMailConfig } from "@/lib/mail/sendgrid";
+import { isForeignOrigin, readJsonObject } from "@/lib/http";
+import { logSendGridError, readMailConfig } from "@/lib/mail/sendgrid";
 import {
   HONEYPOT_FIELD,
   normalizeContact,

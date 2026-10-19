@@ -36,7 +36,7 @@
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  height: calc(1672 * var(--k));
+  min-height: calc(1672 * var(--k));
   background: var(--black);
 }
 
@@ -59,7 +59,7 @@
   position: relative;
   z-index: 1;
   width: calc(941 * var(--k));
-  height: 100%;
+  min-height: calc(1672 * var(--k));
   margin-inline: auto;
 }
 
@@ -154,10 +154,11 @@
 /* Stage                                                                     */
 /* ------------------------------------------------------------------------ */
 
-/* The views other than the first are laid over the photograph's tee (which
-   sits at about x110..830, y405..1040), feathered into the scene at their
-   edges. Each is a portrait picture, cropped to its upper part so the print
-   sits where the tee's chest is. */
+/* The product's photos are laid over the photograph's own tee (which sits
+   at about x110..830, y405..1040), filling the stage and feathered into the
+   scene at their edges, as the mockup's views are: each is cropped to its
+   upper part so a print sits where the tee's chest is. Shot on black, as
+   the mockup's tee is, they melt into the crate scene. */
 .stage {
   position: absolute;
   left: 0;
@@ -194,12 +195,22 @@
   -webkit-user-drag: none;
 }
 
+/* Above the details block: it flows from the frame's top (padded down to
+   y1051), so without this its padding would sit over the rings and take
+   their clicks. The strip itself lets clicks through; only the rings
+   catch them. */
 .rings {
   position: absolute;
   left: 0;
   top: calc(667 * var(--k));
+  z-index: 2;
   width: 100%;
   height: calc(74 * var(--k));
+  pointer-events: none;
+}
+
+.rings .ring {
+  pointer-events: auto;
 }
 
 /* 74 across, a 2 red ring in a soft red glow, the chevron white. */
@@ -257,13 +268,22 @@
 /* Views                                                                     */
 /* ------------------------------------------------------------------------ */
 
+/* From here down the block flows, at the mockup's sizes: it starts where
+   the thumbnails do (y1051) and each part keeps the mockup's gap to the
+   one above, so longer store copy pushes the rest down. */
+.details {
+  position: relative;
+  padding: calc(1051 * var(--k)) calc(62 * var(--k)) calc(55 * var(--k)) calc(59 * var(--k));
+}
+
+/* Up to four, 194 x 181 with a 16 gap; fewer sit centred. */
 .thumbs {
-  position: absolute;
-  left: calc(59 * var(--k));
-  top: calc(1051 * var(--k));
   display: grid;
-  grid-template-columns: repeat(4, calc(194 * var(--k)));
+  grid-auto-flow: column;
+  grid-auto-columns: calc(194 * var(--k));
+  justify-content: center;
   gap: calc(16 * var(--k));
+  min-height: calc(181 * var(--k));
 }
 
 .thumb {
@@ -286,6 +306,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* A portrait photo shows its upper part, where a print sits. */
+  object-position: 50% 25%;
   max-width: none;
 }
 
@@ -307,121 +329,119 @@
 /* Details                                                                   */
 /* ------------------------------------------------------------------------ */
 
-.name,
-.price,
-.desc,
-.sizeLabel {
-  position: absolute;
-  margin: 0;
-  white-space: nowrap;
+/* Name, price and copy at x66..421; the hairline at x470; the options at
+   x519..879. Thumbnail bottom 1231 -> name cap top 1256. */
+.info {
+  display: grid;
+  /* The size column is 360 across, and may take a few pixels from the
+     name column (down to 300) when a small phone's minimum type size makes
+     the boxes wider than the mockup's, so the sizes stay on one row. */
+  grid-template-columns: minmax(calc(300 * var(--k)), 1fr) auto minmax(calc(360 * var(--k)), max-content);
+  column-gap: calc(48 * var(--k));
+  margin: calc(21 * var(--k)) 0 0 calc(7 * var(--k));
 }
 
-/* Name: cap 17, x66..313. */
+.infoMain {
+  min-width: 0;
+}
+
+/* Name: cap 17, white, tracked caps, on one line as the mockup sets it. */
 .name {
-  left: calc(66 * var(--k));
-  top: calc(1256 * var(--k));
+  margin: 0;
   font-size: max(11px, calc(23.5 * var(--k)));
   font-weight: 500;
+  line-height: 1.25;
   letter-spacing: 0.22em;
   color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Price: 64 tall at x66, the display face in red. */
+.name a {
+  transition: color 0.3s;
+}
+
+.name a:hover {
+  color: var(--red);
+}
+
+/* Price: 64 tall, the display face in red. */
 .price {
-  left: calc(66 * var(--k));
-  top: calc(1290 * var(--k));
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  column-gap: calc(16 * var(--k));
+  margin: calc(8 * var(--k)) 0 0;
   font-size: max(20px, calc(71 * var(--k)));
+  line-height: 1.02;
   letter-spacing: -0.02em;
   color: #f3000c;
   -webkit-text-stroke: 0;
 }
 
-/* Copy: cap 17 from y1367, pitch 28, grey. */
-.desc {
-  --lh: 1.16;
-  left: calc(66 * var(--k));
-  top: calc(1367 * var(--k));
-  font-size: max(10px, calc(24.3 * var(--k)));
-  font-weight: 400;
-  letter-spacing: -0.005em;
+.compare {
+  font-size: 0.42em;
+  letter-spacing: 0;
   color: #8a8a8b;
 }
 
-.desc span {
-  display: block;
+/* Copy: cap 17, pitch 28, grey; two lines, as the mockup — the rest is on
+   the product's page. */
+.desc {
+  margin: calc(1 * var(--k)) 0 0;
+  font-size: max(11px, calc(24.3 * var(--k)));
+  font-weight: 400;
+  line-height: 1.16;
+  letter-spacing: -0.005em;
+  color: #8a8a8b;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
+/* The red hairline, x470, from y1286 (30 under the name's cap top) to the
+   foot of the taller column; 125 at least. */
 .divider {
-  position: absolute;
-  left: calc(470 * var(--k));
-  top: calc(1286 * var(--k));
   width: max(1px, calc(2 * var(--k)));
-  height: calc(125 * var(--k));
+  margin-top: calc(30 * var(--k));
+  min-height: calc(125 * var(--k));
   background: #b5020d;
   transform-origin: top;
 }
 
-.sizeLabel {
-  left: calc(521 * var(--k));
-  top: calc(1290 * var(--k));
-  font-size: max(9px, calc(18 * var(--k)));
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  color: #c4c8c5;
+/* The mockup's size boxes, at its sizes: label cap 13 at y1290, boxes 57
+   tall from y1319, a 19 gap. A small phone gets a taller touch target
+   than the box itself. */
+.opts {
+  min-width: 0;
+  /* Name cap top 1256 -> size label cap top 1290. */
+  padding-top: calc(31 * var(--k));
 }
 
-.sizes {
-  position: absolute;
-  left: calc(519 * var(--k));
-  top: calc(1319 * var(--k));
-  display: flex;
-  gap: calc(19 * var(--k));
-}
-
-/* 57 tall; the last is wider for its three letters. */
-.size {
-  display: grid;
-  place-items: center;
-  min-width: calc(56 * var(--k));
-  height: calc(57 * var(--k));
-  padding: 0 calc(10 * var(--k)) calc(3 * var(--k));
-  border: max(1px, calc(1.5 * var(--k))) solid #3a3a3a;
-  border-radius: calc(8 * var(--k));
-  background: #050505;
-  color: #fff;
-  font-size: max(11px, calc(20.5 * var(--k)));
-  font-weight: 500;
-  letter-spacing: 0;
-  cursor: pointer;
-  transition:
-    border-color 0.35s,
-    box-shadow 0.45s var(--ease-out);
-}
-
-.size:last-child {
-  min-width: calc(66 * var(--k));
-}
-
-.size:hover {
-  border-color: #666;
-}
-
-.sizeActive,
-.sizeActive:hover {
-  border-color: #ff5a68;
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 150, 160, 0.7),
-    0 0 calc(12 * var(--k)) calc(1 * var(--k)) rgba(var(--red-rgb), 0.5);
+.options {
+  --opt-h: calc(57 * var(--k));
+  /* S..XL 54-55 across, XXL 65 with its padding: five fit x519..878. */
+  --opt-min: calc(54.5 * var(--k));
+  --opt-pad: calc(10 * var(--k));
+  --opt-font: max(11px, calc(20.5 * var(--k)));
+  --opt-gap: calc(19 * var(--k));
+  --opt-radius: calc(8 * var(--k));
+  --opt-border: max(1px, calc(1.5 * var(--k)));
+  --opt-label: max(9px, calc(18 * var(--k)));
+  --opt-label-gap: calc(16 * var(--k));
+  --opt-group-gap: calc(26 * var(--k));
+  --opt-hit: max(0px, calc((40px - 57 * var(--k)) / 2));
 }
 
 /* ------------------------------------------------------------------------ */
 /* Button and dots                                                           */
 /* ------------------------------------------------------------------------ */
 
+/* Copy foot ~1418 -> button top 1443; x61..879. */
 .btnWrap {
-  position: absolute;
-  left: calc(61 * var(--k));
-  top: calc(1443 * var(--k));
+  margin: calc(24 * var(--k)) 0 0 calc(2 * var(--k));
 }
 
 .btnMagnet {
@@ -448,6 +468,19 @@
     inset 0 0 calc(16 * var(--k)) rgba(255, 60, 70, 0.3);
 }
 
+/* Sold out (or a combination the store doesn't make): the red drains. */
+.btn:disabled,
+.btn:disabled:hover {
+  background: linear-gradient(180deg, #3a1012 0%, #2a0b0d 100%);
+  box-shadow: inset 0 0 0 max(1px, calc(2 * var(--k))) rgba(255, 120, 120, 0.28);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.btnBusy {
+  cursor: progress;
+  pointer-events: none;
+}
+
 .cart {
   width: calc(56 * var(--k)) !important;
   height: calc(52 * var(--k)) !important;
@@ -459,12 +492,24 @@
   stroke-width: 2;
 }
 
+.error {
+  margin-top: calc(18 * var(--k));
+  font-size: max(12px, calc(20 * var(--k)));
+  line-height: 1.35;
+  text-align: center;
+  color: var(--red-hot);
+}
+
+.error:empty {
+  display: none;
+}
+
+/* Button bottom 1545 -> dots 1591; 26 across at a 52.7 pitch, centred. */
 .dots {
-  position: absolute;
-  left: calc(378 * var(--k));
-  top: calc(1591 * var(--k));
   display: flex;
+  justify-content: center;
   gap: calc(25.7 * var(--k));
+  margin-top: calc(46 * var(--k));
 }
 
 .dot {
@@ -497,6 +542,31 @@
 .dotActive,
 .dotActive:hover {
   background: #fc0313;
+}
+
+/* ------------------------------------------------------------------------ */
+/* No product: the store's state, under the photograph                       */
+/* ------------------------------------------------------------------------ */
+
+.state {
+  position: relative;
+  padding: calc(1110 * var(--k)) calc(90 * var(--k)) calc(160 * var(--k));
+  text-align: center;
+}
+
+.stateTitle {
+  font-size: max(26px, calc(76 * var(--k)));
+  line-height: 1;
+  color: #fff;
+  transform: skewX(-10deg);
+}
+
+.stateBody {
+  max-width: 34em;
+  margin: calc(22 * var(--k)) auto 0;
+  font-size: max(13px, calc(24 * var(--k)));
+  line-height: 1.45;
+  color: #9a9a9b;
 }
 
 /* ------------------------------------------------------------------------ */

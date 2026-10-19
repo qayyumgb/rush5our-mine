@@ -1,7 +1,8 @@
 "use client";
 
 /**
- * NAV — fixed header with the logo, a burger and a full-screen drawer.
+ * NAV — fixed header with the logo, the cart (once the store is set up),
+ * a burger and a full-screen drawer.
  *
  * Behaviours:
  *   • transparent over the hero, gaining a solid background once the page has
@@ -21,6 +22,7 @@ import { EASE, EASE_IO } from "@/lib/motion/helpers";
 import { whenIntroReady } from "@/lib/motion/intro";
 import { useMotion } from "@/components/motion/MotionProvider";
 import { navLinks, site, socialLinks } from "@/data/site";
+import CartButton from "@/components/cart/CartButton";
 import Logo from "./Logo";
 import SocialIcon from "./SocialIcon";
 import styles from "./Nav.module.css";
@@ -183,22 +185,26 @@ export function Nav() {
         <div className={styles.inner}>
           <Logo hideUntilRevealed />
 
-          <button
-            ref={burgerRef}
-            type="button"
-            className={[styles.burger, open ? styles.burgerOpen : ""]
-              .filter(Boolean)
-              .join(" ")}
-            aria-label={open ? "Close menu" : "Open menu"}
-            aria-expanded={open}
-            aria-controls="nav-drawer"
-            onClick={() => setOpen((v) => !v)}
-            data-a
-          >
-            <span />
-            <span />
-            <span />
-          </button>
+          <div className={styles.actions}>
+            <CartButton />
+
+            <button
+              ref={burgerRef}
+              type="button"
+              className={[styles.burger, open ? styles.burgerOpen : ""]
+                .filter(Boolean)
+                .join(" ")}
+              aria-label={open ? "Close menu" : "Open menu"}
+              aria-expanded={open}
+              aria-controls="nav-drawer"
+              onClick={() => setOpen((v) => !v)}
+              data-a
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+          </div>
         </div>
       </header>
 

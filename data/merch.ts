@@ -67,8 +67,7 @@ export const merch: MerchContent = {
   titleRed: "Movement",
   subLines: ["More than merch. It's a symbol", "for the ones who were here "],
   subBold: "early.",
-  // SHOP LINK: point at the store.
-  cta: { label: "View all merch", href: "#" },
+  cta: { label: "View all merch", href: "/merch#shop" },
   badges: [
     { icon: "diamond", label: ["Premium", "quality"] },
     { icon: "globe", label: ["Made for", "the streets"] },
@@ -199,37 +198,25 @@ export const merchHero: MerchHeroContent = {
 /* Page section 2 — FEATURED DROP: LEVEL 1: ESSENTIALS (mockups/Merch/2.png) */
 /* ------------------------------------------------------------------------ */
 
-export interface MerchDropView {
-  /** What the view shows, read out on its thumbnail and dot. */
-  label: string;
-  thumb: { src: string; width: number; height: number };
-  /**
-   * The picture shown on the stage for this view. The first view has none:
-   * the tee in the section's own photograph is the product. The rest are
-   * laid over it.
-   */
-  stage?: { src: string; width: number; height: number };
-}
-
 export interface MerchDropContent {
   eyebrow: string;
   titleWhite: string;
   titleRed: string;
   subline: string;
   /**
-   * BACKEND SEAM: one product, as the mockup shows. This maps onto a
-   * Shopify product (name, price, description, variants = sizes, images =
-   * views); swap it for a fetched product and the section renders it. The
-   * "add to cart" link goes to the Shopify checkout once Phase 2 wires it.
+   * The product is Shopify's: the first product in the store's "featured"
+   * collection (see lib/shopify/products.ts). Only these labels are ours;
+   * the buying words are in data/shop.ts.
    */
-  product: {
-    name: string;
-    price: string;
-    descriptionLines: string[];
-    sizeLabel: string;
-    sizes: string[];
-    views: MerchDropView[];
-    cta: { label: string; href: string };
+  labels: {
+    /** The size column's label, and its one box, for a product without
+        options (the mockup always shows sizes). */
+    size: string;
+    oneSize: string;
+    prev: string;
+    next: string;
+    /** "{n}" is replaced with the photo's number. */
+    view: string;
   };
 }
 
@@ -238,35 +225,34 @@ export const merchDrop: MerchDropContent = {
   titleWhite: "Level 1:",
   titleRed: "Essentials",
   subline: "The foundation of the movement.",
-  product: {
-    name: "Rush 5our Tee",
-    price: "$35.00",
-    descriptionLines: ["Premium heavyweight tee.", "Built for the culture."],
-    sizeLabel: "Size",
-    sizes: ["S", "M", "L", "XL", "XXL"],
-    // ARTWORK: the thumbnails are cut from mockups/Merch/2.png; the back
-    // view is cut from mockups/Merch/1.png, the logo and label views are the
-    // thumbnails enlarged. Replace with product photographs when supplied.
-    views: [
-      { label: "Front", thumb: { src: "/assets/images/merch-drop-thumb-front.webp", width: 189, height: 177 } },
-      {
-        label: "Back",
-        thumb: { src: "/assets/images/merch-drop-thumb-back.webp", width: 186, height: 177 },
-        stage: { src: "/assets/images/merch-drop-view-back.webp", width: 480, height: 720 },
-      },
-      {
-        label: "Logo",
-        thumb: { src: "/assets/images/merch-drop-thumb-logo.webp", width: 187, height: 177 },
-        stage: { src: "/assets/images/merch-drop-view-logo.webp", width: 560, height: 530 },
-      },
-      {
-        label: "Label",
-        thumb: { src: "/assets/images/merch-drop-thumb-label.webp", width: 187, height: 177 },
-        stage: { src: "/assets/images/merch-drop-view-label.webp", width: 560, height: 530 },
-      },
-    ],
-    cta: { label: "Add to cart", href: "#drop" },
+  labels: {
+    size: "Size",
+    oneSize: "One size",
+    prev: "Previous photo",
+    next: "Next photo",
+    view: "Photo {n}",
   },
+};
+
+/* ------------------------------------------------------------------------ */
+/* Page section 2b — THE STORE: every product (no mockup; Phase 2)           */
+/* ------------------------------------------------------------------------ */
+
+export interface MerchShopContent {
+  eyebrow: string;
+  titleWhite: string;
+  titleRed: string;
+  subline: string;
+  /** The carousel's rings. */
+  labels: { prev: string; next: string };
+}
+
+export const merchShop: MerchShopContent = {
+  eyebrow: "The store",
+  titleWhite: "All",
+  titleRed: "Merch",
+  subline: "Every piece. Every drop.",
+  labels: { prev: "Previous pieces", next: "More pieces" },
 };
 
 /* ------------------------------------------------------------------------ */
@@ -384,8 +370,7 @@ export interface MerchCloseContent {
   titleWhite: string[];
   titleRed: string[];
   bodyLines: string[];
-  /** BACKEND SEAM: the featured drop on this page until the Shopify store
-      (Phase 2B) gives "all merch" a page of its own. */
+  /** To the store's grid on this page. */
   cta: { label: string; href: string };
   taglines: string[];
 }
@@ -401,6 +386,6 @@ export const merchClose: MerchCloseContent = {
     "A symbol of believing in something real.",
     "A symbol of YOU.",
   ],
-  cta: { label: "Shop all merch", href: "#drop" },
+  cta: { label: "Shop all merch", href: "#shop" },
   taglines: ["Bigger than clothes.", "A stronger tomorrow."],
 };

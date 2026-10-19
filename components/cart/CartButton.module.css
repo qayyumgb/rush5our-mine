@@ -1,0 +1,44 @@
+/* CART BUTTON — sized with the nav (--nu), so it scales with the burger
+   beside it; never smaller than a 40px target. */
+
+.button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: max(40px, calc(64 * var(--nu)));
+  height: max(40px, calc(64 * var(--nu)));
+  color: var(--white);
+  transition: color 0.3s;
+}
+
+.button:hover {
+  color: var(--red);
+}
+
+.icon {
+  width: max(22px, calc(40 * var(--nu)));
+  height: auto;
+  overflow: visible;
+}
+
+.icon :global(.i-stroke) {
+  stroke-width: 2;
+}
+
+.badge {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--red);
+  box-shadow: 0 0 12px rgba(var(--red-rgb), 0.6);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+}

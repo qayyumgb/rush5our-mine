@@ -1,0 +1,341 @@
+/* =========================================================================
+   MERCH — THE STORE (no mockup)
+
+   In the page's column unit `--k` (1/941 of the viewport, capped at the
+   900px column — see MerchDrop.module.css), with the statement set as the
+   Locked section sets its own, so it reads as one of the page's sections.
+   The carousel shows one card and a peek of the next on a phone, three
+   across from 700px.
+   ========================================================================= */
+
+.section {
+  --k: calc(min(100vw, 900px) / 941);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: calc(96 * var(--k)) 0 calc(130 * var(--k));
+  background: var(--black);
+}
+
+/* A low red pool behind the carousel, as the other sections are lit. */
+.atmos {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 40% at 50% 0%, rgba(var(--red-rgb), 0.16), transparent 70%),
+    radial-gradient(70% 45% at 50% 100%, rgba(var(--red-rgb), 0.1), transparent 70%);
+}
+
+.frame {
+  position: relative;
+  z-index: 1;
+  width: calc(941 * var(--k));
+  margin-inline: auto;
+  padding: 0 calc(59 * var(--k));
+}
+
+/* ------------------------------------------------------------------------ */
+/* Statement                                                                 */
+/* ------------------------------------------------------------------------ */
+
+.head {
+  text-align: center;
+}
+
+.eyebrow {
+  font-size: max(9px, calc(23.5 * var(--k)));
+  font-weight: 500;
+  letter-spacing: 0.57em;
+  padding-left: 0.57em;
+  color: var(--red);
+  white-space: nowrap;
+}
+
+.title {
+  margin-top: calc(20 * var(--k));
+}
+
+.title :global(.line) {
+  text-align: center;
+  transform: skewX(-10deg);
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+  overflow: visible;
+  clip-path: inset(-8% -10% -2% -10%);
+  font-size: max(40px, calc(128 * var(--k)));
+}
+
+.title :global(.line-inner) {
+  display: inline-block;
+  transform: scaleX(1.3);
+}
+
+.title :global(.char) {
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 240px 240px, 100% 100%;
+  background-repeat: repeat, no-repeat;
+  -webkit-text-stroke: max(0.5px, calc(1.3 * var(--k))) rgba(255, 255, 255, 0.5);
+}
+
+.title :global(.char.t-white),
+.title :global(.t-white .char) {
+  background-image: var(--grunge), linear-gradient(180deg, #fff 0%, #f4f4f4 50%, #d6d6d6 100%);
+}
+
+.title :global(.char.t-red),
+.title :global(.t-red .char) {
+  background-image: var(--grunge), linear-gradient(180deg, #ff2b34 0%, var(--red) 50%, #b40e17 100%);
+  -webkit-text-stroke: max(0.5px, calc(1.3 * var(--k))) rgba(255, 60, 70, 0.5);
+}
+
+.subline {
+  margin-top: calc(22 * var(--k));
+  font-size: max(9px, calc(20.5 * var(--k)));
+  font-weight: 400;
+  letter-spacing: 0.45em;
+  padding-left: 0.45em;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Carousel                                                                  */
+/* ------------------------------------------------------------------------ */
+
+/* The row runs out to the frame's edges (on a phone, the screen's), past
+   the column's 59 margins, so the next card peeks in from the edge rather
+   than being cut at the column. The cards still start on the column.
+   --cw is a card's width, from the column's width (container units): most
+   of it on a phone, a third from 700px. */
+.carousel {
+  --pad: calc(59 * var(--k));
+  --col: calc(100cqw - 2 * var(--pad));
+  --gap: max(12px, calc(24 * var(--k)));
+  --cw: calc(var(--col) * 0.64);
+  --ring: max(32px, calc(74 * var(--k)));
+  position: relative;
+  margin: calc(70 * var(--k)) calc(-59 * var(--k)) 0;
+  container-type: inline-size;
+}
+
+@media (min-width: 700px) {
+  .carousel {
+    --cw: calc((var(--col) - 2 * var(--gap)) / 3);
+  }
+}
+
+/* A native scroll-snap row: a swipe on touch, the rings or the arrow keys
+   elsewhere. Padded so the hover glow isn't clipped. */
+.track {
+  display: flex;
+  gap: var(--gap);
+  margin: 0;
+  padding: 6px var(--pad) 10px;
+  scroll-padding-inline: var(--pad);
+  /* Cards fade out across the edge margins rather than being sliced. */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--pad), #000 calc(100% - var(--pad)), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 var(--pad), #000 calc(100% - var(--pad)), transparent 100%);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  list-style: none;
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+.track:focus-visible {
+  outline: 2px solid var(--white);
+  outline-offset: 6px;
+  border-radius: 6px;
+}
+
+.card {
+  flex: 0 0 var(--cw);
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+/* The featured drop's rings, centred on the photos (4:5, so half a card
+   width x 1.25 down) and half over the row's edges; dimmed at either end. */
+.ring {
+  position: absolute;
+  top: calc(6px + var(--cw) * 0.625 - var(--ring) / 2);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: var(--ring);
+  height: var(--ring);
+  padding: 0;
+  border: max(1.5px, calc(2 * var(--k))) solid #f2021a;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 0 calc(14 * var(--k)) calc(2 * var(--k)) rgba(var(--red-rgb), 0.45);
+  transition:
+    transform 0.45s var(--ease-out),
+    box-shadow 0.45s var(--ease-out),
+    background-color 0.3s,
+    opacity 0.3s;
+}
+
+.ring:hover:not(:disabled) {
+  background: rgba(20, 0, 2, 0.95);
+  box-shadow: 0 0 calc(22 * var(--k)) calc(4 * var(--k)) rgba(var(--red-rgb), 0.65);
+}
+
+.ring:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.ring:disabled {
+  opacity: 0.25;
+  cursor: default;
+  box-shadow: none;
+}
+
+.ring svg {
+  width: max(6px, calc(11 * var(--k)));
+  height: max(12px, calc(23 * var(--k)));
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+}
+
+.ringL {
+  left: calc(var(--pad) - var(--ring) / 2);
+}
+
+.ringR {
+  right: calc(var(--pad) - var(--ring) / 2);
+}
+
+/* Where in the row you are: a red thumb, as wide as the share in view. */
+.bar {
+  position: relative;
+  height: 3px;
+  margin: calc(40 * var(--k)) auto 0;
+  max-width: calc(560 * var(--k));
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.thumb {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 2px;
+  background: var(--red);
+  box-shadow: 0 0 10px rgba(var(--red-rgb), 0.7);
+  transition:
+    left 0.15s linear,
+    width 0.3s var(--ease-out);
+}
+
+.link {
+  display: block;
+}
+
+.media {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 1px solid #2c2a2a;
+  border-radius: max(8px, calc(14 * var(--k)));
+  background: var(--card);
+  transition:
+    border-color 0.4s,
+    box-shadow 0.5s var(--ease-out);
+}
+
+.img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition:
+    opacity 0.6s var(--ease-out),
+    transform 0.9s var(--ease-out);
+}
+
+.imgAlt {
+  opacity: 0;
+}
+
+.tag {
+  position: absolute;
+  top: max(8px, calc(16 * var(--k)));
+  left: max(8px, calc(16 * var(--k)));
+  padding: 5px 9px 4px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 4px;
+  background: rgba(4, 4, 4, 0.82);
+  font-size: max(11px, calc(15 * var(--k)));
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  color: #fff;
+}
+
+.name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin-top: max(10px, calc(20 * var(--k)));
+  font-size: max(13px, calc(25 * var(--k)));
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  color: #fff;
+  transition: color 0.3s;
+}
+
+.price {
+  display: block;
+  margin-top: max(4px, calc(8 * var(--k)));
+  font-size: max(17px, calc(36 * var(--k)));
+  line-height: 1.05;
+  color: #f3000c;
+}
+
+@media (hover: hover) {
+  .link:hover .media {
+    border-color: rgba(var(--red-rgb), 0.8);
+    box-shadow: 0 0 calc(26 * var(--k)) rgba(var(--red-rgb), 0.35);
+  }
+
+  .link:hover .img {
+    transform: scale(1.035);
+  }
+
+  .link:hover .imgAlt {
+    opacity: 1;
+  }
+
+  .link:hover .name {
+    color: var(--red);
+  }
+}
+
+.link:focus-visible {
+  outline: none;
+}
+
+.link:focus-visible .media {
+  outline: 2px solid var(--white);
+  outline-offset: 3px;
+}

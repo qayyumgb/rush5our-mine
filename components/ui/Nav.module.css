@@ -38,6 +38,13 @@
   padding: 0 calc(46 * var(--nu)) 0 calc(34 * var(--nu));
 }
 
+/* The cart (when the store is set up) and the burger, on the right. */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: max(10px, calc(22 * var(--nu)));
+}
+
 /* ---------------------------------------------------------------------- */
 /* Burger                                                                  */
 /* ---------------------------------------------------------------------- */
