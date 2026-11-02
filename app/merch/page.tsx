@@ -7,7 +7,8 @@
  *
  *   1  BUILD THE MOVEMENT.         the hero
  *   2  FEATURED DROP               Shopify's featured product, buyable
- *   2b THE STORE                   every Shopify product → /merch/[handle]
+ *   2b THE STORE                   every Shopify product → /merch/[handle];
+ *                                  shown once there is more than one
  *   3  LOCKED FUTURE DROPS
  *   4  WHY OUR MERCH MATTERS
  *   5  WEAR THE MOVEMENT.
@@ -45,17 +46,31 @@ export const metadata: Metadata = {
   },
 };
 
-/** The featured drop and the grid, once Shopify has answered. Without
-    products the featured drop says why, and the grid is left out. */
+/**
+ * The featured drop and the store, once Shopify has answered. Without
+ * products the featured drop says why.
+ *
+ * THE STORE (MerchShop, "All merch") only shows once there's something
+ * besides the featured drop: with one product it would just repeat it.
+ * Add a second product in Shopify and it appears on its own. Until then the
+ * featured drop carries the store's "#shop" anchor, so the links that point
+ * there ("Shop all merch", the cart's "Shop the drop", the product page's
+ * "All merch") land on it.
+ */
 async function Store() {
   const products = await getProducts();
   if (!products.ok) return <MerchDrop product={null} failure={products.reason} />;
   if (products.data.length === 0) return <MerchDrop product={null} failure="empty" />;
 
   const featured = await getFeaturedProduct(products.data);
+  const drop = <MerchDrop product={featured.ok ? featured.data : null} failure={featured.ok ? "empty" : featured.reason} />;
+  const featuredHandle = featured.ok ? featured.data?.handle : undefined;
+  const hasMore = products.data.some((p) => p.handle !== featuredHandle);
+
+  if (!hasMore) return <div id="shop">{drop}</div>;
   return (
     <>
-      <MerchDrop product={featured.ok ? featured.data : null} failure={featured.ok ? "empty" : featured.reason} />
+      {drop}
       <MerchShop products={products.data} />
     </>
   );

@@ -278,12 +278,38 @@
 
 /* Up to four, 194 x 181 with a 16 gap; fewer sit centred. */
 .thumbs {
+  position: relative;
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: calc(194 * var(--k));
   justify-content: center;
   gap: calc(16 * var(--k));
   min-height: calc(181 * var(--k));
+}
+
+/* More than four: the row scrolls — a swipe, or it follows the chosen
+   photo. It runs out to the frame's edges so the fifth peeks in, fading
+   there, while the first still starts at x59. Padded top and bottom so the
+   chosen one's glow isn't clipped. */
+.thumbsMany {
+  justify-content: start;
+  margin: -10px calc(-62 * var(--k)) -10px calc(-59 * var(--k));
+  padding: 10px calc(62 * var(--k)) 10px calc(59 * var(--k));
+  scroll-padding-inline: calc(59 * var(--k));
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 calc(59 * var(--k)), #000 calc(100% - 62 * var(--k)), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 calc(59 * var(--k)), #000 calc(100% - 62 * var(--k)), transparent 100%);
+}
+
+.thumbsMany::-webkit-scrollbar {
+  display: none;
+}
+
+.thumbsMany .thumb {
+  scroll-snap-align: start;
 }
 
 .thumb {

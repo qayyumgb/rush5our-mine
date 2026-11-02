@@ -7,7 +7,8 @@
  * The product: a centred statement — red tracked eyebrow, a two-line
  * leaning headline, a tracked subline — over the section's photograph (a
  * crate under red light), the product's photo on the stage with a
- * prev/next ring at each side, up to four photo thumbnails, the name,
+ * prev/next ring at each side, the photo thumbnails (four across; more
+ * scroll), the name,
  * price and description beside the option boxes behind a red hairline,
  * the glowing "add to cart" button, and a dot per photo.
  *
@@ -58,8 +59,11 @@ import { shop } from "@/data/shop";
 import ProductOptions from "./ProductOptions";
 import styles from "./MerchDrop.module.css";
 
-/** The thumbnail row holds four, as the mockup does. */
-const MAX_VIEWS = 4;
+/** Every photo the product has, up to ten. Four thumbnails fit across, as
+    the mockup has them; with more, the row scrolls. */
+const MAX_VIEWS = 10;
+/** Thumbnails across before the row scrolls. */
+const THUMBS_ACROSS = 4;
 
 export interface MerchDropProps {
   product: ShopProduct | null;
@@ -138,6 +142,7 @@ export function MerchDrop({ product, failure = "empty" }: MerchDropProps) {
   const rootRef = useRef<HTMLElement>(null);
   const { ready, reduced } = useMotion();
   const [view, setView] = useState(0);
+  const thumbsRef = useRef<HTMLDivElement>(null);
 
   const c = merchDrop;
   const views = product?.images.slice(0, MAX_VIEWS) ?? [];
@@ -187,7 +192,7 @@ export function MerchDrop({ product, failure = "empty" }: MerchDropProps) {
           .timeline({ defaults: { ease: EASE }, scrollTrigger: { trigger: details, start: "top 88%" } })
           .fromTo(q(`.${styles.thumb}`), { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, stagger: 0.08 }, 0)
           .fromTo(
-            q(`.${styles.name}, .${styles.price}, .${styles.desc}, .${styles.more}`),
+            q(`.${styles.name}, .${styles.price}, .${styles.desc}`),
             { y: 16, opacity: 0 },
             { y: 0, opacity: 1, duration: 0.9, stagger: 0.1 },
             0.3,
@@ -211,6 +216,16 @@ export function MerchDrop({ product, failure = "empty" }: MerchDropProps) {
 
     return () => ctx.revert();
   }, [ready, reduced]);
+
+  // With more photos than fit, keep the chosen one's thumbnail in view —
+  // scrolling the row only, never the page.
+  useEffect(() => {
+    const strip = thumbsRef.current;
+    if (!strip || strip.scrollWidth <= strip.clientWidth + 1) return;
+    const thumb = strip.children[view] as HTMLElement | undefined;
+    if (!thumb) return;
+    strip.scrollTo({ left: thumb.offsetLeft - (strip.clientWidth - thumb.offsetWidth) / 2, behavior: reduced ? "auto" : "smooth" });
+  }, [view, reduced]);
 
   const go = (next: number) => setView(((next % count) + count) % count);
   const viewLabel = (i: number) => c.labels.view.replace("{n}", String(i + 1));
@@ -288,7 +303,12 @@ export function MerchDrop({ product, failure = "empty" }: MerchDropProps) {
           <div className={styles.details}>
             {/* ---------------- Photos ---------------- */}
             {count > 0 && (
-              <div className={styles.thumbs} role="tablist" aria-label={product.title}>
+              <div
+                ref={thumbsRef}
+                className={`${styles.thumbs} ${count > THUMBS_ACROSS ? styles.thumbsMany : ""}`}
+                role="tablist"
+                aria-label={product.title}
+              >
                 {views.map((img, i) => (
                   <button
                     key={img.url}
