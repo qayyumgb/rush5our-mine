@@ -1,13 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import { fontVariables } from "./fonts";
 import { site } from "@/data/site";
-import { MotionProvider } from "@/components/motion/MotionProvider";
-import Footer from "@/components/ui/Footer";
-import { VideoPlayerProvider } from "@/components/ui/VideoPlayer";
-import Cursor from "@/components/ui/Cursor";
-import CartProvider from "@/components/cart/CartProvider";
-import { readShopifyConfig } from "@/lib/shopify/client";
 import "./globals.css";
+
+/*
+ * ROOT LAYOUT — only what every page needs: the document, the fonts, the
+ * stylesheet, the motion gate and the film grain. The website's shared
+ * pieces (motion, cart, footer, cursor) live in app/(site)/layout.tsx, so a
+ * page outside that group — the Early Access page — gets none of them.
+ */
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -81,18 +82,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Film grain over the entire page — purely atmospheric. */}
         <div className="grain" aria-hidden="true" />
 
-        <MotionProvider>
-          <VideoPlayerProvider>
-            {/* The Shopify cart, on every page. Only whether the store is set
-                up crosses to the browser — never its domain or token. */}
-            <CartProvider enabled={readShopifyConfig() !== null}>
-              {children}
-              {/* One footer for every page, after its sections. */}
-              <Footer />
-            </CartProvider>
-            <Cursor />
-          </VideoPlayerProvider>
-        </MotionProvider>
+        {children}
       </body>
     </html>
   );

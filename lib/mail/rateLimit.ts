@@ -15,6 +15,7 @@
  * is the only function that would change.
  */
 
+/** Submissions per window, unless a route asks for another number. */
 const LIMIT = 5;
 const WINDOW_MS = 10 * 60 * 1000;
 
@@ -40,7 +41,12 @@ export interface RateLimitResult {
   retryAfter: number;
 }
 
-export function checkRateLimit(key: string): RateLimitResult {
+/**
+ * `limit` defaults to 5. A form that many people fill in from one place —
+ * the Early Access QR page, scanned at an event, where phones on the same
+ * Wi-Fi or mobile network share one address — passes a higher one.
+ */
+export function checkRateLimit(key: string, limit = LIMIT): RateLimitResult {
   const now = Date.now();
   sweep(now);
 
@@ -50,7 +56,7 @@ export function checkRateLimit(key: string): RateLimitResult {
     return { allowed: true, retryAfter: 0 };
   }
 
-  if (bucket.count >= LIMIT) {
+  if (bucket.count >= limit) {
     return { allowed: false, retryAfter: Math.ceil((bucket.resetAt - now) / 1000) };
   }
 

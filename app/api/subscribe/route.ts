@@ -1,6 +1,8 @@
 /**
- * POST /api/subscribe — receives the Join the Movement sign-up and sends it
- * on through SendGrid.
+ * POST /api/subscribe — receives a sign-up and sends it on through SendGrid:
+ * the Join the Movement form, and the Early Access page (app/early-access),
+ * which sends `source: "early-access"` and is tagged "Early Access / Merch
+ * Drop" in the business email.
  *
  * In order, a request is:
  *   1. checked for origin, size and shape   (lib/http.ts)
@@ -37,6 +39,9 @@ import {
   type SubscribeResponse,
 } from "@/lib/subscribe/validation";
 
+/** Early Access sign-ups allowed per address every 10 minutes. */
+const EARLY_ACCESS_LIMIT = 30;
+
 /** Largest request body accepted, in bytes. A sign-up is a few hundred. */
 const MAX_BODY = 4_000;
 
@@ -61,7 +66,13 @@ export async function POST(request: Request) {
 
   /* --- 2. rate limit ---------------------------------------------------- */
 
-  const limit = checkRateLimit(`subscribe:${clientKey(request)}`);
+  // Early Access is a QR page scanned at events, where many phones share one
+  // address (venue Wi-Fi, mobile networks), so it gets a roomier allowance
+  // and its own count.
+  const early = payload.source === "early-access";
+  const limit = early
+    ? checkRateLimit(`early-access:${clientKey(request)}`, EARLY_ACCESS_LIMIT)
+    : checkRateLimit(`subscribe:${clientKey(request)}`);
   if (!limit.allowed) {
     return json(
       { ok: false, error: "Too many sign-ups from here. Please try again in a few minutes." },

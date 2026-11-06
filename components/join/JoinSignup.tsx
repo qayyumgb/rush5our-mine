@@ -403,13 +403,14 @@ export function JoinSignup() {
           {/* Honeypot: off-screen, out of the tab order and hidden from
               assistive tech, so no person fills it — a bot that does is
               dropped by the API route. Not `display: none`, which some
-              bots skip. */}
+              bots skip. Its name and label mean nothing to a browser, so
+              autofill never fills it for a real person ("company" would be). */}
           <div className={styles.trap} aria-hidden="true">
             <label>
-              Company
+              Leave this empty
               <input
                 type="text"
-                name={HONEYPOT_FIELD}
+                name="hp_check"
                 tabIndex={-1}
                 autoComplete="off"
                 value={honeypot}
