@@ -355,7 +355,7 @@ export const aboutMission: AboutMissionContent = {
   welcomeRed: "The culture.",
   copyLines: ["If you’re here, you’re early.", "You’re not just watching RUSH 5OUR grow."],
   copyRed: "You’re part of the reason it will.",
-  cta: { label: "Join the movement", href: "/#faq" },
+  cta: { label: "Join the movement", href: "/join" },
   stats: [
     { icon: "bolt", top: "More than", bottom: "Content." },
     { icon: "community", top: "More than", bottom: "A brand." },

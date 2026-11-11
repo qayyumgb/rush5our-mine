@@ -63,7 +63,7 @@ export const hero: HeroContent = {
     "challenges, prizes, and",
     "unforgettable moments.",
   ],
-  primaryCta: { label: "Join the movement", href: "#concept" },
+  primaryCta: { label: "Join the movement", href: "/join" },
   storyVideo: {
     label: "Watch\nour story",
     videoUrl: STORY_VIDEO.url,

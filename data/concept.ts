@@ -108,7 +108,7 @@ export const concept: ConceptContent = {
   cta: {
     tags: ["Real people.", "Real rewards.", "Real opportunities."],
     accent: { lines: ["Build", "the movement."] },
-    button: { label: "Join the movement", href: "#culture" },
+    button: { label: "Join the movement", href: "/join" },
   },
 
   scrollCue: "Scroll for more",

@@ -36,7 +36,7 @@ export const culture: CultureContent = {
     "You are not just watching Rush5our grow.",
     "You are a part of the reason it will.",
   ],
-  cta: { label: "Join the movement", href: "#faq" },
+  cta: { label: "Join the movement", href: "/join" },
   features: [
     {
       icon: "globe",
