@@ -579,6 +579,111 @@
   color: #ff6b70;
 }
 
+/* "Send the link again", under the check-your-email note. */
+.noteAction {
+  display: block;
+  margin-top: calc(10 * var(--k));
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--f-ui);
+  font-size: max(12px, calc(17 * var(--k)));
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #ff2b3a;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.noteAction:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* "Already a member? Sign in", at the foot of the form. */
+.signIn {
+  margin: calc(22 * var(--k)) 0 0;
+  font-size: max(13px, calc(19 * var(--k)));
+  text-align: center;
+  color: #a9a9a9;
+}
+
+.signInLink {
+  font-weight: 600;
+  color: #fff;
+  text-decoration: underline;
+  text-decoration-color: var(--red);
+  text-underline-offset: 4px;
+}
+
+.signInLink:hover {
+  color: var(--red);
+}
+
+/* The links are buttons where they swap the panel in place. */
+button.signInLink {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+button.signInLink:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* The panel's faces (sign up, sign in, signed in) swap with `hidden`. */
+.panel[hidden] {
+  display: none;
+}
+
+/* Sign-in mode: "Forgot your password?" over "New here? Create…". */
+.signInStack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(12 * var(--k));
+}
+
+/* A notice that opens the sign-in face (an expired link, signed out). */
+.noteTop {
+  margin: 0 0 calc(16 * var(--k));
+}
+
+/* The submit style as a link (My account). */
+a.submit {
+  text-decoration: none;
+}
+
+/* Signed in: the member's RUSH Code, then My account and Sign out. */
+.member {
+  text-align: center;
+}
+
+.memberLabel {
+  margin: calc(6 * var(--k)) 0 0;
+  font-size: max(12px, calc(19 * var(--k)));
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  color: #a9a9a9;
+}
+
+.memberCode {
+  display: block;
+  margin: calc(10 * var(--k)) 0 calc(6 * var(--k));
+  font-size: max(40px, calc(84 * var(--k)));
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: #fff;
+  text-shadow: 0 0 calc(28 * var(--k)) rgba(var(--red-rgb), 0.55);
+  user-select: all;
+}
+
 @keyframes join-note-in {
   from {
     opacity: 0;

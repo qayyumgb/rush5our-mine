@@ -23,6 +23,9 @@ export const metadata: Metadata = {
     title: `Join the Movement — ${site.name}`,
     description: joinHero.bodyLines.join(" "),
   },
+  // A password-reset link puts its one-time token in this page's address
+  // (/join?reset=…). Other sites linked from here get only the origin.
+  referrer: "strict-origin-when-cross-origin",
 };
 
 export default function JoinPage() {

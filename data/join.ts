@@ -166,10 +166,10 @@ export interface JoinSignupContent {
   lead: string;
   fields: { name: string; email: string; username: string; password: string };
   /**
-   * Show the Username and Password fields. Off until the account system
-   * exists (Phase 3, RUSH5OUR-Implementation-Plan.md 3.1): today the form
-   * is an email sign-up (app/api/subscribe), and a password typed into it
-   * would go nowhere. Turn on with the accounts.
+   * On: the form creates an account (Username and Password shown, posted
+   * to app/api/auth/signup; the member confirms their email, then signs
+   * in). Off: it's the plain email sign-up it was before accounts
+   * (app/api/subscribe).
    */
   accountFields: boolean;
   updatesLabel: string;
@@ -179,6 +179,70 @@ export interface JoinSignupContent {
   sending: string;
   sentTitle: string;
   sent: string;
+  /** With accounts: after sign-up. "{email}" is replaced. */
+  verifyTitle: string;
+  verify: string;
+  resend: string;
+  resent: string;
+  /** Under the button: turns the form into sign-in, in place. */
+  signIn: { lead: string; label: string };
+  /**
+   * The same panel in sign-in mode ("Already a member? Sign in"), opened
+   * also by links from elsewhere (/join?signin=1, with a `notice`).
+   */
+  signInMode: {
+    createLead: string;
+    createTail: string;
+    lead: string;
+    login: string;
+    password: string;
+    submit: string;
+    sending: string;
+    failedTitle: string;
+    resend: string;
+    resent: string;
+    forgot: string;
+    create: { lead: string; label: string };
+    notices: { expired: string; error: string; "signed-out": string };
+  };
+  /** "Forgot your password?": the panel asks for an email and sends a
+      reset link (/join?forgot=1 opens it directly). */
+  forgotMode: {
+    createLead: string;
+    createTail: string;
+    lead: string;
+    email: string;
+    submit: string;
+    sending: string;
+    sentTitle: string;
+    sent: string;
+    back: string;
+  };
+  /** The reset email's link opens the panel here (/join?reset=<token>). */
+  resetMode: {
+    createLead: string;
+    createTail: string;
+    lead: string;
+    password: string;
+    confirm: string;
+    mismatch: string;
+    submit: string;
+    sending: string;
+    failedTitle: string;
+    expiredTitle: string;
+    expired: string;
+    again: string;
+  };
+  /** A signed-in member visiting the page sees this instead of the form.
+      "{name}" is their first name. */
+  memberMode: {
+    createLead: string;
+    lead: string;
+    codeLabel: string;
+    account: { label: string; href: string };
+    signOut: string;
+    signingOut: string;
+  };
   failedTitle: string;
   failed: string;
   onceWhite: string;
@@ -198,7 +262,7 @@ export const joinSignup: JoinSignupContent = {
   createTail: "account",
   lead: "It’s free. Join the movement and stay connected to what’s next.",
   fields: { name: "Full Name", email: "Email Address", username: "Username", password: "Password" },
-  accountFields: false,
+  accountFields: true,
   updatesLabel: "Send me updates about hunts, drops & opportunities.",
   // BACKEND SEAM: the Terms and Privacy pages do not exist yet (the footer's
   // links point at "#" too); give these real hrefs when they do.
@@ -207,6 +271,63 @@ export const joinSignup: JoinSignupContent = {
   sending: "Joining…",
   sentTitle: "You’re in.",
   sent: "Welcome to RUSH 5OUR. Watch your inbox — the next move is coming.",
+  verifyTitle: "Check your email.",
+  verify: "We sent a link to {email}. Click it to activate your account and get your RUSH Code.",
+  resend: "Send the link again",
+  resent: "Sent. Check your inbox — and your spam folder.",
+  signIn: { lead: "Already a member?", label: "Sign in" },
+  signInMode: {
+    createLead: "Sign in to your",
+    createTail: "account",
+    lead: "Welcome back. Pick up where you left off.",
+    login: "Email or Username",
+    password: "Password",
+    submit: "Sign in",
+    sending: "Signing in…",
+    failedTitle: "Not quite.",
+    resend: "Send a new confirmation link",
+    resent: "Sent. Check your inbox — and your spam folder.",
+    forgot: "Forgot your password?",
+    create: { lead: "New here?", label: "Create your account" },
+    notices: {
+      expired: "That link has expired or was already used. Sign in below, or get a new confirmation link if you still need one.",
+      error: "We couldn’t check that link just now. Please try again in a moment.",
+      "signed-out": "You’re signed out. See you soon.",
+    },
+  },
+  forgotMode: {
+    createLead: "Forgot your",
+    createTail: "password?",
+    lead: "Enter your email and we’ll send you a link to choose a new one.",
+    email: "Email Address",
+    submit: "Send reset link",
+    sending: "Sending…",
+    sentTitle: "Check your email.",
+    sent: "If there’s an account for that address, a reset link is on its way. It works once and expires in an hour.",
+    back: "Back to sign in",
+  },
+  resetMode: {
+    createLead: "Choose a new",
+    createTail: "password",
+    lead: "At least 8 characters. You’ll be signed in when it’s saved.",
+    password: "New Password",
+    confirm: "Repeat New Password",
+    mismatch: "The two passwords don’t match.",
+    submit: "Save new password",
+    sending: "Saving…",
+    failedTitle: "Not quite.",
+    expiredTitle: "This link has expired.",
+    expired: "Reset links work once and last an hour. Get a new one and use the latest email.",
+    again: "Send a new reset link",
+  },
+  memberMode: {
+    createLead: "Welcome back,",
+    lead: "You’re in. Your RUSH 5OUR account is ready.",
+    codeLabel: "Your RUSH Code",
+    account: { label: "My account", href: "/account" },
+    signOut: "Sign out",
+    signingOut: "Signing out…",
+  },
   failedTitle: "Not quite.",
   failed: "Something went wrong. Try again in a moment.",
   onceWhite: "Once",

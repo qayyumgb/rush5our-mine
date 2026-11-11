@@ -11,20 +11,38 @@
  * "ONCE YOU'RE IN…" between rules, four perks divided by red hairlines, and
  * "FREE TO JOIN. BUILT TO GROW." between rules.
  *
- * SIGN-UP — the form posts to app/api/subscribe (SendGrid, the Contact
- *   form's setup): name, email, the updates opt-in and the Terms tick. The
- *   rules are shared with the server (lib/subscribe/validation.ts) — run
- *   here first as a courtesy, again there as the ones that count — and the
- *   states are idle → sending → sent | error: the button locks while
- *   sending, a sent note shows and the form clears, and an error keeps
- *   what was typed and shows the server's own reason, field by field where
- *   it has one.
+ * SIGN-UP — with `joinSignup.accountFields` on (it is), the form creates a
+ *   RUSH 5OUR account: it posts all six fields to app/api/auth/signup,
+ *   which creates the member unverified and emails a confirmation link.
+ *   The form then says "Check your email", with a button to send the link
+ *   again. With the flag off it's the plain email sign-up it was before
+ *   accounts (app/api/subscribe, no username or password).
  *
- * ▸ BACKEND SEAM — the account system is Phase 3 (RUSH5OUR-Implementation-
- *   Plan.md, 3.1). Until then `joinSignup.accountFields` is off and the
- *   Username / Password fields are not shown; they are never sent to the
- *   subscribe route either way. With accounts, turn the flag on and point
- *   `submitSignup` at the sign-up route.
+ *   The rules are shared with the server (lib/auth/validation.ts, or
+ *   lib/subscribe/validation.ts without accounts) — run here first as a
+ *   courtesy, again there as the ones that count — and the states are
+ *   idle → sending → sent | error: the button locks while sending, and an
+ *   error keeps what was typed and shows the server's own reason, field
+ *   by field where it has one.
+ *
+ * ONE PANEL, FIVE FACES (with accounts on) — the Join page is where
+ *   members come and go; there are no separate sign-in or password pages
+ *   and no menu entry. The other faces are in JoinAccount.tsx:
+ *   • sign up    the form above (the default)
+ *   • sign in    "Already a member? Sign in" swaps the panel for a sign-in
+ *                form, and "Create your account" swaps it back. Links from
+ *                elsewhere open it too: /join?signin=1#signup, with a
+ *                `notice` (an expired link, signed out) above the fields.
+ *   • forgot     "Forgot your password?" in sign-in: an email, and a reset
+ *                link is sent (/join?forgot=1 opens it directly)
+ *   • reset      the reset email's link, /join?reset=<token>#signup: the
+ *                new password twice
+ *   • signed in  a member who's already signed in sees their RUSH Code, My
+ *                account and Sign out instead (asked of /api/auth/me once
+ *                the page has loaded). A reset link wins over this.
+ *   The line over the panel ("Create your RUSH 5OUR account") follows the
+ *   face. Faces are swapped with `hidden`, never unmounted, so what's
+ *   typed into one survives a look at the other.
  *
  * MOTION:
  *   • the eyebrow decodes, the rule draws, the headline's characters rise,
@@ -45,14 +63,9 @@ import { scramble, splitTitle } from "@/lib/motion/split";
 import { useMotion } from "@/components/motion/MotionProvider";
 import Icon from "@/components/ui/Icon";
 import { joinSignup } from "@/data/join";
-import {
-  HONEYPOT_FIELD,
-  normalizeSubscribe,
-  validateSubscribe,
-  type SubscribeErrors,
-  type SubscribeResponse,
-  type SubscribeValues,
-} from "@/lib/subscribe/validation";
+import { HONEYPOT_FIELD, normalizeSubscribe, validateSubscribe } from "@/lib/subscribe/validation";
+import { normalizeSignUp, validateSignUp } from "@/lib/auth/validation";
+import { JoinForgot, JoinMember, JoinReset, JoinSignIn, type JoinNotice } from "./JoinAccount";
 import styles from "./JoinSignup.module.css";
 
 interface Values {
@@ -76,44 +89,42 @@ const PERK_ICON: Record<string, string> = {
 };
 
 const EMPTY: Values = { name: "", email: "", username: "", password: "", updates: false, agree: false };
-const USERNAME_RE = /^[a-z0-9._]{3,24}$/i;
 
-/** The sign-up's rules — the server's own — plus the account fields' while
-    those are shown. */
+/** The server's own rules: the account ones with accounts on, the email
+    sign-up's without. */
 function validate(v: Values, accountFields: boolean): Errors {
-  const e: Errors = validateSubscribe(normalizeSubscribe(v));
-  if (accountFields) {
-    if (!USERNAME_RE.test(v.username.trim())) e.username = "3–24 letters, numbers, dots or underscores.";
-    if (v.password.length < 8) e.password = "At least 8 characters.";
-  }
-  return e;
+  return accountFields ? validateSignUp(normalizeSignUp(v)) : validateSubscribe(normalizeSubscribe(v));
 }
+
+type ServerAnswer = { ok: true } | { ok: false; error: string; fields?: Errors };
 
 class SubmitError extends Error {
   constructor(
     message: string,
-    readonly fields?: SubscribeErrors,
+    readonly fields?: Errors,
   ) {
     super(message);
   }
 }
 
 /**
- * Posts the sign-up to the API route — only its four fields, never the
- * account ones. Resolves when it was accepted; throws a `SubmitError`
- * carrying the server's own (visitor-safe) message otherwise, or a plain
- * error if the request never got an answer.
+ * Posts the sign-up: the whole form to the account route, or only the four
+ * email-sign-up fields (never a password) to the subscribe route. Resolves
+ * when it was accepted; throws a `SubmitError` carrying the server's own
+ * (visitor-safe) message otherwise, or a plain error if the request never
+ * got an answer.
  */
-async function submitSignup(values: SubscribeValues, honeypot: string): Promise<void> {
-  const res = await fetch("/api/subscribe", {
+async function submitSignup(values: Values, accountFields: boolean, honeypot: string): Promise<void> {
+  const body = accountFields ? normalizeSignUp(values) : normalizeSubscribe(values);
+  const res = await fetch(accountFields ? "/api/auth/signup" : "/api/subscribe", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ...values, [HONEYPOT_FIELD]: honeypot }),
+    body: JSON.stringify({ ...body, [HONEYPOT_FIELD]: honeypot }),
   });
 
-  let data: SubscribeResponse | null = null;
+  let data: ServerAnswer | null = null;
   try {
-    data = (await res.json()) as SubscribeResponse;
+    data = (await res.json()) as ServerAnswer;
   } catch {
     // Not JSON (a proxy's error page, say): handled as a failure below.
   }
@@ -135,6 +146,61 @@ export function JoinSignup() {
   const [failure, setFailure] = useState("");
   const [honeypot, setHoneypot] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  /** The address the confirmation link went to, for "send it again". */
+  const [sentTo, setSentTo] = useState("");
+  const [resend, setResend] = useState<"idle" | "sending" | "sent">("idle");
+  /** Which face the panel shows; see the header. */
+  const [mode, setMode] = useState<"signup" | "signin" | "forgot" | "reset" | "member">("signup");
+  /** From a reset email's link. */
+  const [resetToken, setResetToken] = useState("");
+  const [notice, setNotice] = useState<JoinNotice | null>(null);
+  const [member, setMember] = useState<{ name: string; rushCode: string } | null>(null);
+
+  // Once loaded: the face asked for in the address, then whether someone's
+  // already signed in (which wins).
+  useEffect(() => {
+    if (!joinSignup.accountFields) return;
+    let cancelled = false;
+    (async () => {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("reset");
+      if (token) {
+        // A reset link wins: the member asked to change their password.
+        setResetToken(token);
+        setMode("reset");
+        return;
+      }
+      const asked = params.get("notice");
+      const known = asked && asked in joinSignup.signInMode.notices ? (asked as JoinNotice) : null;
+      if (params.has("forgot")) setMode("forgot");
+      else if (params.has("signin") || known) {
+        setMode("signin");
+        setNotice(known);
+      }
+      try {
+        const res = await fetch("/api/auth/me", { cache: "no-store" });
+        const data = (await res.json()) as { member: { name: string; rushCode: string } | null };
+        if (!cancelled && data.member) {
+          setMember(data.member);
+          setMode("member");
+        }
+      } catch {
+        // Not knowing is fine: the forms still work.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  /** Swaps the panel's face and puts the cursor in its first field. */
+  const switchTo = (next: "signup" | "signin" | "forgot") => {
+    setMode(next);
+    setNotice(null);
+    requestAnimationFrame(() =>
+      rootRef.current?.querySelector<HTMLInputElement>(`form:not([hidden]) input:not([tabindex="-1"])`)?.focus(),
+    );
+  };
 
   useEffect(() => {
     const root = rootRef.current;
@@ -244,7 +310,9 @@ export function JoinSignup() {
     setStatus("sending");
     setFailure("");
     try {
-      await submitSignup(normalizeSubscribe(values), honeypot);
+      await submitSignup(values, joinSignup.accountFields, honeypot);
+      setSentTo(values.email.trim());
+      setResend("idle");
       setStatus("sent");
       setValues(EMPTY);
     } catch (err) {
@@ -272,7 +340,32 @@ export function JoinSignup() {
     if (status !== "idle") setStatus("idle");
   };
 
+  /** Another confirmation link, to the address just signed up with. */
+  const resendLink = async () => {
+    if (resend === "sending") return;
+    setResend("sending");
+    try {
+      await fetch("/api/auth/resend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: sentTo }),
+      });
+    } catch {
+      // The route answers the same either way; the member can try again.
+    }
+    setResend("sent");
+  };
+
   const c = joinSignup;
+  /** The line over the panel, for the face it shows. */
+  const face =
+    mode === "signin"
+      ? c.signInMode
+      : mode === "forgot"
+        ? c.forgotMode
+        : mode === "reset"
+          ? c.resetMode
+          : { createLead: c.createLead, createTail: c.createTail, lead: c.lead };
 
   const errorId = (key: Field) => `signup-${key}-error`;
 
@@ -347,16 +440,32 @@ export function JoinSignup() {
 
           <p className={`${styles.create} f-display cz caps`} data-a>
             <span className={styles.slant}>
-              {c.createLead} <span className={styles.red}>{c.createBrand}</span> {c.createTail}
+              {mode === "member" && member ? (
+                <>
+                  {c.memberMode.createLead} <span className={styles.red}>{member.name.split(/\s+/)[0]}</span>
+                </>
+              ) : (
+                <>
+                  {face.createLead} <span className={styles.red}>{c.createBrand}</span> {face.createTail}
+                </>
+              )}
             </span>
           </p>
           <p className={`${styles.lead} f-sans cz`} data-a>
-            {c.lead}
+            {mode === "member" ? c.memberMode.lead : face.lead}
           </p>
         </div>
 
         {/* ---------------- Form ---------------- */}
-        <form ref={formRef} className={styles.panel} onSubmit={handleSubmit} noValidate aria-label={c.submit} data-a>
+        <form
+          ref={formRef}
+          className={styles.panel}
+          onSubmit={handleSubmit}
+          noValidate
+          aria-label={c.submit}
+          hidden={mode !== "signup"}
+          data-a
+        >
           {textField("name", "user", "text", "name")}
           {textField("email", "envelope", "email", "email")}
           {/* Account fields — off until Phase 3; see `joinSignup.accountFields`. */}
@@ -442,8 +551,13 @@ export function JoinSignup() {
                   <path d="M4 12.5l5.2 5.2L20 6.8" />
                 </svg>
                 <span>
-                  <strong className="f-cond caps">{c.sentTitle}</strong>
-                  {c.sent}
+                  <strong className="f-cond caps">{c.accountFields ? c.verifyTitle : c.sentTitle}</strong>
+                  {c.accountFields ? c.verify.replace("{email}", sentTo) : c.sent}
+                  {c.accountFields && (
+                    <button type="button" className={styles.noteAction} onClick={resendLink} disabled={resend === "sending"}>
+                      {resend === "sent" ? c.resent : c.resend}
+                    </button>
+                  )}
                 </span>
               </p>
             )}
@@ -460,7 +574,30 @@ export function JoinSignup() {
               </p>
             )}
           </div>
+
+          {c.accountFields && (
+            <p className={`${styles.signIn} f-sans`}>
+              {c.signIn.lead}{" "}
+              <button type="button" className={styles.signInLink} onClick={() => switchTo("signin")}>
+                {c.signIn.label}
+              </button>
+            </p>
+          )}
         </form>
+
+        {c.accountFields && (
+          <>
+            <JoinSignIn
+              notice={notice}
+              onCreateAccount={() => switchTo("signup")}
+              onForgot={() => switchTo("forgot")}
+              hidden={mode !== "signin"}
+            />
+            <JoinForgot onBack={() => switchTo("signin")} hidden={mode !== "forgot"} />
+            {resetToken && <JoinReset token={resetToken} onAgain={() => switchTo("forgot")} hidden={mode !== "reset"} />}
+            {member && <JoinMember rushCode={member.rushCode} hidden={mode !== "member"} />}
+          </>
+        )}
 
         {/* ---------------- Once you're in ---------------- */}
         <div className={styles.once}>
