@@ -100,17 +100,19 @@ export const productSlides: ProductSlide[] = [
     width: 518,
     height: 536,
   },
+  // The client's photos (Home content, 2026-11): the back print and the
+  // QR detail.
   {
-    src: "/assets/images/merch-chaotic.webp",
-    alt: "Chaotic System — Built Different tee, back print",
-    width: 560,
-    height: 560,
+    src: "/assets/images/home-merch-tee-back.webp",
+    alt: "RUSH 5OUR tee, back: Build the Movement, with the Scan to Join QR code",
+    width: 1036,
+    height: 1134,
   },
   {
-    src: "/assets/images/drop-1-blackout.webp",
-    alt: "RUSH 5OUR Blackout tee, detail",
-    width: 414,
-    height: 233,
+    src: "/assets/images/home-merch-qr-detail.webp",
+    alt: "The tee's Scan to Join QR code, close up",
+    width: 1036,
+    height: 1134,
   },
 ];
 
@@ -123,7 +125,8 @@ export const drops: DropCard[] = [
     name: "Blackout",
     image: "/assets/images/drop-1-blackout.webp",
     unlocked: true,
-    href: "#",
+    // The featured drop on the Merch page.
+    href: "/merch#drop",
   },
   {
     id: "streetwear",

@@ -1,5 +1,6 @@
 /* =========================================================================
-   SECTION 3 — FEATURED VIDEOS  (mockup 3.png, 950-wide frame)
+   SECTION 3 — FEATURED VIDEOS  (mockup 3.png, 950-wide frame; the client's
+   reference "2b Featured Videos" for the tabs and the row)
    ========================================================================= */
 
 .videos {
@@ -94,10 +95,10 @@
 }
 
 /* ------------------------------------------------------------------------ */
-/* The featured set                                                          */
-/* Each tile keeps its video's own shape: the long-form lead at 16:9 where   */
-/* the mockup's featured frame sat, the Reels beneath at 9:16. Posters are   */
-/* the clips' own frames, so `cover` fills without distorting or cropping.  */
+/* Cards — shared by the featured card and the row                           */
+/* A picture of the other shape than its frame (a vertical clip in the 16:9  */
+/* card, a horizontal one in a 9:16 card) sits whole on a blurred fill of    */
+/* itself, never cropped or stretched.                                       */
 /* ------------------------------------------------------------------------ */
 
 .tile {
@@ -122,7 +123,26 @@
   border-radius: calc(14 * var(--u));
 }
 
-/* The whole tile is the play target. */
+/* The featured card's content, re-keyed per tab so a change fades in. */
+.swap {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+:global(.motion) .swap,
+:global(.motion) .reels {
+  animation: vswap 0.6s var(--ease-out) both;
+}
+
+@keyframes vswap {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+/* The whole card is the play target. */
 .tileBtn {
   position: absolute;
   inset: 0;
@@ -149,12 +169,29 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
   transition:
     transform 1s var(--ease-out),
     filter 0.6s;
 }
 
-.tileBtn:hover img {
+.tileBtn img.contain {
+  object-fit: contain;
+}
+
+/* The blurred fill behind a contained picture — oversized so the blur's soft
+   edge falls outside the card. */
+.tileBtn img.fill {
+  inset: -12%;
+  width: 124%;
+  height: 124%;
+  filter: blur(18px) brightness(0.5) saturate(1.2);
+}
+
+.tileBtn:hover img.cover,
+.tileBtn:hover img.contain {
   transform: scale(1.06);
   filter: brightness(1.08) saturate(1.1);
 }
@@ -181,9 +218,9 @@
   min-width: 0;
 }
 
-/* The series: a small red tag, readable on any frame. Plain line boxes, not
-   the cap-trimmed `.cz` — that trim, inside an ellipsis box, shaves the tops
-   off the letters. */
+/* The category: a small red tag, readable on any frame. Plain line boxes,
+   not the cap-trimmed `.cz` — that trim, inside an ellipsis box, shaves the
+   tops off the letters. */
 .tileKicker {
   max-width: 100%;
   padding: max(3px, calc(5 * var(--u))) max(6px, calc(9 * var(--u)));
@@ -227,7 +264,8 @@
   font-size: max(16px, calc(46 * var(--u)));
 }
 
-/* Runtime chip — the long-form lead only; Reels carry none. */
+/* Runtime chip: bottom right on the featured card, top right on a 9:16 one
+   (where the bottom belongs to the title). */
 .dur {
   position: absolute;
   z-index: 4;
@@ -246,8 +284,44 @@
   color: #fff;
 }
 
+/* A 9:16 card is narrow: a tighter tag so a category name fits whole, and
+   a title that takes two lines before it's cut. */
+.reel .tileText {
+  left: max(8px, calc(12 * var(--u)));
+  right: max(8px, calc(12 * var(--u)));
+  bottom: max(8px, calc(14 * var(--u)));
+}
+
+.reel .tileKicker {
+  font-size: max(8.5px, calc(11 * var(--u)));
+  letter-spacing: 0.05em;
+  padding-inline: max(5px, calc(7 * var(--u)));
+}
+
+.reel .tileTitle {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-size: max(12px, calc(20 * var(--u)));
+  line-height: 1.08;
+}
+
+.reel .dur {
+  top: calc(12 * var(--u));
+  right: calc(12 * var(--u));
+  bottom: auto;
+  min-width: 0;
+  height: max(18px, calc(30 * var(--u)));
+  padding: 0 max(5px, calc(9 * var(--u)));
+  border-radius: max(4px, calc(6 * var(--u)));
+  font-size: max(9.5px, calc(15 * var(--u)));
+}
+
 /* ------------------------------------------------------------------------ */
-/* Play mark — a glass disc that turns red with the tile's hover             */
+/* Play mark — a glass disc that turns red with the card's hover             */
 /* ------------------------------------------------------------------------ */
 
 .vplay {
@@ -293,7 +367,7 @@
   border-width: max(1.5px, calc(2 * var(--u)));
 }
 
-/* Slow outward ping on the lead, drawing the eye to the first play target. */
+/* Slow outward ping on the featured card, drawing the eye to it. */
 .lead .vplay::after {
   content: "";
   position: absolute;
@@ -321,53 +395,231 @@
 }
 
 /* ------------------------------------------------------------------------ */
-/* Reels — five 9:16 tiles across; a swipeable shelf on a phone              */
+/* Category tabs — a row of chips; scrolls sideways when they don't fit      */
 /* ------------------------------------------------------------------------ */
 
-.reels {
-  margin: calc(26 * var(--u)) 0 0 calc(33 * var(--u));
+.tabs {
+  margin: calc(34 * var(--u)) 0 0 calc(33 * var(--u));
   width: calc(885 * var(--u));
-  padding: 0;
+  /* Room for the active chip's glow inside the scroller's clip. */
+  padding: 6px 0;
+  display: flex;
+  gap: max(8px, calc(12 * var(--u)));
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  flex: none;
+  height: max(32px, calc(48 * var(--u)));
+  padding: 0 max(14px, calc(24 * var(--u)));
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: max(11.5px, calc(18 * var(--u)));
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  color: #cfcfcf;
+  cursor: pointer;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s,
+    color 0.3s,
+    box-shadow 0.4s var(--ease-out);
+}
+
+.tab:hover {
+  border-color: rgba(var(--red-rgb), 0.7);
+  color: #fff;
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+
+.tab[aria-pressed="true"] {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+  box-shadow: 0 0 18px rgba(255, 25, 30, 0.45);
+}
+
+/* A desktop: all seven on one line across the frame (they still scroll on
+   a narrow tablet, where the type's floor makes them wider). */
+@media (min-width: 640px) {
+  .tabs {
+    gap: max(6px, calc(9 * var(--u)));
+  }
+
+  .tab {
+    height: max(30px, calc(44 * var(--u)));
+    padding: 0 max(10px, calc(16 * var(--u)));
+    font-size: max(11px, calc(14.5 * var(--u)));
+  }
+}
+
+/* ------------------------------------------------------------------------ */
+/* The row — 9:16 cards, five in view on a desktop; swipes on touch, drags   */
+/* with a mouse, pages with the arrows                                       */
+/* ------------------------------------------------------------------------ */
+
+.carousel {
+  position: relative;
+  margin: calc(20 * var(--u)) 0 0 calc(33 * var(--u));
+  width: calc(885 * var(--u));
+}
+
+.reels {
+  --gap: calc(14 * var(--u));
+  margin: 0;
+  /* The bottom padding keeps a hovered card's glow inside the clip. */
+  padding: 0 0 calc(24 * var(--u));
   list-style: none;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: calc(14 * var(--u));
+  display: flex;
+  gap: var(--gap);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  cursor: grab;
+}
+
+.reels::-webkit-scrollbar {
+  display: none;
 }
 
 .reel {
+  flex: 0 0 calc((100% - 4 * var(--gap)) / 5);
   aspect-ratio: 9 / 16;
+  scroll-snap-align: start;
 }
 
-/* A phone: the tiles at a readable size, scrolled sideways and snapping,
-   the shelf running to the screen's edge. */
+/* Mid-drag: no snapping (it fights the drag), no text selection. */
+.dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+  user-select: none;
+}
+
+/* Arrows on the row's ends, for a mouse; touch screens swipe instead. */
+.arrow {
+  position: absolute;
+  z-index: 5;
+  top: calc(50% - 12 * var(--u));
+  width: max(40px, calc(58 * var(--u)));
+  aspect-ratio: 1;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(8, 8, 8, 0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #fff;
+  cursor: pointer;
+  transition:
+    opacity 0.35s,
+    background-color 0.3s,
+    border-color 0.3s,
+    box-shadow 0.4s var(--ease-out);
+}
+
+.arrowL {
+  left: calc(-22 * var(--u));
+}
+
+.arrowR {
+  right: calc(-22 * var(--u));
+}
+
+.arrow svg {
+  width: 26%;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.arrowL svg {
+  margin-right: 8%;
+}
+
+.arrowR svg {
+  margin-left: 8%;
+}
+
+.arrow:hover {
+  background: var(--red);
+  border-color: var(--red);
+  box-shadow: 0 0 24px rgba(255, 30, 30, 0.55);
+}
+
+.arrow:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 3px;
+}
+
+.arrow:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .arrow {
+    display: none;
+  }
+}
+
+/* A phone: tabs and row run to the screen's edges and scroll sideways; the
+   cards at a readable size, two and a bit in view. */
 @media (max-width: 639px) {
-  .reels {
+  .tabs,
+  .carousel {
     width: auto;
     margin-left: 0;
-    padding: 0 calc(33 * var(--u)) 4px;
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: calc(33 * var(--u));
-    scrollbar-width: none;
   }
 
-  .reels::-webkit-scrollbar {
-    display: none;
+  .tabs {
+    padding-inline: calc(33 * var(--u));
+    scroll-padding-inline: calc(33 * var(--u));
+  }
+
+  .reels {
+    --gap: 10px;
+    padding-inline: calc(33 * var(--u));
+    scroll-padding-inline: calc(33 * var(--u));
   }
 
   .reel {
-    flex: 0 0 42%;
-    scroll-snap-align: start;
+    flex-basis: 42%;
+  }
+
+  .arrow {
+    display: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .tileBtn img,
-  .vplay {
+  .vplay,
+  .tab,
+  .arrow {
     transition: none;
+  }
+
+  :global(.motion) .swap,
+  :global(.motion) .reels {
+    animation: none;
   }
 }
 
@@ -376,7 +628,7 @@
 /* ------------------------------------------------------------------------ */
 
 .btnWrap {
-  margin: calc(41 * var(--u)) 0 0 calc(45 * var(--u));
+  margin: calc(20 * var(--u)) 0 0 calc(45 * var(--u));
   width: calc(860 * var(--u));
 }
 

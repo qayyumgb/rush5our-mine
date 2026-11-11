@@ -201,9 +201,12 @@
   height: 0;
 }
 
+/* The top padding gives back what `.cz` trims off the first line: without
+   it the trim pulls the line's ascenders above the panel's top edge, where
+   the panel's clipped overflow cut them off. */
 .answer {
   --lh: 1.375;
-  padding: 0 calc(60 * var(--u)) calc(34 * var(--u)) calc(124 * var(--u));
+  padding: 0.4em calc(60 * var(--u)) calc(34 * var(--u)) calc(124 * var(--u));
   font-size: calc(24 * var(--u));
   color: #bdbdbd;
 }

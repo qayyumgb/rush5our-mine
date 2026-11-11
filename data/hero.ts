@@ -10,6 +10,15 @@
  *   below is already the contract HeroSection expects.
  */
 
+import { R2_BASE } from "./videos";
+
+/** The client's "Our Story" video (70 s, 1080p, on Cloudflare R2), played
+    from the hero's and the About page's "Watch our story" buttons. */
+export const STORY_VIDEO = {
+  url: `${R2_BASE}/story/our-story.mp4`,
+  poster: `${R2_BASE}/story/our-story.jpg`,
+};
+
 export interface HandAccentContent {
   /** One entry per handwritten line — each is revealed independently. */
   lines: string[];
@@ -57,8 +66,8 @@ export const hero: HeroContent = {
   primaryCta: { label: "Join the movement", href: "#concept" },
   storyVideo: {
     label: "Watch\nour story",
-    videoUrl: "", // ← paste the story video URL here
-    poster: "/assets/images/hero-wide.webp",
+    videoUrl: STORY_VIDEO.url,
+    poster: STORY_VIDEO.poster,
     title: "Our story",
   },
   tags: ["Real people.", "Real cities.", "Real rewards."],

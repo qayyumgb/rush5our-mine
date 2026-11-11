@@ -7,6 +7,7 @@
  */
 
 import type { IconName } from "@/components/ui/Icon";
+import { STORY_VIDEO } from "./hero";
 
 export interface AboutHeroContent {
   eyebrow: string;
@@ -51,10 +52,9 @@ export const aboutHero: AboutHeroContent = {
   storyVideo: {
     title: "Our story",
     label: ["Watch", "our story"],
-    // BACKEND SEAM: paste a TikTok / YouTube / Vimeo / file URL here. An empty
-    // string is handled — the player opens on its poster instead of breaking.
-    videoUrl: "",
-    poster: "/assets/images/about-hero-tall.webp",
+    // The same "Our Story" video as the homepage hero (data/hero.ts).
+    videoUrl: STORY_VIDEO.url,
+    poster: STORY_VIDEO.poster,
   },
 
   cue: { label: "Together we go further.", href: "#story" },
