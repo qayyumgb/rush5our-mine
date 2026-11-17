@@ -103,10 +103,12 @@ export const productSlides: ProductSlide[] = [
   // The client's photos (Home content, 2026-11): the back print and the
   // QR detail.
   {
-    src: "/assets/images/home-merch-tee-back.webp",
+    // The client's back-of-tee shot, on the same red-glow ground as slide
+    // 1 and cropped to its shape, so the two read as one shoot.
+    src: "/assets/images/home-merch-tee-back-glow.webp",
     alt: "RUSH 5OUR tee, back: Build the Movement, with the Scan to Join QR code",
     width: 1036,
-    height: 1134,
+    height: 1072,
   },
   {
     src: "/assets/images/home-merch-qr-detail.webp",

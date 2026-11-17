@@ -1,6 +1,6 @@
 /* =========================================================================
-   SECTION 3 — FEATURED VIDEOS  (mockup 3.png, 950-wide frame; the client's
-   reference "2b Featured Videos" for the tabs and the row)
+   SECTION 3 — FEATURED VIDEOS  (the client's reference design, 950-wide
+   frame; units are mockup pixels via --u, as on the rest of the homepage)
    ========================================================================= */
 
 .videos {
@@ -94,56 +94,56 @@
   stroke-width: 4;
 }
 
+/* Shared: mid-drag with a mouse — no snapping (it fights the drag), no
+   text selection. */
+.dragging {
+  cursor: grabbing !important;
+  scroll-snap-type: none !important;
+  user-select: none;
+}
+
 /* ------------------------------------------------------------------------ */
-/* Cards — shared by the featured card and the row                           */
-/* A picture of the other shape than its frame (a vertical clip in the 16:9  */
-/* card, a horizontal one in a 9:16 card) sits whole on a blurred fill of    */
-/* itself, never cropped or stretched.                                       */
+/* Featured slides — four long-form videos at 16:9, swiped through          */
 /* ------------------------------------------------------------------------ */
 
-.tile {
+.spot {
   position: relative;
-  isolation: isolate;
-  border-radius: calc(10 * var(--u));
-  background: #0b0b0c;
-  box-shadow: inset 0 0 0 max(1px, calc(1.5 * var(--u))) rgba(255, 255, 255, 0.14);
-  transition: box-shadow 0.5s;
-}
-
-.tile:hover {
-  box-shadow:
-    inset 0 0 0 max(1px, calc(1.5 * var(--u))) rgba(var(--red-rgb), 0.7),
-    0 20px 40px -20px rgba(var(--red-rgb), 0.6);
-}
-
-.lead {
   margin: calc(57 * var(--u)) 0 0 calc(33 * var(--u));
   width: calc(885 * var(--u));
-  aspect-ratio: 16 / 9;
   border-radius: calc(14 * var(--u));
 }
 
-/* The featured card's content, re-keyed per tab so a change fades in. */
-.swap {
-  position: absolute;
-  inset: 0;
+.slides {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  gap: calc(14 * var(--u));
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
   border-radius: inherit;
+  cursor: grab;
 }
 
-:global(.motion) .swap,
-:global(.motion) .reels {
-  animation: vswap 0.6s var(--ease-out) both;
+.slides::-webkit-scrollbar {
+  display: none;
 }
 
-@keyframes vswap {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
+.slide {
+  position: relative;
+  flex: 0 0 100%;
+  aspect-ratio: 16 / 9;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  border-radius: calc(14 * var(--u));
+  background: #0b0b0c;
+  box-shadow: inset 0 0 0 max(1px, calc(1.5 * var(--u))) rgba(255, 255, 255, 0.14);
 }
 
-/* The whole card is the play target. */
-.tileBtn {
+/* The whole slide is the play target. */
+.slideBtn {
   position: absolute;
   inset: 0;
   display: block;
@@ -155,15 +155,15 @@
   background: radial-gradient(80% 60% at 50% 100%, rgba(var(--red-rgb), 0.18), transparent 70%), #0b0b0c;
   color: #fff;
   text-align: left;
-  cursor: pointer;
+  cursor: inherit;
 }
 
-.tileBtn:focus-visible {
+.slideBtn:focus-visible {
   outline: 2px solid var(--red);
-  outline-offset: 3px;
+  outline-offset: -2px;
 }
 
-.tileBtn img {
+.slideBtn img {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -177,159 +177,125 @@
     filter 0.6s;
 }
 
-.tileBtn img.contain {
-  object-fit: contain;
+.slideBtn:hover img {
+  transform: scale(1.04);
+  filter: brightness(1.06);
 }
 
-/* The blurred fill behind a contained picture — oversized so the blur's soft
-   edge falls outside the card. */
-.tileBtn img.fill {
-  inset: -12%;
-  width: 124%;
-  height: 124%;
-  filter: blur(18px) brightness(0.5) saturate(1.2);
-}
-
-.tileBtn:hover img.cover,
-.tileBtn:hover img.contain {
-  transform: scale(1.06);
-  filter: brightness(1.08) saturate(1.1);
-}
-
-/* Bottom scrim so the type stays readable over any frame. */
+/* Bottom and left shade, so the title stays readable over any frame. */
 .scrim {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.82) 100%);
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.8) 100%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0) 55%);
   pointer-events: none;
 }
 
-.tileText {
+/* "LATEST" — the red tag, top left. */
+.badge {
   position: absolute;
   z-index: 3;
-  left: calc(16 * var(--u));
-  right: calc(16 * var(--u));
-  bottom: calc(16 * var(--u));
+  left: calc(15 * var(--u));
+  top: calc(16 * var(--u));
+  display: grid;
+  place-items: center;
+  height: max(20px, calc(48 * var(--u)));
+  padding: 0 max(8px, calc(18 * var(--u))) 0 calc(max(8px, calc(18 * var(--u))) + 0.22em);
+  border-radius: max(2px, calc(4 * var(--u)));
+  background: var(--red);
+  font-size: max(9px, calc(19 * var(--u)));
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.22em;
+  color: #fff;
+}
+
+.slideText {
+  position: absolute;
+  z-index: 3;
+  left: calc(25 * var(--u));
+  right: calc(120 * var(--u));
+  bottom: calc(26 * var(--u));
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: max(4px, calc(8 * var(--u)));
+  gap: max(3px, calc(10 * var(--u)));
   min-width: 0;
 }
 
-/* The category: a small red tag, readable on any frame. Plain line boxes,
-   not the cap-trimmed `.cz` — that trim, inside an ellipsis box, shaves the
-   tops off the letters. */
-.tileKicker {
+/* The series: an outlined tag, so it doesn't compete with the solid red
+   "LATEST". */
+.slidePill {
   max-width: 100%;
-  padding: max(3px, calc(5 * var(--u))) max(6px, calc(9 * var(--u)));
+  padding: max(3px, calc(5 * var(--u))) max(6px, calc(10 * var(--u)));
+  border: 1px solid var(--red);
   border-radius: max(3px, calc(4 * var(--u)));
-  background: var(--red);
-  font-size: max(9px, calc(13 * var(--u)));
-  font-weight: 700;
+  background: rgba(0, 0, 0, 0.5);
+  font-size: max(8.5px, calc(14 * var(--u)));
+  font-weight: 600;
   line-height: 1.2;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   color: #fff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.tileTitle {
+/* Plain line boxes, not the cap-trimmed `.cz`: that trim, inside an
+   ellipsis box, shaves the tops off the letters. */
+.slideTitle {
   max-width: 100%;
   padding-top: 0.08em;
-  font-size: max(12px, calc(22 * var(--u)));
-  line-height: 1.12;
-  letter-spacing: 0.03em;
-  color: #fff;
+  font-size: max(16px, calc(42 * var(--u)));
+  line-height: 1.05;
+  letter-spacing: 0.02em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 0 14px rgba(0, 0, 0, 0.7);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 0 16px rgba(0, 0, 0, 0.6);
 }
 
-.lead .tileText {
-  left: calc(30 * var(--u));
-  right: calc(120 * var(--u));
-  bottom: calc(26 * var(--u));
-  gap: calc(12 * var(--u));
+.slideSub {
+  max-width: 100%;
+  font-size: max(8.5px, calc(16.5 * var(--u)));
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: 0.2em;
+  color: #d4d4d4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
 }
 
-.lead .tileKicker {
-  font-size: max(9px, calc(18 * var(--u)));
-}
-
-.lead .tileTitle {
-  font-size: max(16px, calc(46 * var(--u)));
-}
-
-/* Runtime chip: bottom right on the featured card, top right on a 9:16 one
-   (where the bottom belongs to the title). */
+/* Runtime chip, bottom right. */
 .dur {
   position: absolute;
   z-index: 4;
-  right: calc(15 * var(--u));
-  bottom: calc(17 * var(--u));
+  right: calc(18 * var(--u));
+  bottom: calc(20 * var(--u));
   display: grid;
   place-items: center;
-  min-width: calc(75 * var(--u));
-  height: max(20px, calc(45 * var(--u)));
-  padding: 0 calc(10 * var(--u));
-  border-radius: calc(8 * var(--u));
+  min-width: calc(70 * var(--u));
+  height: max(20px, calc(40 * var(--u)));
+  padding: 0 max(6px, calc(10 * var(--u)));
+  border-radius: max(4px, calc(8 * var(--u)));
   background: rgba(0, 0, 0, 0.72);
-  font-size: max(10px, calc(20.6 * var(--u)));
+  font-size: max(10px, calc(21 * var(--u)));
   font-weight: 500;
   font-variant-numeric: tabular-nums;
   color: #fff;
 }
 
-/* A 9:16 card is narrow: a tighter tag so a category name fits whole, and
-   a title that takes two lines before it's cut. */
-.reel .tileText {
-  left: max(8px, calc(12 * var(--u)));
-  right: max(8px, calc(12 * var(--u)));
-  bottom: max(8px, calc(14 * var(--u)));
-}
-
-.reel .tileKicker {
-  font-size: max(8.5px, calc(11 * var(--u)));
-  letter-spacing: 0.05em;
-  padding-inline: max(5px, calc(7 * var(--u)));
-}
-
-.reel .tileTitle {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  font-size: max(12px, calc(20 * var(--u)));
-  line-height: 1.08;
-}
-
-.reel .dur {
-  top: calc(12 * var(--u));
-  right: calc(12 * var(--u));
-  bottom: auto;
-  min-width: 0;
-  height: max(18px, calc(30 * var(--u)));
-  padding: 0 max(5px, calc(9 * var(--u)));
-  border-radius: max(4px, calc(6 * var(--u)));
-  font-size: max(9.5px, calc(15 * var(--u)));
-}
-
-/* ------------------------------------------------------------------------ */
-/* Play mark — a glass disc that turns red with the card's hover             */
-/* ------------------------------------------------------------------------ */
-
+/* Play mark — a glass disc that turns red with the slide's hover. */
 .vplay {
   position: absolute;
   z-index: 2;
   left: 50%;
   top: 50%;
-  width: max(36px, calc(111 * var(--u)));
+  width: max(40px, calc(110 * var(--u)));
   aspect-ratio: 1;
   transform: translate(-50%, -50%);
   border-radius: 50%;
@@ -351,9 +317,9 @@
   margin-left: 9%;
 }
 
-.tileBtn:hover .vplay,
-.tileBtn:focus-visible .vplay {
-  transform: translate(-50%, -50%) scale(1.12);
+.slideBtn:hover .vplay,
+.slideBtn:focus-visible .vplay {
+  transform: translate(-50%, -50%) scale(1.1);
   background: var(--red);
   border-color: var(--red);
   box-shadow:
@@ -361,77 +327,177 @@
     0 0 44px rgba(255, 30, 30, 0.75);
 }
 
-.reel .vplay {
-  top: 44%;
-  width: max(36px, calc(60 * var(--u)));
-  border-width: max(1.5px, calc(2 * var(--u)));
+/* ------------------------------------------------------------------------ */
+/* Dots + "View all videos" (long-form)                                      */
+/* ------------------------------------------------------------------------ */
+
+.spotBar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin: calc(10 * var(--u)) 0 0 calc(33 * var(--u));
+  width: calc(885 * var(--u));
+  min-height: max(28px, calc(40 * var(--u)));
 }
 
-/* Slow outward ping on the featured card, drawing the eye to it. */
-.lead .vplay::after {
-  content: "";
+/* Centred on the frame, whatever the link's width. */
+.dots {
   position: absolute;
-  inset: -3px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+}
+
+/* A comfortable tap target around a small dot. */
+.dot {
+  display: grid;
+  place-items: center;
+  width: max(18px, calc(31 * var(--u)));
+  height: max(24px, calc(36 * var(--u)));
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.dot::before {
+  content: "";
+  width: max(7px, calc(14 * var(--u)));
+  aspect-ratio: 1;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.6);
-  opacity: 0;
-  pointer-events: none;
+  background: #3b3b3d;
+  transition:
+    background-color 0.3s,
+    box-shadow 0.4s var(--ease-out),
+    transform 0.4s var(--ease-out);
 }
 
-:global(.motion) .lead .vplay::after {
-  animation: vring 3.2s var(--ease-out) 1.5s infinite;
+.dot:hover::before {
+  background: #6b6b6e;
 }
 
-@keyframes vring {
-  0% {
-    transform: scale(1);
-    opacity: 0.8;
-  }
-  70%,
-  100% {
-    transform: scale(1.65);
-    opacity: 0;
-  }
+.dot[aria-current="true"]::before {
+  background: var(--red);
+  box-shadow: 0 0 10px rgba(255, 25, 30, 0.6);
+}
+
+.dot:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+
+.viewLong {
+  display: inline-flex;
+  align-items: center;
+  gap: max(8px, calc(24 * var(--u)));
+  margin-right: calc(5 * var(--u));
+  font-size: max(9px, calc(16.5 * var(--u)));
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  color: #e6e6e6;
+  white-space: nowrap;
+  transition: color 0.3s;
+}
+
+.viewLong span {
+  padding-bottom: max(2px, calc(4 * var(--u)));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.65);
+  transition: border-color 0.3s;
+}
+
+.viewLong svg {
+  flex: none;
+  width: max(14px, calc(30 * var(--u)));
+  height: auto;
+  overflow: visible;
+  fill: none;
+  stroke: var(--red);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.45s var(--ease-out);
+}
+
+.viewLong:hover {
+  color: #fff;
+}
+
+.viewLong:hover span {
+  border-color: var(--red);
+}
+
+.viewLong:hover svg {
+  transform: translateX(5px);
+}
+
+.viewLong:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 4px;
+  border-radius: 2px;
 }
 
 /* ------------------------------------------------------------------------ */
-/* Category tabs — a row of chips; scrolls sideways when they don't fit      */
+/* Category tabs — square-cornered chips; scroll sideways when they don't fit */
 /* ------------------------------------------------------------------------ */
 
 .tabs {
-  margin: calc(34 * var(--u)) 0 0 calc(33 * var(--u));
-  width: calc(885 * var(--u));
-  /* Room for the active chip's glow inside the scroller's clip. */
-  padding: 6px 0;
+  margin: calc(28 * var(--u)) 0 0;
+  padding: 0 calc(28 * var(--u));
   display: flex;
-  gap: max(8px, calc(12 * var(--u)));
+  gap: max(6px, calc(13 * var(--u)));
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scrollbar-width: none;
+  scroll-padding-inline: calc(28 * var(--u));
 }
 
 .tabs::-webkit-scrollbar {
   display: none;
 }
 
+/* More tabs than fit: the edge they continue past fades out, and a mouse
+   can drag the row (touch swipes it). */
+.moreStart,
+.moreEnd {
+  cursor: grab;
+  --fade: max(28px, calc(70 * var(--u)));
+}
+
+.moreEnd {
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - var(--fade)), transparent);
+  mask-image: linear-gradient(90deg, #000 calc(100% - var(--fade)), transparent);
+}
+
+.moreStart {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--fade));
+  mask-image: linear-gradient(90deg, transparent, #000 var(--fade));
+}
+
+.moreStart.moreEnd {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent);
+}
+
 .tab {
   flex: none;
-  height: max(32px, calc(48 * var(--u)));
-  padding: 0 max(14px, calc(24 * var(--u)));
-  border-radius: 999px;
+  height: max(30px, calc(52 * var(--u)));
+  padding: 0 max(10px, calc(21 * var(--u)));
+  border-radius: max(4px, calc(6 * var(--u)));
   border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.03);
-  font-size: max(11.5px, calc(18 * var(--u)));
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  background: rgba(255, 255, 255, 0.02);
+  font-size: max(11px, calc(22 * var(--u)));
+  font-weight: 500;
+  letter-spacing: 0.03em;
   white-space: nowrap;
-  color: #cfcfcf;
+  color: #c8c8c8;
   cursor: pointer;
   transition:
     background-color 0.3s,
     border-color 0.3s,
-    color 0.3s,
-    box-shadow 0.4s var(--ease-out);
+    color 0.3s;
 }
 
 .tab:hover {
@@ -444,191 +510,153 @@
   outline-offset: 2px;
 }
 
+/* Active: solid red with dark type, as in the reference. */
 .tab[aria-pressed="true"] {
   background: var(--red);
   border-color: var(--red);
-  color: #fff;
-  box-shadow: 0 0 18px rgba(255, 25, 30, 0.45);
-}
-
-/* A desktop: all seven on one line across the frame (they still scroll on
-   a narrow tablet, where the type's floor makes them wider). */
-@media (min-width: 640px) {
-  .tabs {
-    gap: max(6px, calc(9 * var(--u)));
-  }
-
-  .tab {
-    height: max(30px, calc(44 * var(--u)));
-    padding: 0 max(10px, calc(16 * var(--u)));
-    font-size: max(11px, calc(14.5 * var(--u)));
-  }
+  color: #150303;
+  font-weight: 600;
 }
 
 /* ------------------------------------------------------------------------ */
-/* The row — 9:16 cards, five in view on a desktop; swipes on touch, drags   */
-/* with a mouse, pages with the arrows                                       */
+/* Cards — three across; more swipe sideways                                 */
 /* ------------------------------------------------------------------------ */
 
-.carousel {
-  position: relative;
-  margin: calc(20 * var(--u)) 0 0 calc(33 * var(--u));
-  width: calc(885 * var(--u));
-}
-
-.reels {
-  --gap: calc(14 * var(--u));
-  margin: 0;
-  /* The bottom padding keeps a hovered card's glow inside the clip. */
-  padding: 0 0 calc(24 * var(--u));
+.cards {
+  --gap: calc(19 * var(--u));
+  margin: calc(26 * var(--u)) 0 0;
+  padding: 0 calc(18 * var(--u));
   list-style: none;
   display: flex;
   gap: var(--gap);
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
+  scroll-padding-inline: calc(18 * var(--u));
   scrollbar-width: none;
   cursor: grab;
 }
 
-.reels::-webkit-scrollbar {
+.cards::-webkit-scrollbar {
   display: none;
 }
 
-.reel {
-  flex: 0 0 calc((100% - 4 * var(--gap)) / 5);
-  aspect-ratio: 9 / 16;
+.cardItem {
+  display: flex;
+  flex: 0 0 calc((100% - 2 * var(--gap)) / 3);
   scroll-snap-align: start;
 }
 
-/* Mid-drag: no snapping (it fights the drag), no text selection. */
-.dragging {
-  cursor: grabbing;
-  scroll-snap-type: none;
-  user-select: none;
+/* The whole card plays. */
+.card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: max(6px, calc(10 * var(--u)));
+  overflow: hidden;
+  background: #0b0b0c;
+  color: #fff;
+  text-align: left;
+  cursor: inherit;
+  transition:
+    border-color 0.35s,
+    box-shadow 0.5s var(--ease-out);
 }
 
-/* Arrows on the row's ends, for a mouse; touch screens swipe instead. */
-.arrow {
-  position: absolute;
-  z-index: 5;
-  top: calc(50% - 12 * var(--u));
-  width: max(40px, calc(58 * var(--u)));
+.card:hover {
+  border-color: rgba(var(--red-rgb), 0.7);
+  box-shadow: 0 16px 30px -18px rgba(var(--red-rgb), 0.6);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+
+.thumb {
+  position: relative;
+  display: block;
   aspect-ratio: 1;
-  transform: translateY(-50%);
+  overflow: hidden;
+  background: #151516;
+}
+
+.thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  transition:
+    transform 1s var(--ease-out),
+    filter 0.6s;
+}
+
+.card:hover .thumb img {
+  transform: scale(1.05);
+  filter: brightness(1.06);
+}
+
+.cardDur {
+  position: absolute;
+  right: max(5px, calc(10 * var(--u)));
+  bottom: max(5px, calc(11 * var(--u)));
   display: grid;
   place-items: center;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  background: rgba(8, 8, 8, 0.78);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  height: max(17px, calc(32 * var(--u)));
+  padding: 0 max(5px, calc(9 * var(--u)));
+  border-radius: max(3px, calc(6 * var(--u)));
+  background: rgba(0, 0, 0, 0.75);
+  font-size: max(9.5px, calc(17 * var(--u)));
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
   color: #fff;
-  cursor: pointer;
-  transition:
-    opacity 0.35s,
-    background-color 0.3s,
-    border-color 0.3s,
-    box-shadow 0.4s var(--ease-out);
 }
 
-.arrowL {
-  left: calc(-22 * var(--u));
+.cardBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: max(4px, calc(10 * var(--u)));
+  padding: max(8px, calc(20 * var(--u))) max(7px, calc(15 * var(--u))) max(10px, calc(26 * var(--u)));
 }
 
-.arrowR {
-  right: calc(-22 * var(--u));
+.cardTitle,
+.cardDesc {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
-.arrow svg {
-  width: 26%;
-  overflow: visible;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.cardTitle {
+  padding-top: 0.06em;
+  font-size: max(11.5px, calc(27 * var(--u)));
+  line-height: 1.08;
+  letter-spacing: 0.02em;
 }
 
-.arrowL svg {
-  margin-right: 8%;
-}
-
-.arrowR svg {
-  margin-left: 8%;
-}
-
-.arrow:hover {
-  background: var(--red);
-  border-color: var(--red);
-  box-shadow: 0 0 24px rgba(255, 30, 30, 0.55);
-}
-
-.arrow:focus-visible {
-  outline: 2px solid var(--red);
-  outline-offset: 3px;
-}
-
-.arrow:disabled {
-  opacity: 0;
-  pointer-events: none;
-}
-
-@media (hover: none), (pointer: coarse) {
-  .arrow {
-    display: none;
-  }
-}
-
-/* A phone: tabs and row run to the screen's edges and scroll sideways; the
-   cards at a readable size, two and a bit in view. */
-@media (max-width: 639px) {
-  .tabs,
-  .carousel {
-    width: auto;
-    margin-left: 0;
-  }
-
-  .tabs {
-    padding-inline: calc(33 * var(--u));
-    scroll-padding-inline: calc(33 * var(--u));
-  }
-
-  .reels {
-    --gap: 10px;
-    padding-inline: calc(33 * var(--u));
-    scroll-padding-inline: calc(33 * var(--u));
-  }
-
-  .reel {
-    flex-basis: 42%;
-  }
-
-  .arrow {
-    display: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tileBtn img,
-  .vplay,
-  .tab,
-  .arrow {
-    transition: none;
-  }
-
-  :global(.motion) .swap,
-  :global(.motion) .reels {
-    animation: none;
-  }
+.cardDesc {
+  font-size: max(8.5px, calc(14.5 * var(--u)));
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0.08em;
+  color: #a8a8a8;
 }
 
 /* ------------------------------------------------------------------------ */
-/* View-all button                                                          */
+/* "Watch all videos" (short-form)                                           */
 /* ------------------------------------------------------------------------ */
 
 .btnWrap {
-  margin: calc(20 * var(--u)) 0 0 calc(45 * var(--u));
+  margin: calc(41 * var(--u)) 0 0 calc(45 * var(--u));
   width: calc(860 * var(--u));
 }
 
@@ -650,4 +678,16 @@
 .btn svg {
   width: calc(32 * var(--u));
   height: calc(20 * var(--u));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slideBtn img,
+  .thumb img,
+  .vplay,
+  .tab,
+  .card,
+  .dot::before,
+  .viewLong svg {
+    transition: none;
+  }
 }

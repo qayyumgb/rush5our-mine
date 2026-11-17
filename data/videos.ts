@@ -4,8 +4,9 @@
  * One list feeds both places: the Videos page (components/videos/*) shows
  * every series below, and the homepage's Featured Videos section
  * (components/home/VideosSection.tsx) shows the videos marked
- * `featured: true`, via `homeFeatured` at the end of this file. To change
- * what the homepage features, move the flag — nothing else.
+ * `featured: true` in its cards (`homeFeatured`), and the featured videos
+ * with a `featuredOrder` in its slides (`homeSpotlight`), in that order. To
+ * change what the homepage features, move those two fields — nothing else.
  *
  * ▸ BACKEND SEAM — the series are plain arrays shaped like a typical video
  *   API response; a loader can replace them without touching a component.
@@ -21,8 +22,12 @@ export interface VideosContent {
   titleRed: string;
   subtitle: string;
   accent: { lines: string[] };
-  /** The section's one CTA, to the full Videos page. */
-  viewAll: { label: string; href: string };
+  /** The tag on the first featured slide. */
+  latest: string;
+  /** Beside the featured slides' dots: the long-form videos. */
+  viewAllLong: { label: string; href: string };
+  /** The red button under the cards: the short-form series. */
+  viewAllShort: { label: string; href: string };
 }
 
 export const videosContent: VideosContent = {
@@ -31,7 +36,9 @@ export const videosContent: VideosContent = {
   titleRed: "Videos",
   subtitle: "Real people. Real moments. No scripts.",
   accent: { lines: ["Press", "play.", "See what", "we do."] },
-  viewAll: { label: "View all videos", href: "/videos" },
+  latest: "Latest",
+  viewAllLong: { label: "View all videos", href: "/videos#watch" },
+  viewAllShort: { label: "Watch all videos", href: "/videos#series" },
 };
 
 /* =========================================================================
@@ -73,17 +80,23 @@ export interface FeedVideo {
   /** Vertical (9:16) clips fill the stage; horizontal ones sit centred on a
       blurred fill of their poster, the whole picture visible. */
   orientation: "vertical" | "horizontal";
-  /** Shown on the homepage's Featured Videos section (see `homeFeatured`
-      and the category tabs, `videoCategories`). Flag a few per series: the
-      first featured video of a category leads it on the homepage (a
-      horizontal one first, if the category has one), the rest fill the
-      swipeable row. */
+  /** Shown in the homepage Featured Videos cards' "All" tab
+      (`homeFeatured`); a category tab shows its whole series, these first. */
   featured?: boolean;
+  /** A featured video's place among the featured slides at the top of the
+      homepage section (1–4, one dot each; `homeSpotlight`). Leave it off
+      for a video that should only be a card. */
+  featuredOrder?: number;
   /** The homepage tab it shows under: one of `videoCategories`' ids. */
   category: VideoCategoryId;
-  /** The homepage card's picture: 9:16 (1080 × 1920), or 16:9 (1920 × 1080)
-      for a horizontal video. Empty = the clip's own frame (`poster`). */
+  /** The video's own picture in its shape: 16:9 (1920 × 1080) for a
+      horizontal video — the homepage's featured slide and the Videos page —
+      or 9:16 (1080 × 1920) for a vertical one. Empty = the clip's own frame
+      (`poster`). */
   thumbnail: string;
+  /** The homepage card's square picture (1:1, 1080 × 1080). Empty = the
+      centre of `thumbnail` / `poster`, cropped square. */
+  cardThumbnail?: string;
   /** Runtime as printed on the card's chip, e.g. "1:34". */
   duration: string;
   /** The video file's URL (Cloudflare R2). Empty = not uploaded: the
@@ -100,15 +113,17 @@ export interface FeedVideo {
 
 /** The tabs, in order. "All" shows every featured video; the others show
     the videos whose `category` matches. Relabel or reorder freely; a new
-    category needs its id added here and on its videos. */
+    category needs its id added here and on its videos. `tagline` is the
+    short line under a card's title (and a featured slide's) when the video
+    has no `caption` of its own. */
 export const videoCategories = [
-  { id: "all", label: "All" },
-  { id: "picking-up-girls", label: "Picking Up Girls" },
-  { id: "rush-hunts", label: "RUSH HUNTS" },
-  { id: "five-or-mystery-gift", label: "$5 or 🎁" },
-  { id: "bet-five", label: "Bet $5" },
-  { id: "you-got-game", label: "You Got Game?" },
-  { id: "rush-reacts", label: "RUSH REACTS" },
+  { id: "all", label: "All", tagline: "" },
+  { id: "picking-up-girls", label: "Picking Up Girls", tagline: "Real convos. Real reactions." },
+  { id: "rush-hunts", label: "Rush Hunts", tagline: "Find it. Scan it. Win it." },
+  { id: "five-or-mystery-gift", label: "$5 or Mystery Gift", tagline: "Random people. Big wins." },
+  { id: "bet-five", label: "Bet $5", tagline: "Social experiments. Real bets." },
+  { id: "you-got-game", label: "You Got Game?", tagline: "Public challenges." },
+  { id: "rush-reacts", label: "Rush Reacts", tagline: "Music. Culture. Reactions." },
 ] as const;
 
 export type VideoCategoryId = (typeof videoCategories)[number]["id"];
@@ -311,6 +326,7 @@ export const pickingUpGirls: LongSeries = {
     {
       id: "picking-up-girls-02-using-chatgpt",
       featured: true,
+      featuredOrder: 2,
       category: "picking-up-girls",
       number: "02",
       title: "Picking Up Girls Using ChatGPT",
@@ -342,7 +358,6 @@ export const pickingUpGirls: LongSeries = {
     },
     {
       id: "picking-up-girls-05-as-kamala-harris",
-      featured: true,
       category: "picking-up-girls",
       number: "05",
       title: "Picking Up Girls As Kamala Harris",
@@ -358,7 +373,6 @@ export const pickingUpGirls: LongSeries = {
     },
     {
       id: "picking-up-girls-06-as-donald-trump",
-      featured: true,
       category: "picking-up-girls",
       number: "06",
       title: "Picking Up Girls As Donald Trump",
@@ -404,6 +418,8 @@ export const pickingUpGirls: LongSeries = {
     },
     {
       id: "picking-up-girls-12-with-a-magic-8-ball",
+      featured: true,
+      featuredOrder: 3,
       category: "picking-up-girls",
       number: "12",
       title: "Picking Up Girls With a Magic 8 Ball",
@@ -434,6 +450,8 @@ export const pickingUpGirls: LongSeries = {
     },
     {
       id: "picking-up-girls-14-using-airdrop",
+      featured: true,
+      featuredOrder: 4,
       category: "picking-up-girls",
       number: "14",
       title: "Picking Up Girls Using AirDrop",
@@ -449,6 +467,11 @@ export const pickingUpGirls: LongSeries = {
     },
     {
       id: "picking-up-girls-15-in-30-seconds-part-8",
+      featured: true,
+      // PLACEHOLDER — slot 1 belongs to the series' first video, "Picking Up
+      // Girls in 30 Seconds" (episode 1), not supplied yet. When it's added,
+      // give it `featured: true, featuredOrder: 1` and remove this one's.
+      featuredOrder: 1,
       category: "picking-up-girls",
       number: "15",
       title: "Picking Up Girls In 30 Seconds (Part 8)",
@@ -501,5 +524,12 @@ export const homeVideos: HomeFeatured[] = [
   ),
 ];
 
-/** Every `featured: true` video — the "All" tab's curated mix. */
+/** Every `featured: true` video — the cards' "All" tab. */
 export const homeFeatured: HomeFeatured[] = homeVideos.filter((f) => f.video.featured);
+
+/** The featured slides at the top of the homepage section, one dot each:
+    the featured videos with a `featuredOrder`, in that order (the client's
+    picks: the series' first video, then three favourites). */
+export const homeSpotlight: HomeFeatured[] = homeFeatured
+  .filter((f) => f.video.featuredOrder !== undefined)
+  .sort((a, b) => (a.video.featuredOrder ?? 0) - (b.video.featuredOrder ?? 0));

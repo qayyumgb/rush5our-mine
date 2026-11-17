@@ -182,8 +182,10 @@
   opacity: 0;
 }
 
-/* Slides 2+ are looser crops, so they get an oval feather instead. */
-.slide:nth-child(n + 2) img {
+/* Slides 3+ are looser crops, so they get an oval feather instead. Slide 2
+   (the back of the tee) is framed like slide 1, from the same shoot, and
+   keeps its soft edges. */
+.slide:nth-child(n + 3) img {
   -webkit-mask-image: radial-gradient(closest-side at 55% 50%, #000 62%, transparent 100%);
   mask-image: radial-gradient(closest-side at 55% 50%, #000 62%, transparent 100%);
 }
