@@ -71,16 +71,30 @@ function interleave(lists: HomeFeatured[][]): HomeFeatured[] {
   return out;
 }
 
-/** The cards for one tab. */
+/** Featured videos in their `cardOrder` (those without one keep their place
+    after the ordered ones). */
+const byCardOrder = (a: HomeFeatured, b: HomeFeatured) =>
+  (a.video.cardOrder ?? Infinity) - (b.video.cardOrder ?? Infinity);
+
+/** The cards for one tab. "All": the featured videos in the client's order
+    (`cardOrder`), then any others, the series taken in turn. A series tab:
+    its featured videos in that order, then the rest of the series. */
 function cardsFor(videos: HomeFeatured[], category: VideoCategoryId): HomeFeatured[] {
-  const inCategory = (id: VideoCategoryId) => videos.filter((f) => f.video.category === id);
+  const featured = videos.filter((f) => f.video.featured);
   if (category === "all") {
-    return interleave(
-      videoCategories.filter((c) => c.id !== "all").map((c) => inCategory(c.id).filter((f) => f.video.featured)),
+    const ordered = featured.filter((f) => f.video.cardOrder !== undefined).sort(byCardOrder);
+    const rest = interleave(
+      videoCategories
+        .filter((c) => c.id !== "all")
+        .map((c) => featured.filter((f) => f.video.cardOrder === undefined && f.video.category === c.id)),
     );
+    return [...ordered, ...rest];
   }
-  const all = inCategory(category);
-  return [...all.filter((f) => f.video.featured), ...all.filter((f) => !f.video.featured)];
+  const inCategory = (f: HomeFeatured) => f.video.category === category;
+  return [
+    ...featured.filter(inCategory).sort(byCardOrder),
+    ...videos.filter((f) => inCategory(f) && !f.video.featured),
+  ];
 }
 
 /** The distance from one item of a scroller to the next. */
@@ -162,9 +176,17 @@ function useDragScroll<T extends HTMLElement = HTMLUListElement>() {
   return ref;
 }
 
-/** Hides a picture that fails to load, leaving the dark ground. */
+/** A picture that fails to load falls back to `data-fallback` (a card's
+    video frame, while its own art isn't uploaded yet), else is hidden,
+    leaving the dark ground. */
 const hide = (e: React.SyntheticEvent<HTMLImageElement>) => {
-  e.currentTarget.style.visibility = "hidden";
+  const img = e.currentTarget;
+  const fallback = img.dataset.fallback;
+  if (fallback && img.getAttribute("src") !== fallback) {
+    img.src = fallback;
+    return;
+  }
+  img.style.visibility = "hidden";
 };
 
 export interface VideosSectionProps {
@@ -482,6 +504,7 @@ export function VideosSection({ spotlight = homeSpotlight, videos = homeVideos }
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={video.cardThumbnail || video.thumbnail || video.poster}
+                      data-fallback={video.thumbnail || video.poster}
                       alt=""
                       loading="lazy"
                       decoding="async"

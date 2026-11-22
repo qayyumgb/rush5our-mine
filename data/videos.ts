@@ -94,9 +94,14 @@ export interface FeedVideo {
       or 9:16 (1080 × 1920) for a vertical one. Empty = the clip's own frame
       (`poster`). */
   thumbnail: string;
-  /** The homepage card's square picture (1:1, 1080 × 1080). Empty = the
+  /** The homepage card's square picture (1:1; the client's are on R2 as
+      `<video>-card.webp`, 800 × 800). Empty, or not uploaded yet = the
       centre of `thumbnail` / `poster`, cropped square. */
   cardThumbnail?: string;
+  /** A featured video's place among the cards' "All" tab — the client's card
+      numbers, so gaps are fine. Featured videos without one follow, the
+      series taken in turn. */
+  cardOrder?: number;
   /** Runtime as printed on the card's chip, e.g. "1:34". */
   duration: string;
   /** The video file's URL (Cloudflare R2). Empty = not uploaded: the
@@ -163,10 +168,10 @@ export const shortSeries: ShortSeries[] = [
     thumbnailAlt: "A man opening a red gift box — $5 or ?",
     platformUrl: "#", // PLACEHOLDER
     videos: [
-      { id: "five-or-mystery-gift-01", featured: true, category: "five-or-mystery-gift", title: "Episode 01", caption: "", orientation: "vertical", duration: "1:17", src: `${R2_BASE}/five-or-mystery-gift/01.mp4`, poster: `${R2_BASE}/five-or-mystery-gift/01.jpg`, thumbnail: "" },
-      { id: "five-or-mystery-gift-02", featured: true, category: "five-or-mystery-gift", title: "Episode 02", caption: "", orientation: "vertical", duration: "1:50", src: `${R2_BASE}/five-or-mystery-gift/02.mp4`, poster: `${R2_BASE}/five-or-mystery-gift/02.jpg`, thumbnail: "" },
-      { id: "five-or-mystery-gift-03", featured: true, category: "five-or-mystery-gift", title: "Episode 03", caption: "", orientation: "vertical", duration: "0:54", src: `${R2_BASE}/five-or-mystery-gift/03.mp4`, poster: `${R2_BASE}/five-or-mystery-gift/03.jpg`, thumbnail: "" },
-      { id: "five-or-mystery-gift-04", featured: true, category: "five-or-mystery-gift", title: "Episode 04", caption: "", orientation: "vertical", duration: "1:57", src: `${R2_BASE}/five-or-mystery-gift/04.mp4`, poster: `${R2_BASE}/five-or-mystery-gift/04.jpg`, thumbnail: "" },
+      { id: "five-or-mystery-gift-01", featured: true, category: "five-or-mystery-gift", title: "Episode 01", caption: "", orientation: "vertical", duration: "1:17", src: `${R2_BASE}/five-or-mystery-gift/01.mp4`, poster: `${R2_BASE}/five-or-mystery-gift/01.jpg`, thumbnail: "", cardOrder: 10, cardThumbnail: `${R2_BASE}/five-or-mystery-gift/01-card.webp` },
+      { id: "five-or-mystery-gift-02", featured: true, category: "five-or-mystery-gift", title: "Episode 02", caption: "", orientation: "vertical", duration: "1:50", src: `${R2_BASE}/five-or-mystery-gift/02.mp4`, poster: `${R2_BASE}/five-or-mystery-gift/02.jpg`, thumbnail: "", cardOrder: 16, cardThumbnail: `${R2_BASE}/five-or-mystery-gift/02-card.webp` },
+      { id: "five-or-mystery-gift-03", featured: true, category: "five-or-mystery-gift", title: "Episode 03", caption: "", orientation: "vertical", duration: "0:54", src: `${R2_BASE}/five-or-mystery-gift/03.mp4`, poster: `${R2_BASE}/five-or-mystery-gift/03.jpg`, thumbnail: "", cardOrder: 22, cardThumbnail: `${R2_BASE}/five-or-mystery-gift/03-card.webp` },
+      { id: "five-or-mystery-gift-04", featured: true, category: "five-or-mystery-gift", title: "Episode 04", caption: "", orientation: "vertical", duration: "1:57", src: `${R2_BASE}/five-or-mystery-gift/04.mp4`, poster: `${R2_BASE}/five-or-mystery-gift/04.jpg`, thumbnail: "", cardOrder: 28, cardThumbnail: `${R2_BASE}/five-or-mystery-gift/04-card.webp` },
       { id: "five-or-mystery-gift-05", category: "five-or-mystery-gift", title: "Episode 05", caption: "", orientation: "vertical", duration: "0:47", src: `${R2_BASE}/five-or-mystery-gift/05.mp4`, poster: `${R2_BASE}/five-or-mystery-gift/05.jpg`, thumbnail: "" },
       { id: "five-or-mystery-gift-06", category: "five-or-mystery-gift", title: "Episode 06", caption: "", orientation: "vertical", duration: "1:32", src: `${R2_BASE}/five-or-mystery-gift/06.mp4`, poster: `${R2_BASE}/five-or-mystery-gift/06.jpg`, thumbnail: "" },
       { id: "five-or-mystery-gift-07", category: "five-or-mystery-gift", title: "Episode 07", caption: "", orientation: "vertical", duration: "2:39", src: `${R2_BASE}/five-or-mystery-gift/07.mp4`, poster: `${R2_BASE}/five-or-mystery-gift/07.jpg`, thumbnail: "" },
@@ -189,10 +194,10 @@ export const shortSeries: ShortSeries[] = [
     thumbnailAlt: "A woman laughing at her phone with dollar bills falling — Bet $5",
     platformUrl: "#", // PLACEHOLDER
     videos: [
-      { id: "bet-five-01", featured: true, category: "bet-five", title: "Episode 01", caption: "", orientation: "vertical", duration: "1:35", src: `${R2_BASE}/bet-five/01.mp4`, poster: `${R2_BASE}/bet-five/01.jpg`, thumbnail: "" },
-      { id: "bet-five-02", featured: true, category: "bet-five", title: "Episode 02", caption: "", orientation: "vertical", duration: "1:08", src: `${R2_BASE}/bet-five/02.mp4`, poster: `${R2_BASE}/bet-five/02.jpg`, thumbnail: "" },
-      { id: "bet-five-03", featured: true, category: "bet-five", title: "Episode 03", caption: "", orientation: "vertical", duration: "1:15", src: `${R2_BASE}/bet-five/03.mp4`, poster: `${R2_BASE}/bet-five/03.jpg`, thumbnail: "" },
-      { id: "bet-five-04", featured: true, category: "bet-five", title: "Episode 04", caption: "", orientation: "vertical", duration: "1:11", src: `${R2_BASE}/bet-five/04.mp4`, poster: `${R2_BASE}/bet-five/04.jpg`, thumbnail: "" },
+      { id: "bet-five-01", featured: true, category: "bet-five", title: "Episode 01", caption: "", orientation: "vertical", duration: "1:35", src: `${R2_BASE}/bet-five/01.mp4`, poster: `${R2_BASE}/bet-five/01.jpg`, thumbnail: "", cardOrder: 11, cardThumbnail: `${R2_BASE}/bet-five/01-card.webp` },
+      { id: "bet-five-02", featured: true, category: "bet-five", title: "Episode 02", caption: "", orientation: "vertical", duration: "1:08", src: `${R2_BASE}/bet-five/02.mp4`, poster: `${R2_BASE}/bet-five/02.jpg`, thumbnail: "", cardOrder: 17, cardThumbnail: `${R2_BASE}/bet-five/02-card.webp` },
+      { id: "bet-five-03", featured: true, category: "bet-five", title: "Episode 03", caption: "", orientation: "vertical", duration: "1:15", src: `${R2_BASE}/bet-five/03.mp4`, poster: `${R2_BASE}/bet-five/03.jpg`, thumbnail: "", cardOrder: 23, cardThumbnail: `${R2_BASE}/bet-five/03-card.webp` },
+      { id: "bet-five-04", featured: true, category: "bet-five", title: "Episode 04", caption: "", orientation: "vertical", duration: "1:11", src: `${R2_BASE}/bet-five/04.mp4`, poster: `${R2_BASE}/bet-five/04.jpg`, thumbnail: "", cardOrder: 29, cardThumbnail: `${R2_BASE}/bet-five/04-card.webp` },
       { id: "bet-five-05", category: "bet-five", title: "Episode 05", caption: "", orientation: "vertical", duration: "2:24", src: `${R2_BASE}/bet-five/05.mp4`, poster: `${R2_BASE}/bet-five/05.jpg`, thumbnail: "" },
       { id: "bet-five-06", category: "bet-five", title: "Episode 06", caption: "", orientation: "vertical", duration: "1:14", src: `${R2_BASE}/bet-five/06.mp4`, poster: `${R2_BASE}/bet-five/06.jpg`, thumbnail: "" },
       { id: "bet-five-07", category: "bet-five", title: "Episode 07", caption: "", orientation: "vertical", duration: "2:38", src: `${R2_BASE}/bet-five/07.mp4`, poster: `${R2_BASE}/bet-five/07.jpg`, thumbnail: "" },
@@ -215,10 +220,10 @@ export const shortSeries: ShortSeries[] = [
     thumbnailAlt: "A RUSH5OUR QR code poster outside Valencia College — Rush Hunts",
     platformUrl: "#", // PLACEHOLDER
     videos: [
-      { id: "rush-hunts-01-boone", featured: true, category: "rush-hunts", title: "Boone", caption: "", orientation: "vertical", duration: "0:34", src: `${R2_BASE}/rush-hunts/01-boone.mp4`, poster: `${R2_BASE}/rush-hunts/01-boone.jpg`, thumbnail: "" },
-      { id: "rush-hunts-02-edgewater", featured: true, category: "rush-hunts", title: "Edgewater", caption: "", orientation: "vertical", duration: "0:33", src: `${R2_BASE}/rush-hunts/02-edgewater.mp4`, poster: `${R2_BASE}/rush-hunts/02-edgewater.jpg`, thumbnail: "" },
-      { id: "rush-hunts-03-jones", featured: true, category: "rush-hunts", title: "Jones", caption: "", orientation: "vertical", duration: "0:34", src: `${R2_BASE}/rush-hunts/03-jones.mp4`, poster: `${R2_BASE}/rush-hunts/03-jones.jpg`, thumbnail: "" },
-      { id: "rush-hunts-04-colonial", featured: true, category: "rush-hunts", title: "Colonial", caption: "", orientation: "vertical", duration: "0:32", src: `${R2_BASE}/rush-hunts/04-colonial.mp4`, poster: `${R2_BASE}/rush-hunts/04-colonial.jpg`, thumbnail: "" },
+      { id: "rush-hunts-01-boone", featured: true, category: "rush-hunts", title: "Boone", caption: "", orientation: "vertical", duration: "0:34", src: `${R2_BASE}/rush-hunts/01-boone.mp4`, poster: `${R2_BASE}/rush-hunts/01-boone.jpg`, thumbnail: "", cardOrder: 9, cardThumbnail: `${R2_BASE}/rush-hunts/01-boone-card.webp` },
+      { id: "rush-hunts-02-edgewater", featured: true, category: "rush-hunts", title: "Edgewater", caption: "", orientation: "vertical", duration: "0:33", src: `${R2_BASE}/rush-hunts/02-edgewater.mp4`, poster: `${R2_BASE}/rush-hunts/02-edgewater.jpg`, thumbnail: "", cardOrder: 15, cardThumbnail: `${R2_BASE}/rush-hunts/02-edgewater-card.webp` },
+      { id: "rush-hunts-03-jones", featured: true, category: "rush-hunts", title: "Jones", caption: "", orientation: "vertical", duration: "0:34", src: `${R2_BASE}/rush-hunts/03-jones.mp4`, poster: `${R2_BASE}/rush-hunts/03-jones.jpg`, thumbnail: "", cardOrder: 21, cardThumbnail: `${R2_BASE}/rush-hunts/03-jones-card.webp` },
+      { id: "rush-hunts-04-colonial", featured: true, category: "rush-hunts", title: "Colonial", caption: "", orientation: "vertical", duration: "0:32", src: `${R2_BASE}/rush-hunts/04-colonial.mp4`, poster: `${R2_BASE}/rush-hunts/04-colonial.jpg`, thumbnail: "", cardOrder: 27, cardThumbnail: `${R2_BASE}/rush-hunts/04-colonial-card.webp` },
       { id: "rush-hunts-05-oak-ridge", category: "rush-hunts", title: "Oak Ridge", caption: "", orientation: "vertical", duration: "0:25", src: `${R2_BASE}/rush-hunts/05-oak-ridge.mp4`, poster: `${R2_BASE}/rush-hunts/05-oak-ridge.jpg`, thumbnail: "" },
       { id: "rush-hunts-06-apopka", category: "rush-hunts", title: "Apopka", caption: "", orientation: "vertical", duration: "0:20", src: `${R2_BASE}/rush-hunts/06-apopka.mp4`, poster: `${R2_BASE}/rush-hunts/06-apopka.jpg`, thumbnail: "" },
       { id: "rush-hunts-07-wekiva", category: "rush-hunts", title: "Wekiva", caption: "", orientation: "vertical", duration: "0:28", src: `${R2_BASE}/rush-hunts/07-wekiva.mp4`, poster: `${R2_BASE}/rush-hunts/07-wekiva.jpg`, thumbnail: "" },
@@ -241,10 +246,10 @@ export const shortSeries: ShortSeries[] = [
     thumbnailAlt: "A man and a woman talking across a café table — You got game?",
     platformUrl: "#", // PLACEHOLDER
     videos: [
-      { id: "you-got-game-01", featured: true, category: "you-got-game", title: "Episode 01", caption: "", orientation: "vertical", duration: "1:21", src: `${R2_BASE}/you-got-game/01.mp4`, poster: `${R2_BASE}/you-got-game/01.jpg`, thumbnail: "" },
-      { id: "you-got-game-02", featured: true, category: "you-got-game", title: "Episode 02", caption: "", orientation: "vertical", duration: "1:34", src: `${R2_BASE}/you-got-game/02.mp4`, poster: `${R2_BASE}/you-got-game/02.jpg`, thumbnail: "" },
-      { id: "you-got-game-03", featured: true, category: "you-got-game", title: "Episode 03", caption: "", orientation: "vertical", duration: "1:46", src: `${R2_BASE}/you-got-game/03.mp4`, poster: `${R2_BASE}/you-got-game/03.jpg`, thumbnail: "" },
-      { id: "you-got-game-04", featured: true, category: "you-got-game", title: "Episode 04", caption: "", orientation: "vertical", duration: "0:53", src: `${R2_BASE}/you-got-game/04.mp4`, poster: `${R2_BASE}/you-got-game/04.jpg`, thumbnail: "" },
+      { id: "you-got-game-01", featured: true, category: "you-got-game", title: "Episode 01", caption: "", orientation: "vertical", duration: "1:21", src: `${R2_BASE}/you-got-game/01.mp4`, poster: `${R2_BASE}/you-got-game/01.jpg`, thumbnail: "", cardOrder: 12, cardThumbnail: `${R2_BASE}/you-got-game/01-card.webp` },
+      { id: "you-got-game-02", featured: true, category: "you-got-game", title: "Episode 02", caption: "", orientation: "vertical", duration: "1:34", src: `${R2_BASE}/you-got-game/02.mp4`, poster: `${R2_BASE}/you-got-game/02.jpg`, thumbnail: "", cardOrder: 18, cardThumbnail: `${R2_BASE}/you-got-game/02-card.webp` },
+      { id: "you-got-game-03", featured: true, category: "you-got-game", title: "Episode 03", caption: "", orientation: "vertical", duration: "1:46", src: `${R2_BASE}/you-got-game/03.mp4`, poster: `${R2_BASE}/you-got-game/03.jpg`, thumbnail: "", cardOrder: 24, cardThumbnail: `${R2_BASE}/you-got-game/03-card.webp` },
+      { id: "you-got-game-04", featured: true, category: "you-got-game", title: "Episode 04", caption: "", orientation: "vertical", duration: "0:53", src: `${R2_BASE}/you-got-game/04.mp4`, poster: `${R2_BASE}/you-got-game/04.jpg`, thumbnail: "", cardOrder: 30, cardThumbnail: `${R2_BASE}/you-got-game/04-card.webp` },
       { id: "you-got-game-05", category: "you-got-game", title: "Episode 05", caption: "", orientation: "vertical", duration: "1:11", src: `${R2_BASE}/you-got-game/05.mp4`, poster: `${R2_BASE}/you-got-game/05.jpg`, thumbnail: "" },
       { id: "you-got-game-06", category: "you-got-game", title: "Episode 06", caption: "", orientation: "vertical", duration: "1:56", src: `${R2_BASE}/you-got-game/06.mp4`, poster: `${R2_BASE}/you-got-game/06.jpg`, thumbnail: "" },
       { id: "you-got-game-07", category: "you-got-game", title: "Episode 07", caption: "", orientation: "vertical", duration: "0:58", src: `${R2_BASE}/you-got-game/07.mp4`, poster: `${R2_BASE}/you-got-game/07.jpg`, thumbnail: "" },
@@ -267,10 +272,10 @@ export const shortSeries: ShortSeries[] = [
     thumbnailAlt: "Two men reacting to Drake — Maid of Honour",
     platformUrl: "#", // PLACEHOLDER
     videos: [
-      { id: "rush-reacts-01-hoe-phase", featured: true, category: "rush-reacts", title: "Hoe Phase", caption: "", orientation: "vertical", duration: "0:29", src: `${R2_BASE}/rush-reacts/01-hoe-phase.mp4`, poster: `${R2_BASE}/rush-reacts/01-hoe-phase.jpg`, thumbnail: "" },
-      { id: "rush-reacts-02-road-trips", featured: true, category: "rush-reacts", title: "Road Trips", caption: "", orientation: "vertical", duration: "0:25", src: `${R2_BASE}/rush-reacts/02-road-trips.mp4`, poster: `${R2_BASE}/rush-reacts/02-road-trips.jpg`, thumbnail: "" },
-      { id: "rush-reacts-03-outside-tweaking", featured: true, category: "rush-reacts", title: "Outside Tweaking", caption: "", orientation: "vertical", duration: "0:31", src: `${R2_BASE}/rush-reacts/03-outside-tweaking.mp4`, poster: `${R2_BASE}/rush-reacts/03-outside-tweaking.jpg`, thumbnail: "" },
-      { id: "rush-reacts-04-outside-tweaking", featured: true, category: "rush-reacts", title: "Outside Tweaking", caption: "", orientation: "vertical", duration: "0:22", src: `${R2_BASE}/rush-reacts/04-outside-tweaking.mp4`, poster: `${R2_BASE}/rush-reacts/04-outside-tweaking.jpg`, thumbnail: "" },
+      { id: "rush-reacts-01-hoe-phase", featured: true, category: "rush-reacts", title: "Hoe Phase", caption: "", orientation: "vertical", duration: "0:29", src: `${R2_BASE}/rush-reacts/01-hoe-phase.mp4`, poster: `${R2_BASE}/rush-reacts/01-hoe-phase.jpg`, thumbnail: "", cardOrder: 13, cardThumbnail: `${R2_BASE}/rush-reacts/01-hoe-phase-card.webp` },
+      { id: "rush-reacts-02-road-trips", featured: true, category: "rush-reacts", title: "Road Trips", caption: "", orientation: "vertical", duration: "0:25", src: `${R2_BASE}/rush-reacts/02-road-trips.mp4`, poster: `${R2_BASE}/rush-reacts/02-road-trips.jpg`, thumbnail: "", cardOrder: 19, cardThumbnail: `${R2_BASE}/rush-reacts/02-road-trips-card.webp` },
+      { id: "rush-reacts-03-outside-tweaking", featured: true, category: "rush-reacts", title: "Outside Tweaking", caption: "", orientation: "vertical", duration: "0:31", src: `${R2_BASE}/rush-reacts/03-outside-tweaking.mp4`, poster: `${R2_BASE}/rush-reacts/03-outside-tweaking.jpg`, thumbnail: "", cardOrder: 25, cardThumbnail: `${R2_BASE}/rush-reacts/03-outside-tweaking-card.webp` },
+      { id: "rush-reacts-04-outside-tweaking", featured: true, category: "rush-reacts", title: "Outside Tweaking", caption: "", orientation: "vertical", duration: "0:22", src: `${R2_BASE}/rush-reacts/04-outside-tweaking.mp4`, poster: `${R2_BASE}/rush-reacts/04-outside-tweaking.jpg`, thumbnail: "", cardOrder: 31, cardThumbnail: `${R2_BASE}/rush-reacts/04-outside-tweaking-card.webp` },
       { id: "rush-reacts-05-cheetah-print", category: "rush-reacts", title: "Cheetah Print", caption: "", orientation: "vertical", duration: "0:12", src: `${R2_BASE}/rush-reacts/05-cheetah-print.mp4`, poster: `${R2_BASE}/rush-reacts/05-cheetah-print.jpg`, thumbnail: "" },
       { id: "rush-reacts-06-which-one", category: "rush-reacts", title: "Which One", caption: "", orientation: "vertical", duration: "0:34", src: `${R2_BASE}/rush-reacts/06-which-one.mp4`, poster: `${R2_BASE}/rush-reacts/06-which-one.jpg`, thumbnail: "" },
       { id: "rush-reacts-07-amazing-shape", category: "rush-reacts", title: "Amazing Shape", caption: "", orientation: "vertical", duration: "0:20", src: `${R2_BASE}/rush-reacts/07-amazing-shape.mp4`, poster: `${R2_BASE}/rush-reacts/07-amazing-shape.jpg`, thumbnail: "" },
@@ -320,9 +325,28 @@ export const pickingUpGirls: LongSeries = {
   platformUrl: "https://www.youtube.com/@RUSH5OUR", // PLACEHOLDER — the series' playlist
   featuredId: "picking-up-girls-02-using-chatgpt",
   cards: 4,
-  /* The client's numbering is kept (episodes 1, 4, 7, 9 and 10 were not
+  /* The client's numbering is kept (episodes 4, 7, 9 and 10 were not
      supplied). Streams from R2 at 720p, encoded from the 4K masters. */
   videos: [
+    {
+      id: "picking-up-girls-01-in-30-seconds",
+      featured: true,
+      featuredOrder: 1,
+      category: "picking-up-girls",
+      number: "01",
+      title: "Picking Up Girls In 30 Seconds",
+      caption: "",
+      orientation: "horizontal",
+      src: `${R2_BASE}/picking-up-girls/01-in-30-seconds.mp4`,
+      cardOrder: 5,
+      cardThumbnail: `${R2_BASE}/picking-up-girls/01-in-30-seconds-card.webp`,
+      poster: `${R2_BASE}/picking-up-girls/01-in-30-seconds.jpg`,
+      cardTitle: [[{ text: "Picking up girls" }], [{ text: "in " }, { text: "30 seconds", red: true }]],
+      description: ["The clock is running.", "Where it all started."], // PLACEHOLDER copy
+      duration: "6:32",
+      thumbnail: `${R2_BASE}/picking-up-girls/01-in-30-seconds.jpg`, // the client's thumbnail
+      thumbnailAlt: "Picking Up Girls In 30 Seconds",
+    },
     {
       id: "picking-up-girls-02-using-chatgpt",
       featured: true,
@@ -333,6 +357,8 @@ export const pickingUpGirls: LongSeries = {
       caption: "",
       orientation: "horizontal",
       src: `${R2_BASE}/picking-up-girls/02-using-chatgpt.mp4`,
+      cardOrder: 8,
+      cardThumbnail: `${R2_BASE}/picking-up-girls/02-using-chatgpt-card.webp`,
       poster: `${R2_BASE}/picking-up-girls/02-using-chatgpt.jpg`,
       cardTitle: [[{ text: "Picking up girls" }], [{ text: "using " }, { text: "ChatGPT", red: true }]],
       description: ["AI writes the lines.","Real people answer."], // PLACEHOLDER copy
@@ -349,6 +375,8 @@ export const pickingUpGirls: LongSeries = {
       caption: "",
       orientation: "horizontal",
       src: `${R2_BASE}/picking-up-girls/03-using-siri.mp4`,
+      cardOrder: 14,
+      cardThumbnail: `${R2_BASE}/picking-up-girls/03-using-siri-card.webp`,
       poster: `${R2_BASE}/picking-up-girls/03-using-siri.jpg`,
       cardTitle: [[{ text: "Picking up girls" }], [{ text: "using " }, { text: "Siri", red: true }]],
       description: ["Smooth or awkward?","Let’s find out..."], // PLACEHOLDER copy
@@ -426,6 +454,8 @@ export const pickingUpGirls: LongSeries = {
       caption: "",
       orientation: "horizontal",
       src: `${R2_BASE}/picking-up-girls/12-with-a-magic-8-ball.mp4`,
+      cardOrder: 20,
+      cardThumbnail: `${R2_BASE}/picking-up-girls/12-with-a-magic-8-ball-card.webp`,
       poster: `${R2_BASE}/picking-up-girls/12-with-a-magic-8-ball.jpg`,
       cardTitle: [[{ text: "Picking up girls" }], [{ text: "with a " }, { text: "Magic 8 Ball", red: true }]],
       description: ["Every move decided","by the ball."], // PLACEHOLDER copy
@@ -458,6 +488,8 @@ export const pickingUpGirls: LongSeries = {
       caption: "",
       orientation: "horizontal",
       src: `${R2_BASE}/picking-up-girls/14-using-airdrop.mp4`,
+      cardOrder: 26,
+      cardThumbnail: `${R2_BASE}/picking-up-girls/14-using-airdrop-card.webp`,
       poster: `${R2_BASE}/picking-up-girls/14-using-airdrop.jpg`,
       cardTitle: [[{ text: "Picking up girls" }], [{ text: "using " }, { text: "AirDrop", red: true }]],
       description: ["No words.","Just a notification."], // PLACEHOLDER copy
@@ -468,16 +500,14 @@ export const pickingUpGirls: LongSeries = {
     {
       id: "picking-up-girls-15-in-30-seconds-part-8",
       featured: true,
-      // PLACEHOLDER — slot 1 belongs to the series' first video, "Picking Up
-      // Girls in 30 Seconds" (episode 1), not supplied yet. When it's added,
-      // give it `featured: true, featuredOrder: 1` and remove this one's.
-      featuredOrder: 1,
       category: "picking-up-girls",
       number: "15",
       title: "Picking Up Girls In 30 Seconds (Part 8)",
       caption: "",
       orientation: "horizontal",
       src: `${R2_BASE}/picking-up-girls/15-in-30-seconds-part-8.mp4`,
+      cardOrder: 32,
+      cardThumbnail: `${R2_BASE}/picking-up-girls/15-in-30-seconds-part-8-card.webp`,
       poster: `${R2_BASE}/picking-up-girls/15-in-30-seconds-part-8.jpg`,
       cardTitle: [[{ text: "Picking up girls" }], [{ text: "in " }, { text: "30 seconds", red: true }]],
       description: ["The clock is running.","Part 8."], // PLACEHOLDER copy
